@@ -2493,8 +2493,50 @@ model="models/flags/b_flag.md3"
 	},
 
     {
-        "powerup_noslow",
+        "powerup",
         "sound/misc/am_pkup.wav",
+        { 
+            "models/satchelrace/powerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "No slow",		// pickup
+        0,
+        IT_POWERUP,
+        NUM_SR_POWERUP_TYPES,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "randompowerup",
+            "sound/misc/am_pkup.wav",
+        { 
+            "models/satchelrace/randompowerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "No slow",		// pickup
+        0,
+        IT_POWERUP,
+        PW_RANDOM,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "startpoint",
+            "",
         { 
             "models/satchelrace/startpoint.md3",
                 0,
@@ -2505,7 +2547,49 @@ model="models/flags/b_flag.md3"
         "No slow",		// pickup
         0,
         IT_POWERUP,
-        PW_NOSLOW,
+        ROUTE_STARTPOINT,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "endpoint",
+            "",
+        { 
+            "models/satchelrace/endpoint.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "No slow",		// pickup
+        0,
+        IT_POWERUP,
+        ROUTE_ENDPOINT,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "checkpoint",
+            "",
+        { 
+            "models/satchelrace/checkpoint.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "No slow",		// pickup
+        0,
+        IT_POWERUP,
+        ROUTE_CHECKPOINT,
         0,
         0,
         "",					// precache

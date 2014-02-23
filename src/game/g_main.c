@@ -3872,6 +3872,7 @@ void CheckSatchelRunStatus()
             int i = 0;
             for(; i < level.numConnectedClients; i++)
             {
+                int j = 0;
                 int clientNum = level.sortedClients[i];
                 gentity_t *target = g_entities + clientNum;
 
@@ -3882,6 +3883,11 @@ void CheckSatchelRunStatus()
 
                     target->client->sess.racing = qtrue;
                     target->client->sess.raceStartTime = level.time;
+
+                    for(j = 0; j < level.numCheckpoints; j++)
+                    {
+                        target->client->sess.checkpointVisited[j] = qfalse;
+                    }
                 }
             }
 

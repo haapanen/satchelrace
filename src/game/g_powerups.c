@@ -15,6 +15,8 @@ gentity_t *spawner_slow( gentity_t *spawner, void (*think)(gentity_t *self) );
 gentity_t *spawner_gravity( gentity_t *spawner, void (*think)(gentity_t *self) );
 gentity_t *spawner_satchelUnboost( gentity_t *spawner, void (*think)(gentity_t *self) );
 gentity_t *spawner_root( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *spawner_random( gentity_t *spawner, void (*think)(gentity_t *self) );
+
 
 void think_noSlow( gentity_t *self );
 void think_lowGravity( gentity_t *self );
@@ -23,6 +25,7 @@ void think_satchelBoost( gentity_t *self );
 void think_satchelUnboost( gentity_t *self );
 void think_slow( gentity_t *self );
 void think_gravity( gentity_t *self );
+void think_random( gentity_t *self );
 
 static const Powerup_t powerups[] = {
     {"noslow", "No Slow", spawner_noSlow, think_noSlow},
@@ -214,7 +217,7 @@ void think_noSlow( gentity_t *self )
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
     
-    item = BG_FindItemForPowerup( PW_NOSLOW );
+    item = BG_FindItemForPowerup( PW_RANDOM );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -244,7 +247,7 @@ void think_lowGravity( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_NOSLOW );
+    item = BG_FindItemForPowerup( PW_RANDOM );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -276,7 +279,7 @@ void think_root( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_NOSLOW );
+    item = BG_FindItemForPowerup( PW_RANDOM );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -306,7 +309,7 @@ void think_satchelBoost( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_NOSLOW );
+    item = BG_FindItemForPowerup( PW_RANDOM );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -349,7 +352,7 @@ void think_satchelUnboost( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_NOSLOW );
+    item = BG_FindItemForPowerup( PW_RANDOM );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -392,7 +395,7 @@ void think_slow( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_NOSLOW );
+    item = BG_FindItemForPowerup( PW_RANDOM );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -435,7 +438,7 @@ void think_gravity( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_NOSLOW );
+    item = BG_FindItemForPowerup( PW_RANDOM );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -444,7 +447,6 @@ void think_gravity( gentity_t *self )
 
     self->child = DropPowerup(self, item, TouchPowerupGravity, qfalse);
 }
-
 
 void Cmd_Powerup_f( gentity_t * ent ) 
 {
