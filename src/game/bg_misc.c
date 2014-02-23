@@ -2492,6 +2492,23 @@ model="models/flags/b_flag.md3"
 //		{0,0,0,0,0}
 	},
 
+    {
+        "powerup_noslow",
+            "",
+        { "models/powerups/ammo/am30cal_s.md3", 0, 0},
+        "",	// icon
+        NULL,						// ammo icon
+        "No slow",			// pickup
+        5,
+        IT_HOLDABLE,
+        HI_NOSLOW,
+        0,
+        0,
+        "",							// precache
+        "",							// sounds
+        //		{5,2,2,2}
+    },
+
 	//---- (SA) Wolf keys
 
 /* QUAKED key_1 (1 1 0) (-8 -8 -8) (8 8 8) SUSPENDED SPIN - RESPAWN
@@ -3184,6 +3201,9 @@ qboolean	BG_CanItemBeGrabbed( const entityState_t *ent, const playerState_t *ps,
 
 	case IT_KEY:
 		return qtrue;	// keys are always picked up
+
+    case IT_POWERUP:
+        return qtrue;
 
 	case IT_BAD:
 		Com_Error( ERR_DROP, "BG_CanItemBeGrabbed: IT_BAD" );

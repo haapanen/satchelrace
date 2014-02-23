@@ -766,6 +766,7 @@ typedef enum {
 	HI_12,
 	HI_13,
 	HI_14,
+    HI_NOSLOW,
 //	HI_15,	// ?
 
 	HI_NUM_HOLDABLE
@@ -1506,6 +1507,7 @@ typedef enum {
 	IT_KEY,
 	IT_TREASURE,			// gold bars, etc.  things that can be picked up and counted for a tally at end-level
 	IT_TEAM,
+    IT_POWERUP,
 } itemType_t;
 
 #define MAX_ITEM_MODELS 3

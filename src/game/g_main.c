@@ -3846,6 +3846,18 @@ void CheckSatchelRunStatus()
                     target->client->sess.raceStartTime = level.time;
                 }
             }
+
+            for(i = 0; i < level.numPowerups; i++)
+            {
+                if(level.powerups[i])
+                {
+                    level.powerups[i]->think(level.powerups[i]);
+                } else
+                {
+                    G_Printf("error: powerup didn't exist.\n");
+                }
+            }
+
             level.raceIsStarting = qfalse;
             trap_SendServerCommand(-1, "cp \"^5Race started!\n\"");
         }
