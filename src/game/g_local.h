@@ -632,7 +632,7 @@ typedef struct {
     int lastRouteSpotTime;
     int timeBetweenRouteSpotsMS;
 	int timeBetweenRouteSpotsSec;
-	int travelTime;
+
 
 	qboolean	versionOK;
 } clientSession_t;
