@@ -3574,6 +3574,11 @@ void RouteMakerCheckpoints( gentity_t * ent )
     checkpoint->position = level.numCheckpoints;
     checkpoint->think = CheckRacersNearCP;
     checkpoint->nextthink = level.time + FRAMETIME;
+    // Experimentary
+    checkpoint->s.eType = ET_ITEM;
+    checkpoint->item = BG_FindItemForPowerup( ROUTE_CHECKPOINT );
+    checkpoint->s.modelindex = checkpoint->item - bg_itemlist;
+    checkpoint->s.otherEntityNum2 = 1;
     if(trap_Argc() == 2)
     {
         checkpoint->horizontalRange = sr_defaultEndAreaRange.integer;
@@ -3641,10 +3646,13 @@ void RouteMakerCheckpoints( gentity_t * ent )
         }
         CP(va("cp \"^5Added a checkpoint (%d, %d)\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
     }
+        
+    G_SetOrigin(checkpoint, ent->r.currentOrigin);
+    G_SetAngle(checkpoint, ent->r.currentAngles);
 
-   
-    VectorCopy( ent->r.currentOrigin, checkpoint->r.currentOrigin );
-    VectorCopy( ent->client->ps.viewangles, checkpoint->r.currentAngles );
+    trap_LinkEntity(checkpoint);
+//     VectorCopy( ent->r.currentOrigin, checkpoint->r.currentOrigin );
+//     VectorCopy( ent->client->ps.viewangles, checkpoint->r.currentAngles );
     level.checkpoints[level.numCheckpoints] = checkpoint;
     level.numCheckpoints++;
     CP(va("cp \"^5Added a checkpoint (%d, %d).\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
@@ -3663,17 +3671,14 @@ void RouteMakerBegin( gentity_t * ent )
 
     begin = G_Spawn();
     begin->classname = "route_begin";
-    // begin->item = item;
     // Experimentary
-    // begin->s.eType = ET_ITEM;        
-    // begin->s.modelindex = item - bg_itemlist;
-    // begin->s.modelindex2 = 1;
-    VectorCopy( ent->r.currentOrigin, begin->r.currentOrigin );
+    begin->s.eType = ET_ITEM;
+    begin->item = BG_FindItemForPowerup( ROUTE_STARTPOINT );
+    begin->s.modelindex = begin->item - bg_itemlist;
+    begin->s.otherEntityNum2 = 1;
     G_SetOrigin(begin, ent->r.currentOrigin);
     G_SetAngle(begin, ent->client->ps.viewangles);
-    // G_SetOrigin( begin, begin->r.currentOrigin );
-    // trap_LinkEntity(begin);
-    // End of experimentary
+    trap_LinkEntity(begin);
 
     level.routeBegin = begin;
     CP("cp \"^5Added a start spot\n\"");
@@ -3695,8 +3700,13 @@ void RouteMakerEnd( gentity_t *ent )
     end->think = CheckWinner;
     end->nextthink = level.time + FRAMETIME;
 
-    VectorCopy( ent->r.currentOrigin, end->r.currentOrigin );
-    VectorCopy( ent->client->ps.viewangles, end->r.currentAngles );
+    end->s.eType = ET_ITEM;
+    end->item = BG_FindItemForPowerup( ROUTE_ENDPOINT );
+    end->s.modelindex = end->item - bg_itemlist;
+    end->s.otherEntityNum2 = 1;
+    G_SetOrigin(end, ent->r.currentOrigin);
+    G_SetAngle(end, ent->client->ps.viewangles);
+    trap_LinkEntity(end);
     level.routeEnd = end;
 
 
