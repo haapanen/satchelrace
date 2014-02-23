@@ -266,8 +266,14 @@ vmCvar_t sr_pw_lowGravity;
 
 vmCvar_t sr_pw_rootDuration;
 
-vmCvar_t sr_pw_knockback;
+vmCvar_t sr_pw_satchelBoostKnockback;
 vmCvar_t sr_pw_satchelBoost;
+
+vmCvar_t sr_pw_satchelUnboost;
+vmCvar_t sr_pw_satchelUnboostKnockback;
+
+vmCvar_t sr_pw_slowDuration;
+vmCvar_t sr_pw_slowPercent;
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -533,8 +539,14 @@ cvarTable_t		gameCvarTable[] = {
 
     { &sr_pw_rootDuration, "sr_pw_rootDuration", "3000", CVAR_ARCHIVE },
 
-    { &sr_pw_knockback, "sr_pw_knockback", "2", CVAR_ARCHIVE},
-    { &sr_pw_satchelBoost, "sr_pw_satchelBoost", "3", CVAR_ARCHIVE }
+    { &sr_pw_satchelBoostKnockback, "sr_pw_knockback", "2", CVAR_ARCHIVE},
+    { &sr_pw_satchelBoost, "sr_pw_satchelBoost", "3", CVAR_ARCHIVE },
+
+    { &sr_pw_satchelUnboost, "sr_pw_satchelUnboost", "3", CVAR_ARCHIVE },
+    { &sr_pw_satchelUnboostKnockback, "sr_pw_satchelUnboostKnockback", "0.5", CVAR_ARCHIVE },
+
+    { &sr_pw_slowDuration, "sr_pw_slowDuration", "5000", CVAR_ARCHIVE },
+    { &sr_pw_slowPercent, "sr_pw_slowPercent", "50", CVAR_ARCHIVE}
 };
 
 // bk001129 - made static to avoid aliasing

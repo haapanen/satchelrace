@@ -2494,9 +2494,9 @@ model="models/flags/b_flag.md3"
 
     {
         "powerup_noslow",
-            "",
+        "sound/misc/am_pkup.wav",
         { 
-            "models/powerups/ammo/am30cal_s.md3",
+            "models/satchelrace/startpoint.md3",
                 0,
                 0
         },

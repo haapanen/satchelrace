@@ -1496,6 +1496,8 @@ typedef enum {
     PW_LOWGRAVITY,
     PW_ROOT_PROTECTION,
     PW_SATCHELBOOST,
+    PW_SATCHELUNBOOST,
+    PW_SLOW,
     NUM_SR_POWERUP_TYPES
 } satchelRacePowerup_t;
 
