@@ -1384,11 +1384,16 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	knockback = damage;
     if( mod != MOD_FALLING && targ->client )
     {
+        if( inflictor->parent->client && inflictor->parent->client->powerups[PW_SATCHELBOOST] )
+        {
+            knockback = knockback * sr_pw_knockback.value;
+        }
         damage = 0;
     }
-	if ( knockback > 200 ) {
-		knockback = 200;
-	}
+// Zero: not needed
+// 	if ( knockback > 200 ) {
+// 		knockback = 200;
+// 	}
 	if ( targ->flags & FL_NO_KNOCKBACK ) {
 		knockback = 0;
 	}

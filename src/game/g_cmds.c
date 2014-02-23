@@ -3488,6 +3488,7 @@ void CheckWinner(gentity_t *self)
 
         if( ent->client->sess.racing )
         {
+            int i = 0;
             int msec = 0;
             int sec = 0;
             int min = 0;
@@ -3499,6 +3500,11 @@ void CheckWinner(gentity_t *self)
             trap_SendServerCommand(-1, va("cpm \"%s ^7reached the end in %02d:%02d:%03d.\n\"", 
                 ent->client->pers.netname, min, sec, msec));
             ent->client->sess.racing = qfalse;
+            // Reset powerups
+            for(; i < NUM_SR_POWERUP_TYPES; i++)
+            {
+                ent->client->powerups[i] = 0;
+            }
         } 
     }
 

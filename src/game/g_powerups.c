@@ -19,11 +19,12 @@ gentity_t *spawner_root( gentity_t *spawner, void (*think)(gentity_t *self) );
 void think_noSlow( gentity_t *self );
 void think_lowGravity( gentity_t *self );
 void think_root( gentity_t *self );
+void think_satchelBoost( gentity_t *self );
 
 static const Powerup_t powerups[] = {
     {"noslow", "No Slow", spawner_noSlow, think_noSlow},
     {"lowgravity", "Low Gravity", spawner_lowGravity, think_lowGravity},
-    {"satchelboost", "Satchel Boost", spawner_satchelBoost, NULL},
+    {"satchelboost", "Satchel Boost", spawner_satchelBoost, think_satchelBoost},
     {"slow", "Slow Others", spawner_slow, NULL},
     {"gravity", "Gravity", spawner_gravity, NULL},
     {"satchelunboost", "Satchel Unboost", spawner_satchelUnboost, NULL},
@@ -137,7 +138,12 @@ gentity_t * spawner_lowGravity( gentity_t *spawner, void (*think)(gentity_t *sel
 
 gentity_t * spawner_satchelBoost( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
-
+    gentity_t *powerupSpawner = G_Spawn();
+    powerupSpawner->classname = "powerup_satchelboost_spawner";
+    powerupSpawner->think = think;
+    powerupSpawner->child = NULL;
+    G_SetOrigin(powerupSpawner, spawner->r.currentOrigin);
+    return powerupSpawner;
 }
 
 gentity_t * spawner_slow( gentity_t *spawner, void (*think)(gentity_t *self) )
@@ -260,6 +266,36 @@ void think_root( gentity_t *self )
     }
 
     self->child = DropPowerup(self, item, TouchPowerupRoot, qfalse);
+}
+
+void TouchPowerupSatchelBoost(gentity_t *self, gentity_t *player, trace_t *trace)
+{
+    if(!player->client)
+    {
+        return;
+    }
+
+    player->client->powerups[PW_SATCHELBOOST] = sr_pw_satchelBoost.integer;
+
+    AP(va("cpm \"%s ^7picked up a ^5Satchel Boost ^7powerup\n\"", player->client->pers.netname));
+    self->parent->child = NULL;
+    G_FreeEntity(self);
+}
+
+void think_satchelBoost( gentity_t *self )
+{
+    gitem_t *item = NULL;
+    gentity_t *dropped = NULL;
+
+    // FIXME: wrong PW_
+    item = BG_FindItemForPowerup( PW_NOSLOW );
+    if(!item)
+    {
+        G_Printf("Error: couldn't find powerup.\n");
+        return;
+    }
+
+    self->child = DropPowerup(self, item, TouchPowerupSatchelBoost, qfalse);
 }
 
 void Cmd_Powerup_f( gentity_t * ent ) 
