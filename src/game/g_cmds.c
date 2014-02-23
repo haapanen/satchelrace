@@ -3638,6 +3638,7 @@ void RouteMakerCheckpoints( gentity_t * ent )
 
    
     VectorCopy( ent->r.currentOrigin, checkpoint->r.currentOrigin );
+    VectorCopy( ent->r.currentAngles, checkpoint->r.currentAngles );
     level.checkpoints[level.numCheckpoints] = checkpoint;
     level.numCheckpoints++;
     CP(va("cp \"^5Added a checkpoint (%d, %d).\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
@@ -3662,6 +3663,8 @@ void RouteMakerBegin( gentity_t * ent )
     // begin->s.modelindex = item - bg_itemlist;
     // begin->s.modelindex2 = 1;
     VectorCopy( ent->r.currentOrigin, begin->r.currentOrigin );
+    G_SetOrigin(begin, ent->r.currentOrigin);
+    G_SetAngle(begin, ent->r.currentAngles);
     // G_SetOrigin( begin, begin->r.currentOrigin );
     // trap_LinkEntity(begin);
     // End of experimentary
@@ -3687,6 +3690,7 @@ void RouteMakerEnd( gentity_t *ent )
     end->nextthink = level.time + FRAMETIME;
 
     VectorCopy( ent->r.currentOrigin, end->r.currentOrigin );
+    VectorCopy( ent->r.currentAngles, end->r.currentAngles );
     level.routeEnd = end;
 
 
@@ -3874,6 +3878,11 @@ void Cmd_ShowRoute_f( gentity_t * ent )
 
 
 
+void Cmd_StopShowRoute_f( gentity_t * ent ) 
+{
+    ent->client->sess.nextCp = MAX_CHECKPOINTS + 1;
+}
+
 /*
 =================
 ClientCommand
@@ -4024,6 +4033,12 @@ void ClientCommand( int clientNum ) {
     if( !Q_stricmp(cmd, "powerup"))
     {
         Cmd_Powerup_f( ent );
+        return;
+    }
+
+    if(!Q_stricmp(cmd, "stopshowroute"))
+    {
+        Cmd_StopShowRoute_f( ent );
         return;
     }
 

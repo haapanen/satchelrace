@@ -1182,6 +1182,8 @@ typedef struct {
     gentity_t *powerups[MAX_POWERUPS];
     int numPowerups;
 
+    int rootPlayers;
+
 #ifdef OMNIBOT_SUPPORT
 	// sta acqu-sdk (issue 3): omnibot support
 	qboolean        twoMinute;
@@ -2016,8 +2018,15 @@ extern vmCvar_t sr_satchelDistance;
 extern vmCvar_t sr_smokeBounce;
 extern vmCvar_t sr_defaultEndAreaRange;
 extern vmCvar_t sr_startTime;
-extern vmCvar_t sr_noSlowDuration;
 
+// Powerups
+// no slow
+extern vmCvar_t sr_pw_noSlowDuration;
+// low gravity
+extern vmCvar_t sr_pw_lowGravityDuration;
+extern vmCvar_t sr_pw_lowGravity;
+// Root
+extern vmCvar_t sr_pw_rootDuration;
 
 
 void	trap_Printf( const char *fmt );

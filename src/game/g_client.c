@@ -2041,7 +2041,12 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 		VectorCopy( ent->r.currentOrigin, spawn_origin );
 		spawn_origin[2] += 9;	// spawns seem to be sunk into ground?
 		VectorCopy( ent->s.angles, spawn_angles );
-	} else {
+	} else if( ent->client->sess.racing ) {
+        ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
+
+        VectorCopy(level.routeBegin->r.currentOrigin, spawn_origin);
+        VectorCopy( ent->s.angles, spawn_angles );
+    } else {
 		// Arnout: let's just be sure it does the right thing at all times. (well maybe not the right thing, but at least not the bad thing!)
 		//if( client->sess.sessionTeam == TEAM_SPECTATOR || client->sess.sessionTeam == TEAM_FREE ) {
 		if( client->sess.sessionTeam != TEAM_AXIS && client->sess.sessionTeam != TEAM_ALLIES ) {

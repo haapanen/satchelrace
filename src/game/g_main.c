@@ -258,7 +258,13 @@ vmCvar_t sr_satchelDistance;
 vmCvar_t sr_smokeBounce;
 vmCvar_t sr_defaultEndAreaRange;
 vmCvar_t sr_startTime;
-vmCvar_t sr_noSlowDuration;
+// powerups
+vmCvar_t sr_pw_noSlowDuration;
+
+vmCvar_t sr_pw_lowGravityDuration;
+vmCvar_t sr_pw_lowGravity;
+
+vmCvar_t sr_pw_rootDuration;
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -516,8 +522,13 @@ cvarTable_t		gameCvarTable[] = {
     { &sr_smokeBounce, "sr_smokeBounce", "0", CVAR_ARCHIVE },
     { &sr_defaultEndAreaRange, "sr_defaultEndAreaRange", "300", CVAR_ARCHIVE },
     { &sr_startTime, "sr_startTime", "5000", CVAR_ARCHIVE },
-    { &sr_noSlowDuration, "sr_noSlowDuration", "10000", CVAR_ARCHIVE }
+    // Powerups
+    { &sr_pw_noSlowDuration, "sr_pw_noSlowDuration", "10000", CVAR_ARCHIVE },
 
+    { &sr_pw_lowGravityDuration, "sr_pw_lowGravityDuration", "10000", CVAR_ARCHIVE},
+    { &sr_pw_lowGravity, "sr_pw_lowGravity", "600", CVAR_ARCHIVE },
+
+    { &sr_pw_rootDuration, "sr_pw_rootDuration", "3000", CVAR_ARCHIVE }
 };
 
 // bk001129 - made static to avoid aliasing
@@ -1742,6 +1753,7 @@ void G_InitSatchelRace()
             target->client->sess.checkpointVisited[i] = qfalse;
         }
     }
+    level.rootPlayers = 0;
 }
 
 /*
@@ -3849,7 +3861,7 @@ void CheckSatchelRunStatus()
                 }
             }
 
-            for(i = 0; i < level.numPowerups; i++)
+            for(i = 0; i < MAX_POWERUPS; i++)
             {
                 if(level.powerups[i])
                 {

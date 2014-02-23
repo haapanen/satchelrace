@@ -1067,7 +1067,14 @@ void ClientThink_real( gentity_t *ent ) {
 	}
 
 	client->ps.aiState = AISTATE_COMBAT;
-	client->ps.gravity = g_gravity.value;
+
+    if(client->powerups[PW_LOWGRAVITY] > level.time)
+    {
+        client->ps.gravity = sr_pw_lowGravity.integer;
+    } else
+    {
+        client->ps.gravity = g_gravity.value;
+    }
 
     if(!client->satchelOnGround) 
     {
@@ -1092,6 +1099,14 @@ void ClientThink_real( gentity_t *ent ) {
     if(client->powerups[PW_NOSLOW] > level.time)
     {
         client->ps.speed = g_speed.value;
+    }
+
+    if(level.rootPlayers > level.time)
+    {
+        if(client->powerups[PW_ROOT_PROTECTION] < level.time)
+        {
+            client->ps.speed = 0;
+        }
     }
 
     if(client->noclip)
@@ -1374,18 +1389,21 @@ void ClientThink_real( gentity_t *ent ) {
                 if(level.routeBegin)
                 {
                     VectorCopy(level.routeBegin->r.currentOrigin, ent->client->ps.origin);
+                    VectorCopy(level.routeBegin->r.currentAngles, ent->client->ps.viewangles);
                 }
             } else if(ent->client->sess.nextCp >= 0 && ent->client->sess.nextCp < level.numCheckpoints)
             {
                 if(level.checkpoints[ent->client->sess.nextCp])
                 {
                     VectorCopy(level.checkpoints[ent->client->sess.nextCp]->r.currentOrigin, ent->client->ps.origin);
+                    VectorCopy(level.checkpoints[ent->client->sess.nextCp]->r.currentAngles, ent->client->ps.viewangles);
                 }
             } else if(ent->client->sess.nextCp == level.numCheckpoints)
             {
                 if(level.routeEnd)
                 {
                     VectorCopy(level.routeEnd->r.currentOrigin, ent->client->ps.origin);
+                    VectorCopy(level.routeEnd->r.currentAngles, ent->client->ps.viewangles);
                 }
             }
 
