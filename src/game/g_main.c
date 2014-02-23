@@ -1718,6 +1718,7 @@ void G_InitSatchelRace()
     level.routeBegin = NULL;
     level.routeEnd = NULL;
     level.raceIsStarting = qfalse;
+	level.timeLimit = qfalse;
     level.raceStartTime = 0;
     for(; i < MAX_CHECKPOINTS; i++)
     {
@@ -3100,7 +3101,7 @@ void CheckExitRules( void ) {
 		return;
 	}
 
-	if ( g_timelimit.value && !level.warmupTime ) {
+	if ( level.timeLimit == qtrue && !level.warmupTime ) {
 		// OSP
 		if((level.timeCurrent - level.startTime) >= (g_timelimit.value * 60000)) {
 		// OSP

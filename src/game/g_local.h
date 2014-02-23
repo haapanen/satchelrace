@@ -1170,6 +1170,7 @@ typedef struct {
     gentity_t *routeBegin;
     gentity_t *routeEnd;
     qboolean raceIsStarting;
+	qboolean timeLimit;
     int raceStartTime;
     gentity_t *checkpoints[MAX_CHECKPOINTS];
     int numCheckpoints;
