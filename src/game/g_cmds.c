@@ -673,9 +673,12 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 
 	char	*name = ConcatArgs( 1 );
 
-	if ( !CheatsOk( ent ) ) {
-		return;
-	}
+    if( !ent->client->sess.noclipAllowed && !ent->client->sess.routeMaker )
+    {
+        if ( !CheatsOk( ent ) ) {
+            return;
+        }
+    }
 
 	if(!Q_stricmp( name, "on" ) || atoi( name ) ) {
 		ent->client->noclip = qtrue;
@@ -1180,54 +1183,56 @@ Cmd_Team_f
 =================
 */
 void Cmd_Team_f( gentity_t *ent, unsigned int dwCommand, qboolean fValue ) {
-	char		s[MAX_TOKEN_CHARS];
-	char		ptype[4];
-	char		weap[4], weap2[4];
-	weapon_t	w, w2;
+    char s[MAX_TOKEN_CHARS];
+    char ptype[4];
+    char weap[4], weap2[4];
+    weapon_t w, w2;
 
-	if ( trap_Argc() < 2 ) {
-		char *pszTeamName;
+    if ( trap_Argc() < 2 ) {
+        char *pszTeamName;
 
-		switch ( ent->client->sess.sessionTeam ) {
-			case TEAM_ALLIES:
-				pszTeamName = "Allies";
-				break;
-			case TEAM_AXIS:
-				pszTeamName = "Axis";
-				break;
-			case TEAM_SPECTATOR:
-				pszTeamName = "Spectator";
-				break;
-			case TEAM_FREE:
-			default:
-				pszTeamName = "Free";
-				break;
-		}
+        switch ( ent->client->sess.sessionTeam ) {
+        case TEAM_ALLIES:
+            pszTeamName = "Allies";
+            break;
+        case TEAM_AXIS:
+            pszTeamName = "Axis";
+            break;
+        case TEAM_SPECTATOR:
+            pszTeamName = "Spectator";
+            break;
+        case TEAM_FREE:
+        default:
+            pszTeamName = "Free";
+            break;
+        }
 
-		CP(va("print \"%s team\n\"", pszTeamName));
-		return;
-	}
+        CP( va( "print \"%s team\n\"", pszTeamName ) );
+        return;
+    }
 
-	trap_Argv( 1, s,		sizeof( s		));
-	trap_Argv( 2, ptype,	sizeof( ptype	));
-	trap_Argv( 3, weap,		sizeof( weap	));
-	trap_Argv( 4, weap2,	sizeof( weap2	));
+    trap_Argv( 1, s,        sizeof( s       ) );
+    trap_Argv( 2, ptype,    sizeof( ptype   ) );
+    trap_Argv( 3, weap,     sizeof( weap    ) );
+    trap_Argv( 4, weap2,    sizeof( weap2   ) );
 
-	w =		atoi( weap );
-	w2 =	atoi( weap2 );
+    w =     atoi( weap );
+    w2 =    atoi( weap2 );
 
-	ent->client->sess.latchPlayerType =	atoi( ptype );
-	if( ent->client->sess.latchPlayerType < PC_SOLDIER || ent->client->sess.latchPlayerType > PC_COVERTOPS ) {
-		ent->client->sess.latchPlayerType = PC_SOLDIER;
-	}
+    ent->client->sess.latchPlayerType = PC_COVERTOPS;
+    //	ent->client->sess.latchPlayerType = atoi( ptype );
 
-	if( ent->client->sess.latchPlayerType < PC_SOLDIER || ent->client->sess.latchPlayerType > PC_COVERTOPS ) {
-		ent->client->sess.latchPlayerType = PC_SOLDIER;
-	}
+    // 	if ( ent->client->sess.latchPlayerType < PC_SOLDIER || ent->client->sess.latchPlayerType > PC_COVERTOPS ) {
+    // 		ent->client->sess.latchPlayerType = PC_SOLDIER;
+    // 	}
+    // 
+    // 	if ( ent->client->sess.latchPlayerType < PC_SOLDIER || ent->client->sess.latchPlayerType > PC_COVERTOPS ) {
+    // 		ent->client->sess.latchPlayerType = PC_SOLDIER;
+    // 	}
 
-	if( !SetTeam( ent, s, qfalse, w, w2, qtrue ) ) {
-		G_SetClientWeapons( ent, w, w2, qtrue );
-	}
+    if ( !SetTeam( ent, s, qfalse, w, w2, qtrue ) ) {
+        G_SetClientWeapons( ent, w, w2, qtrue );
+    }
 }
 
 void Cmd_ResetSetup_f( gentity_t* ent ) {
@@ -3459,6 +3464,330 @@ void Cmd_SwapPlacesWithBot_f( gentity_t *ent, int botNum ) {
 	client->pers.lastReinforceTime = 0;
 }
 
+void CheckWinner(gentity_t *self)
+{
+    int i = 0;
+    int count = 0;
+    vec3_t range = {self->horizontalRange, self->horizontalRange, self->verticalRange};
+    vec3_t mins = {0, 0, 0};
+    vec3_t maxs = {0, 0, 0};
+    int entityList[MAX_GENTITIES];
+
+    VectorSubtract( self->r.currentOrigin, range, mins );
+    VectorAdd( self->r.currentOrigin, range, maxs ); 
+
+    count = trap_EntitiesInBox(mins, maxs, entityList, MAX_GENTITIES);
+
+    for ( i = 0; i < count; i++ ) {
+        gentity_t *ent = NULL;
+        ent = &g_entities[entityList[i]];
+
+        if ( !ent->client ) {
+            continue;
+        }
+
+        if( ent->client->sess.racing )
+        {
+            trap_SendServerCommand(-1, va("cpm \"%s ^7reached the end.\n\"", ent->client->pers.netname));
+            ent->client->sess.racing = qfalse;
+        } 
+    }
+
+    self->nextthink = FRAMETIME;
+}
+
+void CheckRacersNearCP(gentity_t *self)
+{
+    int i = 0;
+    int count = 0;
+    vec3_t range = {self->horizontalRange, self->horizontalRange, self->verticalRange};
+    vec3_t mins = {0, 0, 0};
+    vec3_t maxs = {0, 0, 0};
+    int entityList[MAX_GENTITIES];
+
+    VectorSubtract( self->r.currentOrigin, range, mins );
+    VectorAdd( self->r.currentOrigin, range, maxs ); 
+
+    count = trap_EntitiesInBox(mins, maxs, entityList, MAX_GENTITIES);
+
+    for ( i = 0; i < count; i++ ) {
+        gentity_t *ent = NULL;
+        ent = &g_entities[entityList[i]];
+
+        if ( !ent->client ) {
+            continue;
+        }
+
+        if( ent->client->sess.racing && !ent->client->sess.checkpointVisited[self->position] )
+        {
+            trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d.\n\"", ent->client->pers.netname, self->position + 1));
+            ent->client->sess.checkpointVisited[self->position] = qtrue;
+        } 
+    }
+
+    self->nextthink = FRAMETIME;
+}
+
+void RouteMakerCheckpoints( gentity_t * ent ) 
+{
+    int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS] = "\0";
+    gentity_t *checkpoint = NULL;
+
+    if(level.numCheckpoints == MAX_CHECKPOINTS)
+    {
+        CP("print \"^1error: ^7maximum number of checkpoints already on map.\n\"");
+        return;
+    }
+
+    checkpoint = G_Spawn();
+    checkpoint->classname = "route_cp";
+    checkpoint->position = level.numCheckpoints;
+    checkpoint->think = CheckRacersNearCP;
+    checkpoint->nextthink = level.time + FRAMETIME;
+
+    if(trap_Argc() == 3)
+    {
+        char horizontalStr[MAX_TOKEN_CHARS] = "\0";
+        char verticalStr[MAX_TOKEN_CHARS] = "\0";
+    } else if(trap_Argc() == 4)
+    {
+
+    }
+
+    checkpoint->horizontalRange = 100;
+    checkpoint->verticalRange = 100;
+    VectorCopy( ent->r.currentOrigin, checkpoint->r.currentOrigin );
+    level.checkpoints[level.numCheckpoints] = checkpoint;
+    level.numCheckpoints++;
+    CP("cp \"^5Added a checkpoint.\n\"");
+}
+
+void Cmd_Route_f( gentity_t * ent ) 
+{
+    int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS] = "\0";
+    if( !ent->client->sess.routeMaker )
+    {
+        return;
+    }
+
+    // /route begin
+    // /route end
+    // /route clear
+    // 
+
+    if(argc < 2)
+    {
+        CP("print \"usage: /route [begin|end|cp|clear|clearcp]\n\"");
+        return;
+    }
+
+    trap_Argv(1, arg, sizeof(arg));
+
+    if(!Q_stricmp(arg, "begin"))
+    {
+        gentity_t *begin = NULL;
+        // gitem_t *item = BG_FindItemForClassName("route_begin");
+
+        if(level.routeBegin != NULL)
+        {
+            G_FreeEntity(level.routeBegin);
+            level.routeBegin = NULL;
+        }
+
+        begin = G_Spawn();
+        begin->classname = "route_begin";
+        // begin->item = item;
+        // Experimentary
+        // begin->s.eType = ET_ITEM;        
+        // begin->s.modelindex = item - bg_itemlist;
+        // begin->s.modelindex2 = 1;
+        VectorCopy( ent->r.currentOrigin, begin->r.currentOrigin );
+        // G_SetOrigin( begin, begin->r.currentOrigin );
+        // trap_LinkEntity(begin);
+        // End of experimentary
+
+        level.routeBegin = begin;
+        CP("cp \"^5Added a start spot\n\"");
+        return;
+    } else if(!Q_stricmp(arg, "end"))
+    {
+        gentity_t *end = NULL;
+
+        if(level.routeEnd != NULL)
+        {
+            G_FreeEntity(level.routeEnd);
+            level.routeEnd = NULL;
+        }
+
+        end = G_Spawn();
+        end->classname = "route_end";
+        end->think = CheckWinner;
+        end->nextthink = level.time + FRAMETIME;
+
+        VectorCopy( ent->r.currentOrigin, end->r.currentOrigin );
+        level.routeEnd = end;
+
+
+
+        // route end [x-y] [z]
+        if(argc == 2)
+        {
+            // use default range == 300
+            end->horizontalRange = sr_defaultEndAreaRange.integer;
+            end->verticalRange = sr_defaultEndAreaRange.integer;
+
+            CP(va("print \"route: dropped an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
+        } else if(argc == 3)
+        {
+            char rangeStr[MAX_TOKEN_CHARS] = "\0";
+            int range = 0;
+            trap_Argv(2, rangeStr, sizeof(rangeStr));
+            range = atoi(rangeStr);
+
+            if(range)
+            {
+                end->horizontalRange = range;
+                end->verticalRange = range;
+            } else
+            {
+                end->horizontalRange = sr_defaultEndAreaRange.integer;
+                end->verticalRange = sr_defaultEndAreaRange.integer;
+            }
+            CP(va("print \"route: dropped an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
+        } else if(argc == 4)
+        {
+            char horizontalRangeStr[MAX_TOKEN_CHARS] = "\0";
+            char verticalRangeStr[MAX_TOKEN_CHARS] = "\0";
+
+            int horizontalRange = atoi(horizontalRangeStr);
+            int verticalRange = atoi(verticalRangeStr);
+
+            trap_Argv(2, horizontalRangeStr, sizeof(horizontalRangeStr));
+            trap_Argv(3, verticalRangeStr, sizeof(verticalRangeStr));            
+
+            horizontalRange = atoi(horizontalRangeStr);
+            verticalRange = atoi(verticalRangeStr);
+
+            if(horizontalRange)
+            {
+                end->horizontalRange = horizontalRange;
+            } else
+            {
+                end->horizontalRange = sr_defaultEndAreaRange.integer;
+            }
+
+            if(verticalRange)
+            {
+                end->verticalRange = verticalRange;
+            } else
+            {
+                end->verticalRange = sr_defaultEndAreaRange.integer;
+            }
+            CP(va("cp \"^5Added an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
+        }
+
+
+    } else if(!Q_stricmp(arg, "clear"))
+    {
+        int i = 0;
+        if(level.routeBegin != NULL)
+        {
+            G_FreeEntity(level.routeBegin);
+            level.routeBegin = NULL;
+        }
+        if(level.routeEnd != NULL)
+        {
+            G_FreeEntity(level.routeEnd);
+            level.routeEnd = NULL;
+        }
+        for(; i < MAX_CHECKPOINTS; i++)
+        {
+            if(level.checkpoints[i])
+            {
+                G_FreeEntity(level.checkpoints[i]);
+                level.checkpoints[i] = NULL;
+                level.numCheckpoints = 0;
+            }
+        }
+        CP("print \"Cleared routes.\n\"");
+    } else if(!Q_stricmp(arg, "clearcp")) 
+    {
+        int i = 0;
+        for(; i < MAX_CHECKPOINTS; i++)
+        {
+            if(level.checkpoints[i])
+            {
+                G_FreeEntity(level.checkpoints[i]);
+                level.checkpoints[i] = NULL;
+                level.numCheckpoints = 0;
+            }
+        }
+    } else if(!Q_stricmp(arg, "show"))
+    {
+        if(level.routeBegin && level.routeEnd)
+        {
+            CP(va("print \"Begin: (%d, %d, %d) End: (%d, %d, %d)\n\"", 
+                level.routeBegin->s.origin[0],
+                level.routeBegin->s.origin[1],
+                level.routeBegin->s.origin[2],
+                level.routeEnd->s.origin[0],
+                level.routeEnd->s.origin[1],
+                level.routeEnd->s.origin[2]));
+        }
+
+        if(!level.routeBegin)
+        {
+            CP("print \"route: no begin.\n\"");
+        } 
+
+        if(!level.routeEnd)
+        {
+            CP("print \"route: no end.\n\"");
+        }
+
+    } else if(!Q_stricmp(arg, "cp"))
+    {
+        RouteMakerCheckpoints( ent );
+    } else
+    {
+        CP(va("print \"incorrect parameter \"%s\"\n\"", arg));
+        return;
+    }
+}
+
+void Cmd_Powerup_f( gentity_t * ent ) 
+{
+
+}
+
+void Cmd_ShowRoute_f( gentity_t * ent ) 
+{
+    char arg[MAX_TOKEN_CHARS] = "\0";
+
+    if(ent->client->sess.racing)
+    {
+        return;
+    }
+
+    ent->client->sess.timeBetweenRouteSpots = 1000;
+
+    if(trap_Argc() == 2)
+    {
+        trap_Argv(1, arg, sizeof(arg));
+        ent->client->sess.timeBetweenRouteSpots = atoi(arg);
+        if(ent->client->sess.timeBetweenRouteSpots < 1000)
+        {
+            ent->client->sess.timeBetweenRouteSpots = 1000;
+        }
+        ent->client->sess.lastRouteSpotTime = 0;
+    }
+
+    ent->client->sess.nextCp = -1;
+}
+
+
 
 /*
 =================
@@ -3600,6 +3929,24 @@ void ClientCommand( int clientNum ) {
 		Cmd_ResetSetup_f( ent );
 		return;
 	}
+
+    if( !Q_stricmp(cmd, "route"))
+    {
+        Cmd_Route_f( ent );
+        return;
+    }
+
+    if( !Q_stricmp(cmd, "powerup"))
+    {
+        Cmd_Powerup_f( ent );
+        return;
+    }
+
+    if( !Q_stricmp(cmd, "showroute"))
+    {
+        Cmd_ShowRoute_f( ent );
+        return;
+    }
 
 	if(G_commandCheck(ent, cmd, qtrue)) return;
 	// OSP

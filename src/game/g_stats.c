@@ -257,6 +257,11 @@ void G_AddSkillPoints( gentity_t *ent, skillType_t skill, float points ) {
 		return;
 	}
 
+    if(qtrue)
+    {
+        return;
+    }
+
 	// no skill gaining during warmup
 	if( g_gamestate.integer != GS_PLAYING ) {
 		return;

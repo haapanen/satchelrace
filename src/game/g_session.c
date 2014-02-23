@@ -27,7 +27,7 @@ void G_WriteClientSessionData( gclient_t *client, qboolean restart )
 	// OSP -- stats reset check
 	if(level.fResetStats) G_deleteStats(client - level.clients);
 
-	s = va("%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+	s = va("%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i % %i",
 		client->sess.sessionTeam,
 		client->sess.spectatorTime,
 		client->sess.spectatorState,
@@ -60,7 +60,9 @@ void G_WriteClientSessionData( gclient_t *client, qboolean restart )
 		client->sess.ignoreClients[0],
 		client->sess.ignoreClients[1],
 		client->pers.enterTime,
-		restart ? client->sess.spawnObjectiveIndex : 0
+		restart ? client->sess.spawnObjectiveIndex : 0,
+        client->sess.noclipAllowed,
+        client->sess.routeMaker
 		);
 
 	trap_Cvar_Set( va( "session%i", client - level.clients ), s );
@@ -169,7 +171,7 @@ void G_ReadSessionData( gclient_t *client )
 
 	trap_Cvar_VariableStringBuffer( va( "session%i", client - level.clients ), s, sizeof(s) );
 
-	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+	sscanf( s, "%i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
 		(int *)&client->sess.sessionTeam,
 		&client->sess.spectatorTime,
 		(int *)&client->sess.spectatorState,
@@ -202,7 +204,9 @@ void G_ReadSessionData( gclient_t *client )
 		&client->sess.ignoreClients[0],
 		&client->sess.ignoreClients[1],
 		&client->pers.enterTime,
-		&client->sess.spawnObjectiveIndex
+		&client->sess.spawnObjectiveIndex,
+        &client->sess.noclipAllowed,
+        &client->sess.routeMaker
 		);
 
 	// OSP -- reinstate MV clients
@@ -282,6 +286,7 @@ Called on a first-time connect
 */
 void G_InitSessionData( gclient_t *client, char *userinfo ) {
 	clientSession_t	*sess;
+    int i = 0;
 //	const char		*value;
 
 	sess = &client->sess;
@@ -322,6 +327,16 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 	sess->referee = (client->pers.localClient) ? RL_REFEREE : RL_NONE;
 	sess->spec_invite = 0;
 	sess->spec_team = 0;
+
+    sess->noclipAllowed = qfalse;
+    sess->routeMaker = qfalse;
+    sess->racing = qfalse;
+    for(; i < MAX_CHECKPOINTS; i++)
+    {
+        sess->checkpointVisited[i] = qfalse;
+    }
+    sess->nextCp = MAX_CHECKPOINTS + 1;
+
 	G_deleteStats(client - level.clients);
 	// OSP
 

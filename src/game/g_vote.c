@@ -69,6 +69,8 @@ static const vote_reference_t aVoteInfo[] = {
 	{ 0x1ff, "warmupdamage", G_Warmupfire_v,	"Warmup Damage",	" <0|1|2>^7\n  Specifies if players can inflict damage during warmup" },
 	{ 0x1ff, "antilag",		 G_AntiLag_v,		"Anti-Lag",			" <0|1>^7\n  Toggles Anit-Lag on the server" },
 	{ 0x1ff, "balancedteams",G_BalancedTeams_v,	"Balanced Teams",	" <0|1>^7\n  Toggles team balance forcing" },
+    { 0x1ff, "startgame", G_StartGame_v, "Start Game", "^7\n Starts satchel race." },
+    { 0x1ff, "routemaker", G_RouteMaker_v, "Route maker", "<played_id>^7\n Elects a player to have route maker abilities." },
 	{ 0, 0, NULL, 0 }
 };
 
@@ -1056,4 +1058,92 @@ int G_Unreferee_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg
 	}
 
 	return(G_OK);
+}
+
+
+int G_StartGame_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd ) {
+    // Vote request (vote is being initiated)
+    if ( arg ) {
+        if ( trap_Argc() > 2 ) {
+            if ( !Q_stricmp( arg2, "?" ) ) {
+                G_refPrintf( ent, "Usage: ^3%s %s%s\n", ( ( fRefereeCmd ) ? "\\ref" : "\\callvote" ), arg, aVoteInfo[dwVoteIndex].pszVoteHelp );
+                return( G_INVALID );
+            }
+        }
+
+        if( !level.routeBegin )
+        {
+            G_refPrintf(ent, "^1No route begin defined.");
+            return(G_INVALID);
+        }
+
+        // Vote action (vote has passed)
+    } else {
+        // Set everyone to "ready" status
+        if(!level.routeBegin)
+        {
+            return(G_INVALID);
+        }
+        level.raceIsStarting = qtrue;
+        level.raceStartTime = level.time + sr_startTime.integer;
+
+        trap_SendServerCommand(-1, va("cp \"^5Race is starting in %d seconds\n\"", 
+            sr_startTime.integer / 1000));
+    }
+
+    return( G_OK );
+}
+
+
+int G_RouteMaker_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd ) {
+    // Vote request (vote is being initiated)
+    if ( arg ) {
+        int pid;
+
+        if ( ent->client->sess.referee && trap_Argc() == 2 ) {
+            G_playersMessage( ent );
+            return( G_INVALID );
+        } else if ( trap_Argc() == 2 ) {
+            pid = ent - g_entities;
+        } else if ( G_voteDescription( ent, fRefereeCmd, dwVoteIndex ) ) {
+            return( G_INVALID );
+        } else if ( ( pid = ClientNumberFromString( ent, arg2 ) ) == -1 )                                                                                        {
+            return( G_INVALID );
+        }
+
+        if ( level.clients[pid].sess.routeMaker ) {
+            G_refPrintf( ent, "[lof]%s [lon]is already a route maker!", level.clients[pid].pers.netname );
+            return( -1 );
+        }
+
+        Com_sprintf( level.voteInfo.vote_value, VOTE_MAXSTRING, "%d", pid );
+        Com_sprintf( arg2, VOTE_MAXSTRING, "%s", level.clients[pid].pers.netname );
+
+        // Vote action (vote has passed)
+    } else {
+        // Voting in a new referee
+        gclient_t *cl = &level.clients[atoi( level.voteInfo.vote_value )];
+
+        if ( cl->pers.connected == CON_DISCONNECTED ) {
+            AP( "print \"Player left before becoming route maker\n\"" );
+        } else {
+            int i = 0;
+            for(; i < level.numConnectedClients; i++)
+            {
+                int clientNum = level.sortedClients[i];
+                gentity_t *target = g_entities + clientNum;
+                if(target->client->sess.routeMaker)
+                {
+                    target->client->sess.routeMaker = qfalse; 
+                }
+                trap_SendServerCommand(clientNum, "cp \"^5You are no longer a route maker\n\"");
+            }
+            cl->sess.routeMaker = qtrue;
+            AP( va( "cp \"%s^7 is now a route maker\n\"", cl->pers.netname ) );
+            ClientUserinfoChanged( atoi( level.voteInfo.vote_value ) );
+
+
+        }
+    }
+    return( G_OK );
 }

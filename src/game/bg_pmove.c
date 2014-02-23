@@ -3650,7 +3650,7 @@ static void PM_Weapon( void ) {
 		}
 	}
 
-	if (pm->ps->weapon == WP_SMOKE_BOMB || pm->ps->weapon == WP_SATCHEL) {
+	if (pm->ps->weapon == WP_SMOKE_BOMB) {
 		if( pm->skill[SK_MILITARY_INTELLIGENCE_AND_SCOPED_WEAPONS] >= 2 ) {
 			if (pm->cmd.serverTime - pm->ps->classWeaponTime < (pm->covertopsChargeTime*0.66f))
 				return;
@@ -3672,13 +3672,14 @@ static void PM_Weapon( void ) {
 		}
 	}
 
-	if( pm->ps->weapon == WP_DYNAMITE ) {
-		if (pm->skill[SK_EXPLOSIVES_AND_CONSTRUCTION] >= 3 ) {
-			if (pm->cmd.serverTime - pm->ps->classWeaponTime < (pm->engineerChargeTime*0.66f))
-				return;
-		} else if (pm->cmd.serverTime - pm->ps->classWeaponTime < pm->engineerChargeTime)
-			return;
-	}
+// Let people always use dyno
+// 	if( pm->ps->weapon == WP_DYNAMITE ) {
+// 		if (pm->skill[SK_EXPLOSIVES_AND_CONSTRUCTION] >= 3 ) {
+// 			if (pm->cmd.serverTime - pm->ps->classWeaponTime < (pm->engineerChargeTime*0.66f))
+// 				return;
+// 		} else if (pm->cmd.serverTime - pm->ps->classWeaponTime < pm->engineerChargeTime)
+// 			return;
+// 	}
 
 	if( pm->ps->weapon == WP_AMMO ) {
 		if (pm->skill[SK_SIGNALS] >= 1 ) {

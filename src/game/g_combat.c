@@ -55,6 +55,13 @@ void AddScore( gentity_t *ent, int score ) {
 	if ( !ent || !ent->client ) {
 		return;
 	}
+
+    if(qtrue)
+    {
+        // Zero: NO XP
+        return;
+    }
+
 	// no scoring during pre-match warmup
 	if ( g_gamestate.integer != GS_PLAYING ) {
 		return;
@@ -1375,6 +1382,10 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	}
 
 	knockback = damage;
+    if( mod != MOD_FALLING && targ->client )
+    {
+        damage = 0;
+    }
 	if ( knockback > 200 ) {
 		knockback = 200;
 	}
@@ -1390,10 +1401,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	// ydnar: set weapons means less knockback
 	if( client && (client->ps.weapon == WP_MORTAR_SET || client->ps.weapon == WP_MOBILE_MG42_SET) )
 		knockback *= 0.5;
-
-	if( targ->client && g_friendlyFire.integer && OnSameTeam(targ, attacker) ) {
-		knockback = 0;
-	}
 	
 	// figure momentum add, even if the damage won't be taken
 	if ( knockback && targ->client ) {
@@ -1485,9 +1492,6 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,  vec3
 	//}
 	// end acqu-sdk (issue 18)
 
-	if ( damage < 1 ) {
-		damage = 1;
-	}
 	take = damage;
 	save = 0;
 

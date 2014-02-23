@@ -1542,15 +1542,15 @@ void Weapon_Engineer( gentity_t *ent ) {
 	traceEnt = &g_entities[ tr.entityNum ];
 	if( G_EmplacedGunIsRepairable( traceEnt, ent ) ) {
 		// "Ammo" for this weapon is time based
-		if ( ent->client->ps.classWeaponTime + level.engineerChargeTime[ent->client->sess.sessionTeam-1] < level.time ) {
-			ent->client->ps.classWeaponTime = level.time - level.engineerChargeTime[ent->client->sess.sessionTeam-1];
-		}
-
-		if( ent->client->sess.skill[SK_EXPLOSIVES_AND_CONSTRUCTION] >= 3 ) {
-			ent->client->ps.classWeaponTime += .66f * 150;
-		} else {
-			ent->client->ps.classWeaponTime += 150;
-		}
+// 		if ( ent->client->ps.classWeaponTime + level.engineerChargeTime[ent->client->sess.sessionTeam-1] < level.time ) {
+// 			ent->client->ps.classWeaponTime = level.time - level.engineerChargeTime[ent->client->sess.sessionTeam-1];
+// 		}
+// 
+// 		if( ent->client->sess.skill[SK_EXPLOSIVES_AND_CONSTRUCTION] >= 3 ) {
+// 			ent->client->ps.classWeaponTime += .66f * 150;
+// 		} else {
+// 			ent->client->ps.classWeaponTime += 150;
+// 		}
 
 		if ( ent->client->ps.classWeaponTime > level.time ) {
 			ent->client->ps.classWeaponTime = level.time;
@@ -3706,6 +3706,12 @@ gentity_t *weapon_grenadelauncher_fire (gentity_t *ent, int grenType) {
 	}
 	// jpw
 
+    if( grenType == WP_SATCHEL )
+    {
+        ent->client->satchelOnGround = qtrue;
+        ent->client->satchelEnt = m;
+    }
+
 	//----(SA)	adjust for movement of character.  TODO: Probably comment in later, but only for forward/back not strafing
 	//VectorAdd( m->s.pos.trDelta, ent->client->ps.velocity, m->s.pos.trDelta );	// "real" physics
 
@@ -4269,10 +4275,12 @@ void FireWeapon( gentity_t *ent ) {
 		break;
 	case WP_SATCHEL_DET:
 		if( G_ExplodeSatchels( ent ) ) {
-			ent->client->ps.ammo[WP_SATCHEL_DET] = 0;
-			ent->client->ps.ammoclip[WP_SATCHEL_DET] = 0;
-			ent->client->ps.ammoclip[WP_SATCHEL] = 1;
-			G_AddEvent( ent, EV_NOAMMO, 0 );
+            ent->client->ps.ammo[WP_SATCHEL_DET] = 0;
+            ent->client->ps.ammoclip[WP_SATCHEL_DET] = 0;
+            ent->client->ps.ammoclip[WP_SATCHEL] = 1;
+            G_AddEvent( ent, EV_NOAMMO, 0 );
+            ent->client->satchelOnGround = qfalse;
+            ent->client->satchelEnt = NULL;
 		}
 		break;
 	case WP_TRIPMINE:
@@ -4377,7 +4385,7 @@ void FireWeapon( gentity_t *ent ) {
 	case WP_LANDMINE:
 	case WP_SATCHEL:
 	case WP_SMOKE_BOMB:
-		if( ent->s.weapon == WP_SMOKE_BOMB || ent->s.weapon == WP_SATCHEL ) {
+		if( ent->s.weapon == WP_SMOKE_BOMB ) {
 			if( level.time - ent->client->ps.classWeaponTime > level.covertopsChargeTime[ent->client->sess.sessionTeam-1] ) {
 				ent->client->ps.classWeaponTime = level.time - level.covertopsChargeTime[ent->client->sess.sessionTeam-1];
 			}
@@ -4403,17 +4411,17 @@ void FireWeapon( gentity_t *ent ) {
 			}
 		}
 
-		if (ent->s.weapon == WP_DYNAMITE) {
-			if( level.time - ent->client->ps.classWeaponTime > level.engineerChargeTime[ent->client->sess.sessionTeam-1] ) {
-				ent->client->ps.classWeaponTime = level.time - level.engineerChargeTime[ent->client->sess.sessionTeam-1];
-			}
-
-			if( ent->client->sess.skill[SK_EXPLOSIVES_AND_CONSTRUCTION] >= 3 ) {
-				ent->client->ps.classWeaponTime += .66f * level.engineerChargeTime[ent->client->sess.sessionTeam-1];
-			} else {
-				ent->client->ps.classWeaponTime = level.time;
-			}
-		}
+// 		if (ent->s.weapon == WP_DYNAMITE) {
+// 			if( level.time - ent->client->ps.classWeaponTime > level.engineerChargeTime[ent->client->sess.sessionTeam-1] ) {
+// 				ent->client->ps.classWeaponTime = level.time - level.engineerChargeTime[ent->client->sess.sessionTeam-1];
+// 			}
+// 
+// 			if( ent->client->sess.skill[SK_EXPLOSIVES_AND_CONSTRUCTION] >= 3 ) {
+// 				ent->client->ps.classWeaponTime += .66f * level.engineerChargeTime[ent->client->sess.sessionTeam-1];
+// 			} else {
+// 				ent->client->ps.classWeaponTime = level.time;
+// 			}
+// 		}
 
 #ifdef OMNIBOT_SUPPORT
 		// sta acqu-sdk (issue 3): omnibot support

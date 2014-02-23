@@ -1069,8 +1069,30 @@ void ClientThink_real( gentity_t *ent ) {
 	client->ps.aiState = AISTATE_COMBAT;
 	client->ps.gravity = g_gravity.value;
 
-	// set speed
-	client->ps.speed = g_speed.value;
+    if(!client->satchelOnGround) 
+    {
+        client->ps.speed = sr_noSatchelSpeed.value;
+    } else
+    {
+        float speed = g_speed.value;
+        if(ent->client->satchelEnt)
+        {
+            vec3_t dist;
+
+            VectorSubtract( ent->r.currentOrigin, ent->client->satchelEnt->r.currentOrigin, dist );
+            if ( VectorLengthSquared( dist ) > SQR( sr_satchelDistance.value ) ) {
+                speed = sr_noSatchelSpeed.value;
+            }
+        }
+
+        // set speed
+        client->ps.speed = speed;
+    }
+
+    if(client->noclip)
+    {
+        client->ps.speed = g_speed.value;
+    }
 
 	if( client->speedScale )				// Goalitem speed scale
 		client->ps.speed *= (client->speedScale * 0.01);
@@ -1331,6 +1353,41 @@ void ClientThink_real( gentity_t *ent ) {
 	if(level.match_pause == PAUSE_NONE) {
 		ClientTimerActions( ent, msec );
 	}
+
+    ent->client->ps.powerups[PW_ADRENALINE] = level.time + 10000;
+
+    // -1 = begin
+    // 0-19 = cp
+    // 20 = end
+    if(!ent->client->sess.racing && ent->client->sess.nextCp <= level.numCheckpoints)
+    {
+        if(ent->client->sess.lastRouteSpotTime + ent->client->sess.timeBetweenRouteSpots < level.time )
+        {
+            ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
+            if(ent->client->sess.nextCp == -1)
+            {
+                if(level.routeBegin)
+                {
+                    VectorCopy(level.routeBegin->r.currentOrigin, ent->client->ps.origin);
+                }
+            } else if(ent->client->sess.nextCp >= 0 && ent->client->sess.nextCp < level.numCheckpoints)
+            {
+                if(level.checkpoints[ent->client->sess.nextCp])
+                {
+                    VectorCopy(level.checkpoints[ent->client->sess.nextCp]->r.currentOrigin, ent->client->ps.origin);
+                }
+            } else if(ent->client->sess.nextCp == level.numCheckpoints)
+            {
+                if(level.routeEnd)
+                {
+                    VectorCopy(level.routeEnd->r.currentOrigin, ent->client->ps.origin);
+                }
+            }
+
+            ent->client->sess.nextCp++;
+            ent->client->sess.lastRouteSpotTime = level.time;
+        }
+    }
 }
 
 /*
@@ -1414,20 +1471,24 @@ void SpectatorClientEndFrame( gentity_t *ent )
 		gclient_t *cl;
 		qboolean do_respawn = qfalse; // JPW NERVE
 
-		// Players can respawn quickly in warmup
-		if(g_gamestate.integer != GS_PLAYING && ent->client->respawnTime <= level.timeCurrent &&
-		  ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
-			do_respawn = qtrue;
-		} else if(ent->client->sess.sessionTeam == TEAM_AXIS) {
-			testtime = (level.dwRedReinfOffset + level.timeCurrent - level.startTime) % g_redlimbotime.integer;
-			do_respawn = (testtime < ent->client->pers.lastReinforceTime);
-			ent->client->pers.lastReinforceTime = testtime;
-		}
-		else if (ent->client->sess.sessionTeam == TEAM_ALLIES) {
-			testtime = (level.dwBlueReinfOffset + level.timeCurrent - level.startTime) % g_bluelimbotime.integer;
-			do_respawn = (testtime < ent->client->pers.lastReinforceTime);
-			ent->client->pers.lastReinforceTime = testtime;
-		}
+        if( ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
+            do_respawn = qtrue;
+        }
+// 
+// 		// Players can respawn quickly in warmup
+// 		if(g_gamestate.integer != GS_PLAYING && ent->client->respawnTime <= level.timeCurrent &&
+// 		  ent->client->sess.sessionTeam != TEAM_SPECTATOR) {
+// 			do_respawn = qtrue;
+// 		} else if(ent->client->sess.sessionTeam == TEAM_AXIS) {
+// 			testtime = (level.dwRedReinfOffset + level.timeCurrent - level.startTime) % g_redlimbotime.integer;
+// 			do_respawn = (testtime < ent->client->pers.lastReinforceTime);
+// 			ent->client->pers.lastReinforceTime = testtime;
+// 		}
+// 		else if (ent->client->sess.sessionTeam == TEAM_ALLIES) {
+// 			testtime = (level.dwBlueReinfOffset + level.timeCurrent - level.startTime) % g_bluelimbotime.integer;
+// 			do_respawn = (testtime < ent->client->pers.lastReinforceTime);
+// 			ent->client->pers.lastReinforceTime = testtime;
+// 		}
 
 		if( g_gametype.integer != GT_WOLF_LMS ) {
 			if ( ( g_maxlives.integer > 0 || g_alliedmaxlives.integer > 0 || g_axismaxlives.integer > 0 )

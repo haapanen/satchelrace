@@ -1816,7 +1816,13 @@ gentity_t *fire_grenade (gentity_t *self, vec3_t start, vec3_t dir, int grenadeW
 		case WP_SMOKE_BOMB:
 			// xkan 11/25/2002, fixed typo, classname used to be "somke_bomb"
 			bolt->classname				= "smoke_bomb";
-			bolt->s.eFlags				= EF_BOUNCE_HALF | EF_BOUNCE;
+            if( sr_smokeBounce.integer == 0 )
+            {
+                bolt->s.eFlags              =  EF_BOUNCE_HALF | EF_BOUNCE;
+            } else 
+            {
+                bolt->s.eFlags              = /* EF_BOUNCE_HALF |*/ EF_BOUNCE;
+            }
 			// rain - this is supposed to be MOD_SMOKEBOMB, not SMOKEGRENADE
 			bolt->methodOfDeath			= MOD_SMOKEBOMB;
 			break;

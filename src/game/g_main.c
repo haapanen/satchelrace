@@ -253,6 +253,12 @@ vmCvar_t lua_allowedModules;
 // end acqu-sdk (issue 9)
 #endif
 
+vmCvar_t sr_noSatchelSpeed;
+vmCvar_t sr_satchelDistance;
+vmCvar_t sr_smokeBounce;
+vmCvar_t sr_defaultEndAreaRange;
+vmCvar_t sr_startTime;
+
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
 	{ &g_cheats, "sv_cheats", "", 0, qfalse },
@@ -504,6 +510,11 @@ cvarTable_t		gameCvarTable[] = {
 	{ &lua_allowedModules, "lua_allowedModules", "", 0 },
 	// end acqu-sdk (issue 9)
 #endif
+    { &sr_noSatchelSpeed, "sr_noSatchelSpeed", "50", CVAR_ARCHIVE },
+    { &sr_satchelDistance, "sr_satchelDistance", "300", CVAR_ARCHIVE },
+    { &sr_smokeBounce, "sr_smokeBounce", "0", CVAR_ARCHIVE },
+    { &sr_defaultEndAreaRange, "sr_defaultEndAreaRange", "300", CVAR_ARCHIVE },
+    { &sr_startTime, "sr_startTime", "5000", CVAR_ARCHIVE }
 
 };
 
@@ -1701,6 +1712,30 @@ void bani_getmapxp( void ) {
 	trap_SetConfigstring( CS_ALLIED_MAPS_XP, s );
 }
 
+void G_InitSatchelRace() 
+{
+    int i = 0;
+    level.routeBegin = NULL;
+    level.routeEnd = NULL;
+    level.raceIsStarting = qfalse;
+    level.raceStartTime = 0;
+    for(; i < MAX_CHECKPOINTS; i++)
+    {
+        level.checkpoints[i] = NULL;
+    }
+    level.numCheckpoints = 0;
+    for(i = 0; i < level.numConnectedClients; i++)
+    {
+        int clientNum = level.sortedClients[i];
+        gentity_t *target = g_entities + clientNum;
+
+        for(; i < MAX_CHECKPOINTS; i++)
+        {
+            target->client->sess.checkpointVisited[i] = qfalse;
+        }
+    }
+}
+
 /*
 ============
 G_InitGame
@@ -1729,24 +1764,29 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	in case the g_maxlives was changed, and a map_restart happened
 	*/
 	ClearMaxLivesBans();
-	
-	// just for verbosity
-	if( g_gametype.integer != GT_WOLF_LMS ) {
-		if( g_enforcemaxlives.integer &&
-			( g_maxlives.integer > 0 || g_axismaxlives.integer > 0 || g_alliedmaxlives.integer > 0 ) ) { 
-			G_Printf ( "EnforceMaxLives-Cleared GUID List\n" );
-		}
-	}
+
 
 	G_ProcessIPBans();
 
 	G_InitMemory();
 
-	// NERVE - SMF - intialize gamestate
-	if ( g_gamestate.integer == GS_INITIALIZE ) {
-		// OSP
-		trap_Cvar_Set( "gamestate", va( "%i", GS_WARMUP ) );
-	}
+    // NERVE - SMF - intialize gamestate
+    if ( g_gamestate.integer == GS_INITIALIZE ) {
+        // OSP"
+        trap_Cvar_Set( "gamestate", va( "%i", GS_WARMUP ) );
+    }
+
+    if( g_gametype.integer != GT_WOLF )
+    {
+        trap_Cvar_Set( "g_gametype", va("%d", GT_WOLF) );
+        trap_Cvar_Update(&g_gametype);
+    }
+
+    trap_Cvar_Set( "timelimit", "0" );
+    trap_Cvar_Update(&g_timelimit);
+
+    trap_Cvar_Set( "mod_version", va("%s", MOD_VERSION) );
+    trap_Cvar_Set( "sv_floodprotect", "0" );
 
 	// set some level globals
 	i = level.server_settings;
@@ -2040,7 +2080,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	G_LuaHook_InitGame( levelTime, randomSeed, restart );
 	// end acqu-sdk (issue 9)
 #endif
-
+    G_InitSatchelRace();
 }
 
 /*
@@ -3779,6 +3819,32 @@ void G_TagLinkEntity( gentity_t* ent, int msec ) {
 	ent->linkTagTime = level.time;
 }
 
+void CheckSatchelRunStatus() 
+{
+    if(level.raceIsStarting)
+    {
+        if(level.time > level.raceStartTime)
+        {
+            int i = 0;
+            for(; i < level.numConnectedClients; i++)
+            {
+                int clientNum = level.sortedClients[i];
+                gentity_t *target = g_entities + clientNum;
+
+                if(target->client->sess.sessionTeam != TEAM_SPECTATOR)
+                {
+                    target->client->ps.eFlags ^= EF_TELEPORT_BIT;
+                    VectorCopy(level.routeBegin->r.currentOrigin, target->client->ps.origin);
+
+                    target->client->sess.racing = qtrue;
+                }
+            }
+            level.raceIsStarting = qfalse;
+            trap_SendServerCommand(-1, "cp \"^5Race started!\n\"");
+        }
+    }
+}
+
 void G_RunEntity( gentity_t* ent, int msec ) {
 	if( ent->runthisframe ) {
 		return;
@@ -4045,6 +4111,8 @@ uebrgpiebrpgibqeripgubeqrpigubqifejbgipegbrtibgurepqgbn%i", level.time )
 	CheckCvars();
 
 	G_UpdateTeamMapData();
+
+    CheckSatchelRunStatus();
 
 	if(level.gameManager) {
 		level.gameManager->s.otherEntityNum = MAX_TEAM_LANDMINES - G_CountTeamLandmines(TEAM_AXIS);

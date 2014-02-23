@@ -1195,6 +1195,164 @@ static void Svcmd_KickNum_f( void ) {
 // -fretn
 
 
+gentity_t *PlayerGentityFromString(const char *name, char *errorMsg, size_t len)
+{
+    int pids[MAX_CLIENTS];
+    gentity_t *player = NULL;
+    if(ClientNumbersFromString(name, pids) != 1) {
+        G_MatchOnePlayer(pids, errorMsg, len);
+        return NULL;
+    }
+
+    player = g_entities + pids[0];
+    return player;
+}
+
+void Svcmd_Noclip_f() 
+{
+    int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS] = "\0";
+    char err[MAX_TOKEN_CHARS] = "\0";
+    gentity_t *target = NULL;
+
+    if(argc != 2)
+    {
+        G_Printf("usage: noclip [player].\n");
+        return;
+    }
+
+    trap_Argv(1, arg, sizeof(arg));
+    target = PlayerGentityFromString(arg, err, sizeof(err));
+    if(!target) 
+    {
+        G_Printf("noclip: %s\n", err);
+        return;
+    }
+
+    if(target->client->noclip)
+    {
+        target->client->noclip = qfalse;
+    } else
+    {
+        target->client->noclip = qtrue;
+    }
+
+    G_Printf("%s ^7has been noclipped.\n", target->client->pers.netname);
+}
+
+void Svcmd_AllowNoclip_f()
+{
+    int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS] = "\0";
+    char err[MAX_TOKEN_CHARS] = "\0";
+    gentity_t *target = NULL;
+
+    if(argc != 2)
+    {
+        G_Printf("usage: allownoclip [player].\n");
+        return;
+    }
+
+    trap_Argv(1, arg, sizeof(arg));
+    target = PlayerGentityFromString(arg, err, sizeof(err));
+    if(!target) 
+    {
+        G_Printf("allownoclip: %s\n", err);
+        return;
+    }
+
+    target->client->sess.noclipAllowed = qtrue;
+    G_Printf("%s ^7can now noclip freely.\n", target->client->pers.netname);
+    trap_SendServerCommand(target->client->ps.clientNum,
+        "cp \"^5You can now noclip freely.\n\"");
+}
+
+void Svcmd_StartGame_f() 
+{
+    gentity_t *target = NULL;
+    int i = 0;
+
+    if(!level.routeBegin)
+    {
+        return;
+    }
+
+    level.raceIsStarting = qtrue;
+    level.raceStartTime = level.time + sr_startTime.integer;
+
+    trap_SendServerCommand(-1, va("cp \"^5Race is starting in %d seconds\n\"", 
+        sr_startTime.integer / 1000));
+}
+
+void Svcmd_RouteMaker_f() 
+{
+    int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS] = "\0";
+    char err[MAX_TOKEN_CHARS] = "\0";
+    gentity_t *target = NULL;
+
+    if(argc != 2)
+    {
+        G_Printf("usage: routemaker [player].\n");
+        return;
+    }
+
+    trap_Argv(1, arg, sizeof(arg));
+    target = PlayerGentityFromString(arg, err, sizeof(err));
+    if(!target) 
+    {
+        G_Printf("routemaker: %s\n", err);
+        return;
+    }
+
+    target->client->sess.routeMaker = qtrue;
+    trap_SendServerCommand(target->client->ps.clientNum, 
+        "cp \"^5You can make routes now.\n\"");
+}
+
+void Svcmd_MoveAll_f()
+{
+    int i = 0;
+    int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS] = "\0";
+    char err[MAX_TOKEN_CHARS] = "\0";
+    gentity_t *target = NULL;
+
+    if(argc != 2)
+    {
+        G_Printf("usage: moveall [player].\n");
+        return;
+    }
+
+    trap_Argv(1, arg, sizeof(arg));
+    target = PlayerGentityFromString(arg, err, sizeof(err));
+    if(!target) 
+    {
+        G_Printf("moveall: %s\n", err);
+        return;
+    }
+
+    for(; i < level.numConnectedClients; i++)
+    {
+        int clientNum = level.sortedClients[i];
+        gentity_t *other = g_entities + clientNum;
+        if(other == target)
+        {
+            continue;
+        }
+
+        if(other->client->sess.sessionTeam == TEAM_SPECTATOR)
+        {
+            continue;
+        }
+
+        target->client->ps.eFlags ^= EF_TELEPORT_BIT;
+
+        VectorCopy(target->client->ps.origin, other->client->ps.origin);
+    }
+    G_Printf("Moved all players to %s\n", target->client->pers.netname);
+}
+
 
 
 /*
@@ -1376,6 +1534,32 @@ qboolean	ConsoleCommand( void ) {
 		return qtrue;
 	}
 // END - Mad Doc - TDF
+
+    if( !Q_stricmp( cmd, "fly")) {
+        Svcmd_Noclip_f();
+        return qtrue;
+    }
+
+    if( !Q_stricmp( cmd, "moveall")) {
+        Svcmd_MoveAll_f();
+        return qtrue;
+    }
+
+    if( !Q_stricmp( cmd, "allownoclip")) {
+        Svcmd_AllowNoclip_f();
+        return qtrue;
+    }
+
+    if( !Q_stricmp( cmd, "startgame")) {
+        Svcmd_StartGame_f();
+        return qtrue;
+    }
+
+    if( !Q_stricmp( cmd, "routemaker")) {
+        Svcmd_RouteMaker_f();
+        return qtrue;
+    }
+
 
 #ifdef OMNIBOT_SUPPORT
 	// sta acqu-sdk (issue 3): omnibot support

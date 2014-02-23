@@ -17,7 +17,8 @@
 
 // the "gameversion" client command will print this plus compile date
 #ifndef PRE_RELEASE_DEMO
-#define GAMEVERSION			"etmain"
+#define GAMEVERSION			"satchelrace"
+#define MOD_VERSION         "0.0.1"
 #else
 //#define GAMEVERSION			"You look like you need a monkey!"
 #define GAMEVERSION			"ettest"
@@ -484,6 +485,10 @@ struct gentity_s {
 
 	vec3_t	oldOrigin;
 
+    int horizontalRange;
+    int verticalRange;
+    int position;
+
 	qboolean runthisframe;
 
 	g_constructible_stats_t	constructibleStats;
@@ -561,6 +566,7 @@ typedef struct {
 	unsigned int kills;
 } weapon_stat_t;
 
+#define MAX_CHECKPOINTS 20
 
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
@@ -611,6 +617,16 @@ typedef struct {
 
 	weapon_stat_t aWeaponStats[WS_MAX+1];	// Weapon stats.  +1 to avoid invalid weapon check
 	// OSP
+
+    qboolean noclipAllowed;
+    qboolean routeMaker;
+    qboolean racing;
+    qboolean checkpointVisited[MAX_CHECKPOINTS];
+
+    // Show route
+    int nextCp;
+    int lastRouteSpotTime;
+    int timeBetweenRouteSpots;
 
 	qboolean	versionOK;
 } clientSession_t;
@@ -892,6 +908,8 @@ struct gclient_s {
 	qboolean		hasaward;
 	qboolean		wantsscore;
 	qboolean		maxlivescalced;
+    qboolean        satchelOnGround;
+    gentity_t       *satchelEnt;
 };
 
 typedef struct {
@@ -1149,6 +1167,13 @@ typedef struct {
 
 	qboolean	tempTraceIgnoreEnts[ MAX_GENTITIES ];
 
+    gentity_t *routeBegin;
+    gentity_t *routeEnd;
+    qboolean raceIsStarting;
+    int raceStartTime;
+    gentity_t *checkpoints[MAX_CHECKPOINTS];
+    int numCheckpoints;
+
 #ifdef OMNIBOT_SUPPORT
 	// sta acqu-sdk (issue 3): omnibot support
 	qboolean        twoMinute;
@@ -1335,7 +1360,8 @@ void G_ParseCampaigns( void );
 qboolean G_MapIsValidCampaignStartMap( void );
 
 team_t G_GetTeamFromEntity( gentity_t *ent );
-
+int ClientNumbersFromString( const char *s, int *plist);
+qboolean G_MatchOnePlayer(int *plist, char *err, int len) ;
 //
 // g_combat.c
 //
@@ -1970,6 +1996,13 @@ extern vmCvar_t lua_modules;
 extern vmCvar_t lua_allowedModules;
 // end acqu-sdk (issue 9)
 #endif
+
+extern vmCvar_t sr_noSatchelSpeed;
+extern vmCvar_t sr_satchelDistance;
+extern vmCvar_t sr_smokeBounce;
+extern vmCvar_t sr_defaultEndAreaRange;
+extern vmCvar_t sr_startTime;
+
 
 
 
@@ -2634,6 +2667,9 @@ int G_Warmupfire_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *ar
 int G_Unreferee_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_AntiLag_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_BalancedTeams_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_StartGame_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd );
+int G_RouteMaker_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd );
+
 
 void G_LinkDebris( void );
 void G_LinkDamageParents( void );
