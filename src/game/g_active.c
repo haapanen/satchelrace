@@ -1389,21 +1389,21 @@ void ClientThink_real( gentity_t *ent ) {
                 if(level.routeBegin)
                 {
                     VectorCopy(level.routeBegin->r.currentOrigin, ent->client->ps.origin);
-                    VectorCopy(level.routeBegin->r.currentAngles, ent->client->ps.viewangles);
+                    SetClientViewAngle(ent, level.routeBegin->r.currentAngles);
                 }
             } else if(ent->client->sess.nextCp >= 0 && ent->client->sess.nextCp < level.numCheckpoints)
             {
                 if(level.checkpoints[ent->client->sess.nextCp])
                 {
                     VectorCopy(level.checkpoints[ent->client->sess.nextCp]->r.currentOrigin, ent->client->ps.origin);
-                    VectorCopy(level.checkpoints[ent->client->sess.nextCp]->r.currentAngles, ent->client->ps.viewangles);
+                    SetClientViewAngle(ent, level.checkpoints[ent->client->sess.nextCp]->r.currentAngles);
                 }
             } else if(ent->client->sess.nextCp == level.numCheckpoints)
             {
                 if(level.routeEnd)
                 {
                     VectorCopy(level.routeEnd->r.currentOrigin, ent->client->ps.origin);
-                    VectorCopy(level.routeEnd->r.currentAngles, ent->client->ps.viewangles);
+                    SetClientViewAngle(ent, level.routeEnd->r.currentAngles);
                 }
             }
 

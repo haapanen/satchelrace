@@ -3638,7 +3638,7 @@ void RouteMakerCheckpoints( gentity_t * ent )
 
    
     VectorCopy( ent->r.currentOrigin, checkpoint->r.currentOrigin );
-    VectorCopy( ent->r.currentAngles, checkpoint->r.currentAngles );
+    VectorCopy( ent->client->ps.viewangles, checkpoint->r.currentAngles );
     level.checkpoints[level.numCheckpoints] = checkpoint;
     level.numCheckpoints++;
     CP(va("cp \"^5Added a checkpoint (%d, %d).\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
@@ -3664,7 +3664,7 @@ void RouteMakerBegin( gentity_t * ent )
     // begin->s.modelindex2 = 1;
     VectorCopy( ent->r.currentOrigin, begin->r.currentOrigin );
     G_SetOrigin(begin, ent->r.currentOrigin);
-    G_SetAngle(begin, ent->r.currentAngles);
+    G_SetAngle(begin, ent->client->ps.viewangles);
     // G_SetOrigin( begin, begin->r.currentOrigin );
     // trap_LinkEntity(begin);
     // End of experimentary
@@ -3690,7 +3690,7 @@ void RouteMakerEnd( gentity_t *ent )
     end->nextthink = level.time + FRAMETIME;
 
     VectorCopy( ent->r.currentOrigin, end->r.currentOrigin );
-    VectorCopy( ent->r.currentAngles, end->r.currentAngles );
+    VectorCopy( ent->client->ps.viewangles, end->r.currentAngles );
     level.routeEnd = end;
 
 
