@@ -3853,6 +3853,7 @@ void Cmd_Route_f( gentity_t * ent )
 
 void Cmd_ShowRoute_f( gentity_t * ent ) 
 {
+	int travelTime;
     char arg[MAX_TOKEN_CHARS] = "\0";
 
     if(ent->client->sess.racing)
@@ -3873,9 +3874,8 @@ void Cmd_ShowRoute_f( gentity_t * ent )
         }
         ent->client->sess.lastRouteSpotTime = 0;
     }
-
-	ent->client->sess.travelTime = ent->client->sess.timeBetweenRouteSpotsSec * level.numCheckpoints;
-	CP(va("cp \"^5Estimated time to show route: %d seconds\n\"", ent->client->sess.travelTime));
+	travelTime = ent->client->sess.timeBetweenRouteSpotsSec * (level.numCheckpoints + 1);
+	CP(va("cp \"^5Estimated time to show route: %d seconds\n\"", travelTime));
 	ent->client->sess.nextCp = -1;
 }
 
