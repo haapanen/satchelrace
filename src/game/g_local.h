@@ -630,7 +630,9 @@ typedef struct {
     // Show route
     int nextCp;
     int lastRouteSpotTime;
-    int timeBetweenRouteSpots;
+    int timeBetweenRouteSpotsMS;
+	int timeBetweenRouteSpotsSec;
+	int travelTime;
 
 	qboolean	versionOK;
 } clientSession_t;
