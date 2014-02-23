@@ -3866,20 +3866,23 @@ void Cmd_ShowRoute_f( gentity_t * ent )
         return;
     }
 
-    ent->client->sess.timeBetweenRouteSpots = 1000;
+    ent->client->sess.timeBetweenRouteSpotsMS = 1000;
 
     if(trap_Argc() == 2)
     {
         trap_Argv(1, arg, sizeof(arg));
-        ent->client->sess.timeBetweenRouteSpots = atoi(arg);
-        if(ent->client->sess.timeBetweenRouteSpots < 1000)
+        ent->client->sess.timeBetweenRouteSpotsSec = atoi(arg);
+		ent->client->sess.timeBetweenRouteSpotsMS = ent->client->sess.timeBetweenRouteSpotsSec * 1000;
+        if(ent->client->sess.timeBetweenRouteSpotsMS < 1000)
         {
-            ent->client->sess.timeBetweenRouteSpots = 1000;
+            ent->client->sess.timeBetweenRouteSpotsMS = 1000;
         }
         ent->client->sess.lastRouteSpotTime = 0;
     }
 
-    ent->client->sess.nextCp = -1;
+	ent->client->sess.travelTime = ent->client->sess.timeBetweenRouteSpotsSec * level.numCheckpoints;
+	CP(va("cp \"^5Estimated time to show route: %d seconds\n\"", ent->client->sess.travelTime));
+	ent->client->sess.nextCp = -1;
 }
 
 

@@ -1381,7 +1381,7 @@ void ClientThink_real( gentity_t *ent ) {
     // 20 = end
     if(!ent->client->sess.racing && ent->client->sess.nextCp <= level.numCheckpoints)
     {
-        if(ent->client->sess.lastRouteSpotTime + ent->client->sess.timeBetweenRouteSpots < level.time )
+        if(ent->client->sess.lastRouteSpotTime + ent->client->sess.timeBetweenRouteSpotsMS < level.time )
         {
             ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
             if(ent->client->sess.nextCp == -1)
