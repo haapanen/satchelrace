@@ -1492,10 +1492,17 @@ typedef enum {
 } meansOfDeath_t;
 
 typedef enum {
+    PW_RANDOM,
     PW_NOSLOW,
     PW_LOWGRAVITY,
     PW_ROOT_PROTECTION,
     PW_SATCHELBOOST,
+    PW_SATCHELUNBOOST,
+    PW_SLOW,
+    PW_GRAVITY,
+    ROUTE_STARTPOINT,
+    ROUTE_CHECKPOINT,
+    ROUTE_ENDPOINT,
     NUM_SR_POWERUP_TYPES
 } satchelRacePowerup_t;
 

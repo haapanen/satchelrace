@@ -1076,6 +1076,11 @@ void ClientThink_real( gentity_t *ent ) {
         client->ps.gravity = g_gravity.value;
     }
 
+    if(client->powerups[PW_GRAVITY] > level.time)
+    {
+        client->ps.gravity = sr_pw_gravity.integer;
+    }
+
     if(!client->satchelOnGround) 
     {
         client->ps.speed = sr_noSatchelSpeed.value;
@@ -1099,6 +1104,15 @@ void ClientThink_real( gentity_t *ent ) {
     if(client->powerups[PW_NOSLOW] > level.time)
     {
         client->ps.speed = g_speed.value;
+    }
+
+    if(client->powerups[PW_SLOW] > level.time)
+    {
+        client->ps.speed = client->ps.speed * (sr_pw_slowPercent.value/100);
+        if(client->ps.speed < 0)
+        {
+            client->ps.speed = 0;
+        }
     }
 
     if(level.rootPlayers > level.time)
