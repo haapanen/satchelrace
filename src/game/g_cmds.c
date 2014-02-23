@@ -3488,7 +3488,16 @@ void CheckWinner(gentity_t *self)
 
         if( ent->client->sess.racing )
         {
-            trap_SendServerCommand(-1, va("cpm \"%s ^7reached the end.\n\"", ent->client->pers.netname));
+            int msec = 0;
+            int sec = 0;
+            int min = 0;
+            msec = level.time - ent->client->sess.raceStartTime;
+            min = msec / 60000;
+            msec = msec - min * 60000;
+            sec = msec / 1000;
+            msec = msec - sec * 1000;
+            trap_SendServerCommand(-1, va("cpm \"%s ^7reached the end in %02d:%02d:%03d.\n\"", 
+                ent->client->pers.netname, min, sec, msec));
             ent->client->sess.racing = qfalse;
         } 
     }
@@ -3511,6 +3520,9 @@ void CheckRacersNearCP(gentity_t *self)
     count = trap_EntitiesInBox(mins, maxs, entityList, MAX_GENTITIES);
 
     for ( i = 0; i < count; i++ ) {
+        int msec = 0;
+        int sec = 0;
+        int min = 0;
         gentity_t *ent = NULL;
         ent = &g_entities[entityList[i]];
 
@@ -3520,7 +3532,13 @@ void CheckRacersNearCP(gentity_t *self)
 
         if( ent->client->sess.racing && !ent->client->sess.checkpointVisited[self->position] )
         {
-            trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d.\n\"", ent->client->pers.netname, self->position + 1));
+            msec = level.time - ent->client->sess.raceStartTime;
+            min = msec / 60000;
+            msec = msec - min * 60000;
+            sec = msec / 1000;
+            msec = msec - sec * 1000;
+            trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
+                min, sec, msec));
             ent->client->sess.checkpointVisited[self->position] = qtrue;
         } 
     }
@@ -3680,7 +3698,6 @@ void RouteMakerEnd( gentity_t *ent )
         end->horizontalRange = sr_defaultEndAreaRange.integer;
         end->verticalRange = sr_defaultEndAreaRange.integer;
 
-        CP(va("print \"route: dropped an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
     } else if(argc == 3)
     {
         char rangeStr[MAX_TOKEN_CHARS] = "\0";
@@ -3713,7 +3730,6 @@ void RouteMakerEnd( gentity_t *ent )
             end->horizontalRange = sr_defaultEndAreaRange.integer;
             end->verticalRange = sr_defaultEndAreaRange.integer;
         }
-        CP(va("cp \"^5Added an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
     } else if(argc == 4)
     {
         char horizontalRangeStr[MAX_TOKEN_CHARS] = "\0";
@@ -3743,8 +3759,8 @@ void RouteMakerEnd( gentity_t *ent )
         {
             end->verticalRange = sr_defaultEndAreaRange.integer;
         }
-        CP(va("cp \"^5Added an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
     }
+    CP(va("cp \"^5Added an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
 }
 
 void RouteMakerClear( gentity_t * ent ) 

@@ -3838,6 +3838,7 @@ void CheckSatchelRunStatus()
                     VectorCopy(level.routeBegin->r.currentOrigin, target->client->ps.origin);
 
                     target->client->sess.racing = qtrue;
+                    target->client->sess.raceStartTime = level.time;
                 }
             }
             level.raceIsStarting = qfalse;

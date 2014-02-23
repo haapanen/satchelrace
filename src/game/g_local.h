@@ -622,6 +622,7 @@ typedef struct {
     qboolean routeMaker;
     qboolean racing;
     qboolean checkpointVisited[MAX_CHECKPOINTS];
+    int raceStartTime;
 
     // Show route
     int nextCp;
