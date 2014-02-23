@@ -266,6 +266,9 @@ vmCvar_t sr_pw_lowGravity;
 
 vmCvar_t sr_pw_rootDuration;
 
+vmCvar_t sr_pw_knockback;
+vmCvar_t sr_pw_satchelBoost;
+
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
 	{ &g_cheats, "sv_cheats", "", 0, qfalse },
@@ -528,7 +531,10 @@ cvarTable_t		gameCvarTable[] = {
     { &sr_pw_lowGravityDuration, "sr_pw_lowGravityDuration", "10000", CVAR_ARCHIVE},
     { &sr_pw_lowGravity, "sr_pw_lowGravity", "600", CVAR_ARCHIVE },
 
-    { &sr_pw_rootDuration, "sr_pw_rootDuration", "3000", CVAR_ARCHIVE }
+    { &sr_pw_rootDuration, "sr_pw_rootDuration", "3000", CVAR_ARCHIVE },
+
+    { &sr_pw_knockback, "sr_pw_knockback", "2", CVAR_ARCHIVE},
+    { &sr_pw_satchelBoost, "sr_pw_satchelBoost", "3", CVAR_ARCHIVE }
 };
 
 // bk001129 - made static to avoid aliasing
@@ -3861,7 +3867,7 @@ void CheckSatchelRunStatus()
                 }
             }
 
-            for(i = 0; i < MAX_POWERUPS; i++)
+            for(i = 0; i < level.numPowerups; i++)
             {
                 if(level.powerups[i])
                 {

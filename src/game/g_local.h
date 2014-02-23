@@ -2030,6 +2030,9 @@ extern vmCvar_t sr_pw_lowGravity;
 // Root
 extern vmCvar_t sr_pw_rootDuration;
 
+extern vmCvar_t sr_pw_knockback;
+extern vmCvar_t sr_pw_satchelBoost;
+
 
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
