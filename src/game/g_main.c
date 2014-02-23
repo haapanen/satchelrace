@@ -1724,7 +1724,12 @@ void G_InitSatchelRace()
     {
         level.checkpoints[i] = NULL;
     }
+    for(i = 0; i < MAX_POWERUPS; i++)
+    {
+        level.powerups[i] = NULL;
+    }
     level.numCheckpoints = 0;
+    level.numPowerups = 0;
     for(i = 0; i < level.numConnectedClients; i++)
     {
         int clientNum = level.sortedClients[i];

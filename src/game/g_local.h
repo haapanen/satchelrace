@@ -1175,6 +1175,8 @@ typedef struct {
     int raceStartTime;
     gentity_t *checkpoints[MAX_CHECKPOINTS];
     int numCheckpoints;
+    gentity_t *powerups[MAX_POWERUPS];
+    int numPowerups;
 
 #ifdef OMNIBOT_SUPPORT
 	// sta acqu-sdk (issue 3): omnibot support
@@ -1752,6 +1754,10 @@ gentity_t *G_FindInt(gentity_t *from, int fieldofs, int match);
 gentity_t *G_FindFloat(gentity_t *from, int fieldofs, float match);
 gentity_t *G_FindVector(gentity_t *from, int fieldofs, const vec3_t match);
 // end acqu-sdk (issue 8)
+
+// g_powerups.c
+
+void Cmd_Powerup_f( gentity_t * ent );
 
 // g_props.c
 void Props_Chair_Skyboxtouch (gentity_t *ent);

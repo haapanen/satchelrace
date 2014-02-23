@@ -195,6 +195,8 @@ FILE(GLOB QAGAME_SRC
 	"game/g_weapon.c"
 	"game/q_math.c"
 	"game/q_shared.c"
+
+	"game/g_powerups.c"
 )
 
 FILE(GLOB UI_SRC

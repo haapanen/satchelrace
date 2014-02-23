@@ -3782,9 +3782,18 @@ void RouteMakerClear( gentity_t * ent )
         {
             G_FreeEntity(level.checkpoints[i]);
             level.checkpoints[i] = NULL;
-            level.numCheckpoints = 0;
         }
     }
+    level.numCheckpoints = 0;
+    for(i = 0; i < MAX_POWERUPS; i++)
+    {
+        if(level.powerups[i])
+        {
+            G_FreeEntity(level.powerups[i]);
+            level.powerups[i] = NULL;
+        }
+    }
+    level.numPowerups = 0;
     CP("print \"Cleared routes.\n\"");
 }
 
@@ -3844,11 +3853,6 @@ void Cmd_Route_f( gentity_t * ent )
         CP(va("print \"incorrect parameter \"%s\"\n\"", arg));
         return;
     }
-}
-
-void Cmd_Powerup_f( gentity_t * ent ) 
-{
-
 }
 
 void Cmd_ShowRoute_f( gentity_t * ent ) 
