@@ -22,13 +22,14 @@ void think_root( gentity_t *self );
 void think_satchelBoost( gentity_t *self );
 void think_satchelUnboost( gentity_t *self );
 void think_slow( gentity_t *self );
+void think_gravity( gentity_t *self );
 
 static const Powerup_t powerups[] = {
     {"noslow", "No Slow", spawner_noSlow, think_noSlow},
     {"lowgravity", "Low Gravity", spawner_lowGravity, think_lowGravity},
     {"satchelboost", "Satchel Boost", spawner_satchelBoost, think_satchelBoost},
     {"slow", "Slow Others", spawner_slow, think_slow},
-    {"gravity", "Gravity", spawner_gravity, NULL},
+    {"gravity", "Gravity", spawner_gravity, think_gravity},
     {"satchelunboost", "Satchel Unboost", spawner_satchelUnboost, think_satchelUnboost},
     {"root", "Root", spawner_root, think_root}
 };
@@ -160,7 +161,12 @@ gentity_t * spawner_slow( gentity_t *spawner, void (*think)(gentity_t *self) )
 
 gentity_t * spawner_gravity( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
-
+    gentity_t *powerupSpawner = G_Spawn();
+    powerupSpawner->classname = "powerup_gravity_spawner";
+    powerupSpawner->think = think;
+    powerupSpawner->child = NULL;
+    G_SetOrigin(powerupSpawner, spawner->r.currentOrigin);
+    return powerupSpawner;
 }
 
 gentity_t * spawner_satchelUnboost( gentity_t *spawner, void (*think)(gentity_t *self) )
@@ -371,7 +377,7 @@ void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace)
             continue;
         } else
         {
-            player->client->powerups[PW_SLOW] = sr_pw_satchelUnboost.integer;
+            player->client->powerups[PW_SLOW] = level.time + sr_pw_slowDuration.integer;
         }
     }
 
@@ -395,6 +401,50 @@ void think_slow( gentity_t *self )
 
     self->child = DropPowerup(self, item, TouchPowerupSlow, qfalse);
 }
+
+void TouchPowerupGravity(gentity_t *self, gentity_t *player, trace_t *trace)
+{
+    int i = 0;
+    if(!player->client)
+    {
+        return;
+    }
+
+    for(; i < level.numConnectedClients; i++)
+    {
+        int clientNum = level.sortedClients[i];
+        gentity_t *target = g_entities + clientNum;
+
+        if(target == player)
+        {
+            continue;
+        } else
+        {
+            player->client->powerups[PW_GRAVITY] = level.time + sr_pw_gravityDuration.integer;
+        }
+    }
+
+    AP(va("cpm \"%s ^7picked up a ^5Slow ^7powerup\n\"", player->client->pers.netname));
+    self->parent->child = NULL;
+    G_FreeEntity(self);
+}
+
+void think_gravity( gentity_t *self )
+{
+    gitem_t *item = NULL;
+    gentity_t *dropped = NULL;
+
+    // FIXME: wrong PW_
+    item = BG_FindItemForPowerup( PW_NOSLOW );
+    if(!item)
+    {
+        G_Printf("Error: couldn't find powerup.\n");
+        return;
+    }
+
+    self->child = DropPowerup(self, item, TouchPowerupGravity, qfalse);
+}
+
 
 void Cmd_Powerup_f( gentity_t * ent ) 
 {

@@ -1076,6 +1076,11 @@ void ClientThink_real( gentity_t *ent ) {
         client->ps.gravity = g_gravity.value;
     }
 
+    if(client->powerups[PW_GRAVITY] > level.time)
+    {
+        client->ps.gravity = sr_pw_gravity.integer;
+    }
+
     if(!client->satchelOnGround) 
     {
         client->ps.speed = sr_noSatchelSpeed.value;

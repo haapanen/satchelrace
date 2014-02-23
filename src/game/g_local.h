@@ -2039,6 +2039,9 @@ extern vmCvar_t sr_pw_satchelUnboostKnockback;
 extern vmCvar_t sr_pw_slowDuration;
 extern vmCvar_t sr_pw_slowPercent;
 
+extern vmCvar_t sr_pw_gravityDuration;
+extern vmCvar_t sr_pw_gravity;
+
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
 int		trap_Milliseconds( void );

@@ -275,6 +275,9 @@ vmCvar_t sr_pw_satchelUnboostKnockback;
 vmCvar_t sr_pw_slowDuration;
 vmCvar_t sr_pw_slowPercent;
 
+vmCvar_t sr_pw_gravity;
+vmCvar_t sr_pw_gravityDuration;
+
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
 	{ &g_cheats, "sv_cheats", "", 0, qfalse },
@@ -546,7 +549,10 @@ cvarTable_t		gameCvarTable[] = {
     { &sr_pw_satchelUnboostKnockback, "sr_pw_satchelUnboostKnockback", "0.5", CVAR_ARCHIVE },
 
     { &sr_pw_slowDuration, "sr_pw_slowDuration", "5000", CVAR_ARCHIVE },
-    { &sr_pw_slowPercent, "sr_pw_slowPercent", "50", CVAR_ARCHIVE}
+    { &sr_pw_slowPercent, "sr_pw_slowPercent", "50", CVAR_ARCHIVE},
+
+    { &sr_pw_gravity, "sr_pw_gravity", "1200", CVAR_ARCHIVE },
+    { &sr_pw_gravityDuration, "sr_pw_gravityDuration", "5000", CVAR_ARCHIVE}
 };
 
 // bk001129 - made static to avoid aliasing
