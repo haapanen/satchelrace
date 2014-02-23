@@ -496,6 +496,9 @@ struct gentity_s {
 	//bani
 	int	etpro_misc_1;
 
+    // Zero: so we can clear powerups on startgame
+    gentity_t *child;
+
 #ifdef OMNIBOT_SUPPORT
 	// sta acqu-sdk (issue 3): omnibot support
 	int numPlanted;
@@ -1758,6 +1761,8 @@ gentity_t *G_FindVector(gentity_t *from, int fieldofs, const vec3_t match);
 // g_powerups.c
 
 void Cmd_Powerup_f( gentity_t * ent );
+void ClearPowerups();
+void ClearPowerupItems();
 
 // g_props.c
 void Props_Chair_Skyboxtouch (gentity_t *ent);

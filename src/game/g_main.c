@@ -3851,6 +3851,13 @@ void CheckSatchelRunStatus()
             {
                 if(level.powerups[i])
                 {
+                    // Make sure there's no existing powerup-items on the map
+                    if(level.powerups[i]->child)
+                    {
+                        G_FreeEntity(level.powerups[i]->child);
+                        level.powerups[i]->child = NULL;
+                    }
+
                     level.powerups[i]->think(level.powerups[i]);
                 } else
                 {

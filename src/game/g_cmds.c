@@ -3785,15 +3785,7 @@ void RouteMakerClear( gentity_t * ent )
         }
     }
     level.numCheckpoints = 0;
-    for(i = 0; i < MAX_POWERUPS; i++)
-    {
-        if(level.powerups[i])
-        {
-            G_FreeEntity(level.powerups[i]);
-            level.powerups[i] = NULL;
-        }
-    }
-    level.numPowerups = 0;
+    ClearPowerups();
     CP("print \"Cleared routes.\n\"");
 }
 
