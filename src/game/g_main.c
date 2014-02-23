@@ -258,6 +258,7 @@ vmCvar_t sr_satchelDistance;
 vmCvar_t sr_smokeBounce;
 vmCvar_t sr_defaultEndAreaRange;
 vmCvar_t sr_startTime;
+vmCvar_t sr_noSlowDuration;
 
 cvarTable_t		gameCvarTable[] = {
 	// don't override the cheat state set by the system
@@ -514,7 +515,8 @@ cvarTable_t		gameCvarTable[] = {
     { &sr_satchelDistance, "sr_satchelDistance", "300", CVAR_ARCHIVE },
     { &sr_smokeBounce, "sr_smokeBounce", "0", CVAR_ARCHIVE },
     { &sr_defaultEndAreaRange, "sr_defaultEndAreaRange", "300", CVAR_ARCHIVE },
-    { &sr_startTime, "sr_startTime", "5000", CVAR_ARCHIVE }
+    { &sr_startTime, "sr_startTime", "5000", CVAR_ARCHIVE },
+    { &sr_noSlowDuration, "sr_noSlowDuration", "10000", CVAR_ARCHIVE }
 
 };
 

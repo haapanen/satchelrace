@@ -166,7 +166,11 @@ void TouchPowerupNoSlow(gentity_t *self, gentity_t *player, trace_t *trace)
         return;
     }
 
-    
+    player->client->powerups[PW_NOSLOW] = level.time + sr_noSlowDuration.integer;
+
+    AP(va("cpm \"%s ^5picked up a No Slow powerup\n\"", player->client->pers.netname));
+    self->parent->child = NULL;
+    G_FreeEntity(self);
 }
 
 void think_noSlow( gentity_t *self )
@@ -189,6 +193,11 @@ void Cmd_Powerup_f( gentity_t * ent )
     int i = 0;
     int argc = trap_Argc();
     char arg[MAX_TOKEN_CHARS] = "\0";
+
+    if( !ent->client->sess.routeMaker )
+    {
+        return;
+    }
 
     if(argc < 2)
     {

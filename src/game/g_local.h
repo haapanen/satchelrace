@@ -914,6 +914,7 @@ struct gclient_s {
 	qboolean		maxlivescalced;
     qboolean        satchelOnGround;
     gentity_t       *satchelEnt;
+    int powerups[NUM_SR_POWERUP_TYPES];
 };
 
 typedef struct {
@@ -2015,7 +2016,7 @@ extern vmCvar_t sr_satchelDistance;
 extern vmCvar_t sr_smokeBounce;
 extern vmCvar_t sr_defaultEndAreaRange;
 extern vmCvar_t sr_startTime;
-
+extern vmCvar_t sr_noSlowDuration;
 
 
 

@@ -1089,6 +1089,11 @@ void ClientThink_real( gentity_t *ent ) {
         client->ps.speed = speed;
     }
 
+    if(client->powerups[PW_NOSLOW] > level.time)
+    {
+        client->ps.speed = g_speed.value;
+    }
+
     if(client->noclip)
     {
         client->ps.speed = g_speed.value;

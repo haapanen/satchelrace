@@ -2611,7 +2611,7 @@ gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 /*
  * BG_FindItemForPowerup
  */
-gitem_t *BG_FindItemForPowerup( powerup_t pw )
+gitem_t *BG_FindItemForPowerup( satchelRacePowerup_t pw )
 {
     gitem_t *it;
 
