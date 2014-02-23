@@ -2495,19 +2495,40 @@ model="models/flags/b_flag.md3"
     {
         "powerup_noslow",
             "",
-        { "models/powerups/ammo/am30cal_s.md3", 0, 0},
+        { 
+            "models/powerups/ammo/am30cal_s.md3",
+                0,
+                0
+        },
         "",	// icon
-        NULL,						// ammo icon
-        "No slow",			// pickup
-        5,
-        IT_HOLDABLE,
-        HI_NOSLOW,
+        NULL,				// ammo icon
+        "No slow",		// pickup
+        0,
+        IT_POWERUP,
+        PW_NOSLOW,
         0,
         0,
-        "",							// precache
-        "",							// sounds
-        //		{5,2,2,2}
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
     },
+
+//     {
+//         "powerup_noslow",
+//             "",
+//         { "models/powerups/ammo/am30cal_s.md3", 0, 0},
+//         "",	// icon
+//         NULL,						// ammo icon
+//         "No slow",			// pickup
+//         5,
+//         IT_POWERUP,
+//         PW_NOSLOW,
+//         0,
+//         0,
+//         "",							// precache
+//         "",							// sounds
+//         //		{5,2,2,2}
+//     },
 
 	//---- (SA) Wolf keys
 
@@ -2585,6 +2606,22 @@ gitem_t	*BG_FindItemForWeapon( weapon_t weapon ) {
 
 	Com_Error( ERR_DROP, "Couldn't find item for weapon %i", weapon);
 	return NULL;
+}
+
+/*
+ * BG_FindItemForPowerup
+ */
+gitem_t *BG_FindItemForPowerup( powerup_t pw )
+{
+    gitem_t *it;
+
+    for ( it = bg_itemlist + 1 ; it->classname ; it++ ) {
+        if ( it->giType == IT_POWERUP && it->giTag == pw ) {
+            return it;
+        }
+    }
+
+    return NULL;
 }
 
 //----(SA) added

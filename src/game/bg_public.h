@@ -715,6 +715,7 @@ typedef enum {
 
 	PW_BLACKOUT = 14,		// OSP - spec blackouts. FIXME: we don't need 32bits here...relocate
 	PW_MVCLIENTLIST = 15,	// OSP - MV client info.. need a full 32 bits
+    PW_NOSLOW,
 
 	PW_NUM_POWERUPS
 } powerup_t;
@@ -1552,6 +1553,7 @@ gitem_t	*BG_FindItemForWeapon	( weapon_t weapon );
 
 gitem_t	*BG_FindItemForHoldable	( holdable_t pw );
 gitem_t *BG_FindItemForAmmo		( int weapon );
+gitem_t *BG_FindItemForPowerup  ( powerup_t pw );
 //gitem_t *BG_FindItemForKey		( wkey_t k, int *index );
 weapon_t BG_FindAmmoForWeapon	( weapon_t weapon );
 weapon_t BG_FindClipForWeapon	( weapon_t weapon );

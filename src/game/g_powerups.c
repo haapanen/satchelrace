@@ -31,7 +31,7 @@ static int numPowerups = sizeof(powerups)/sizeof(Powerup_t);
 gentity_t * spawn_noSlow( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
     gentity_t *powerup = G_Spawn();
-    powerup->classname = "powerup_noslow";
+    powerup->classname = "powerup_noslow_spawner";
     powerup->think = think;
     G_SetOrigin(powerup, spawner->r.currentOrigin);
     G_Printf("Spawned a noSlow spawner.\n");
@@ -91,28 +91,43 @@ void testtouch(gentity_t *self, gentity_t *other, trace_t *trace)
     G_Printf("Trying to pickup think_noSlow.\n");
 }
 
+void dummythink(gentity_t *self)
+{
+    return;
+}
+
 void think_noSlow( gentity_t *spawner, gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
-    G_Printf("think_noSlow:\n");
     
-    item = BG_FindItemForHoldable(HI_NOSLOW);
-
+    item = BG_FindItemForPowerup( PW_NOSLOW );
     if(!item)
     {
-        G_Printf("think_noSlow: no item\n");
+        G_Printf("Error: couldn't find powerup.\n");
+        return;
     }
-    dropped = Drop_Item(self, item, 0, qfalse);
-    
-    if(!dropped)
-    {
-        G_Printf("think_noSlow: failed to drop an item.\n");
-    } else
-    {
-        dropped->touch = testtouch;
-        G_Printf("think_noSlow: dropped an item.\n");
-    }
+
+    dropped = G_Spawn();
+    dropped->s.eType = ET_ITEM;
+    dropped->s.modelindex = item - bg_itemlist;
+    dropped->s.otherEntityNum2 = 1;
+    dropped->classname = item->classname;
+    dropped->item = item;
+
+    VectorSet( dropped->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, 0 );			//----(SA)	so items sit on the ground
+    VectorSet( dropped->r.maxs, ITEM_RADIUS, ITEM_RADIUS, 2*ITEM_RADIUS );	//----(SA)	so items sit on the ground
+    dropped->r.contents = CONTENTS_TRIGGER|CONTENTS_ITEM;
+
+    dropped->clipmask = CONTENTS_SOLID | CONTENTS_MISSILECLIP;	
+
+    dropped->touch = testtouch;
+    dropped->think = dummythink;
+    dropped->nextthink = 100;
+
+    G_SetOrigin(dropped, spawner->r.currentOrigin);
+    G_SetAngle(dropped, spawner->r.currentAngles);
+    trap_LinkEntity(dropped);
 }
 
 void Cmd_Powerup_f( gentity_t * ent ) 
