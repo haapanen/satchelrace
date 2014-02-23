@@ -3528,6 +3528,11 @@ void CheckRacersNearCP(gentity_t *self)
     self->nextthink = FRAMETIME;
 }
 
+#define RANGE_VERYSMALL 30
+#define RANGE_SMALL 100
+#define RANGE_MEDIUM 300
+#define RANGE_LARGE 500
+
 void RouteMakerCheckpoints( gentity_t * ent ) 
 {
     int argc = trap_Argc();
@@ -3545,22 +3550,240 @@ void RouteMakerCheckpoints( gentity_t * ent )
     checkpoint->position = level.numCheckpoints;
     checkpoint->think = CheckRacersNearCP;
     checkpoint->nextthink = level.time + FRAMETIME;
-
-    if(trap_Argc() == 3)
+    if(trap_Argc() == 2)
     {
-        char horizontalStr[MAX_TOKEN_CHARS] = "\0";
-        char verticalStr[MAX_TOKEN_CHARS] = "\0";
+        checkpoint->horizontalRange = sr_defaultEndAreaRange.integer;
+        checkpoint->verticalRange = sr_defaultEndAreaRange.integer;
+    } else if(trap_Argc() == 3)
+    {
+        char rangeStr[MAX_TOKEN_CHARS] = "\0";
+        int range = 0;
+        trap_Argv(2, rangeStr, sizeof(rangeStr));
+        range = atoi(rangeStr);
+
+        if(range)
+        {
+            checkpoint->horizontalRange = range;
+            checkpoint->verticalRange = range;
+        } else if(!Q_stricmp(rangeStr, "verysmall"))
+        {
+            checkpoint->horizontalRange = RANGE_VERYSMALL;
+            checkpoint->verticalRange = RANGE_VERYSMALL;
+        } else if(!Q_stricmp(rangeStr, "small"))
+        {
+            checkpoint->horizontalRange = RANGE_SMALL;
+            checkpoint->verticalRange = RANGE_SMALL;
+        } else if(!Q_stricmp(rangeStr, "medium"))
+        {
+            checkpoint->horizontalRange = RANGE_MEDIUM;
+            checkpoint->verticalRange = RANGE_MEDIUM;
+        } else if(!Q_stricmp(rangeStr, "large"))
+        {
+            checkpoint->horizontalRange = RANGE_LARGE;
+            checkpoint->verticalRange = RANGE_LARGE;
+        } else
+        {
+            checkpoint->horizontalRange = sr_defaultEndAreaRange.integer;
+            checkpoint->verticalRange = sr_defaultEndAreaRange.integer;
+        }
     } else if(trap_Argc() == 4)
     {
+        char horizontalRangeStr[MAX_TOKEN_CHARS] = "\0";
+        char verticalRangeStr[MAX_TOKEN_CHARS] = "\0";
 
+        int horizontalRange = atoi(horizontalRangeStr);
+        int verticalRange = atoi(verticalRangeStr);
+
+        trap_Argv(2, horizontalRangeStr, sizeof(horizontalRangeStr));
+        trap_Argv(3, verticalRangeStr, sizeof(verticalRangeStr));            
+
+        horizontalRange = atoi(horizontalRangeStr);
+        verticalRange = atoi(verticalRangeStr);
+
+        if(horizontalRange)
+        {
+            checkpoint->horizontalRange = horizontalRange;
+        } else
+        {
+            checkpoint->horizontalRange = sr_defaultEndAreaRange.integer;
+        }
+
+        if(verticalRange)
+        {
+            checkpoint->verticalRange = verticalRange;
+        } else
+        {
+            checkpoint->verticalRange = sr_defaultEndAreaRange.integer;
+        }
+        CP(va("cp \"^5Added a checkpoint (%d, %d)\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
     }
 
-    checkpoint->horizontalRange = 100;
-    checkpoint->verticalRange = 100;
+   
     VectorCopy( ent->r.currentOrigin, checkpoint->r.currentOrigin );
     level.checkpoints[level.numCheckpoints] = checkpoint;
     level.numCheckpoints++;
-    CP("cp \"^5Added a checkpoint.\n\"");
+    CP(va("cp \"^5Added a checkpoint (%d, %d).\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
+}
+
+void RouteMakerBegin( gentity_t * ent ) 
+{
+    gentity_t *begin = NULL;
+    // gitem_t *item = BG_FindItemForClassName("route_begin");
+
+    if(level.routeBegin != NULL)
+    {
+        G_FreeEntity(level.routeBegin);
+        level.routeBegin = NULL;
+    }
+
+    begin = G_Spawn();
+    begin->classname = "route_begin";
+    // begin->item = item;
+    // Experimentary
+    // begin->s.eType = ET_ITEM;        
+    // begin->s.modelindex = item - bg_itemlist;
+    // begin->s.modelindex2 = 1;
+    VectorCopy( ent->r.currentOrigin, begin->r.currentOrigin );
+    // G_SetOrigin( begin, begin->r.currentOrigin );
+    // trap_LinkEntity(begin);
+    // End of experimentary
+
+    level.routeBegin = begin;
+    CP("cp \"^5Added a start spot\n\"");
+}
+
+void RouteMakerEnd( gentity_t *ent )
+{
+    gentity_t *end = NULL;
+    int argc = trap_Argc();
+
+    if(level.routeEnd != NULL)
+    {
+        G_FreeEntity(level.routeEnd);
+        level.routeEnd = NULL;
+    }
+
+    end = G_Spawn();
+    end->classname = "route_end";
+    end->think = CheckWinner;
+    end->nextthink = level.time + FRAMETIME;
+
+    VectorCopy( ent->r.currentOrigin, end->r.currentOrigin );
+    level.routeEnd = end;
+
+
+
+    // route end [x-y] [z]
+    if(argc == 2)
+    {
+        // use default range == 300
+        end->horizontalRange = sr_defaultEndAreaRange.integer;
+        end->verticalRange = sr_defaultEndAreaRange.integer;
+
+        CP(va("print \"route: dropped an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
+    } else if(argc == 3)
+    {
+        char rangeStr[MAX_TOKEN_CHARS] = "\0";
+        int range = 0;
+        trap_Argv(2, rangeStr, sizeof(rangeStr));
+        range = atoi(rangeStr);
+
+        if(range)
+        {
+            end->horizontalRange = range;
+            end->verticalRange = range;
+        } else if(!Q_stricmp(rangeStr, "verysmall"))
+        {
+            end->horizontalRange = RANGE_VERYSMALL;
+            end->verticalRange = RANGE_VERYSMALL;
+        } else if(!Q_stricmp(rangeStr, "small"))
+        {
+            end->horizontalRange = RANGE_SMALL;
+            end->verticalRange = RANGE_SMALL;
+        } else if(!Q_stricmp(rangeStr, "medium"))
+        {
+            end->horizontalRange = RANGE_MEDIUM;
+            end->verticalRange = RANGE_MEDIUM;
+        } else if(!Q_stricmp(rangeStr, "large"))
+        {
+            end->horizontalRange = RANGE_LARGE;
+            end->verticalRange = RANGE_LARGE;
+        } else
+        {
+            end->horizontalRange = sr_defaultEndAreaRange.integer;
+            end->verticalRange = sr_defaultEndAreaRange.integer;
+        }
+        CP(va("cp \"^5Added an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
+    } else if(argc == 4)
+    {
+        char horizontalRangeStr[MAX_TOKEN_CHARS] = "\0";
+        char verticalRangeStr[MAX_TOKEN_CHARS] = "\0";
+
+        int horizontalRange = atoi(horizontalRangeStr);
+        int verticalRange = atoi(verticalRangeStr);
+
+        trap_Argv(2, horizontalRangeStr, sizeof(horizontalRangeStr));
+        trap_Argv(3, verticalRangeStr, sizeof(verticalRangeStr));            
+
+        horizontalRange = atoi(horizontalRangeStr);
+        verticalRange = atoi(verticalRangeStr);
+
+        if(horizontalRange)
+        {
+            end->horizontalRange = horizontalRange;
+        } else
+        {
+            end->horizontalRange = sr_defaultEndAreaRange.integer;
+        }
+
+        if(verticalRange)
+        {
+            end->verticalRange = verticalRange;
+        } else
+        {
+            end->verticalRange = sr_defaultEndAreaRange.integer;
+        }
+        CP(va("cp \"^5Added an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
+    }
+}
+
+void RouteMakerClear( gentity_t * ent ) 
+{
+    int i = 0;
+    if(level.routeBegin != NULL)
+    {
+        G_FreeEntity(level.routeBegin);
+        level.routeBegin = NULL;
+    }
+    if(level.routeEnd != NULL)
+    {
+        G_FreeEntity(level.routeEnd);
+        level.routeEnd = NULL;
+    }
+    for(; i < MAX_CHECKPOINTS; i++)
+    {
+        if(level.checkpoints[i])
+        {
+            G_FreeEntity(level.checkpoints[i]);
+            level.checkpoints[i] = NULL;
+            level.numCheckpoints = 0;
+        }
+    }
+    CP("print \"Cleared routes.\n\"");
+}
+
+void RouteMakerClearCP( gentity_t * ent ) 
+{
+    int i = 0;
+    for(; i < MAX_CHECKPOINTS; i++)
+    {
+        if(level.checkpoints[i])
+        {
+            G_FreeEntity(level.checkpoints[i]);
+            level.checkpoints[i] = NULL;
+            level.numCheckpoints = 0;
+        }
+    }
 }
 
 void Cmd_Route_f( gentity_t * ent ) 
@@ -3587,166 +3810,16 @@ void Cmd_Route_f( gentity_t * ent )
 
     if(!Q_stricmp(arg, "begin"))
     {
-        gentity_t *begin = NULL;
-        // gitem_t *item = BG_FindItemForClassName("route_begin");
-
-        if(level.routeBegin != NULL)
-        {
-            G_FreeEntity(level.routeBegin);
-            level.routeBegin = NULL;
-        }
-
-        begin = G_Spawn();
-        begin->classname = "route_begin";
-        // begin->item = item;
-        // Experimentary
-        // begin->s.eType = ET_ITEM;        
-        // begin->s.modelindex = item - bg_itemlist;
-        // begin->s.modelindex2 = 1;
-        VectorCopy( ent->r.currentOrigin, begin->r.currentOrigin );
-        // G_SetOrigin( begin, begin->r.currentOrigin );
-        // trap_LinkEntity(begin);
-        // End of experimentary
-
-        level.routeBegin = begin;
-        CP("cp \"^5Added a start spot\n\"");
-        return;
+        RouteMakerBegin(ent);
     } else if(!Q_stricmp(arg, "end"))
     {
-        gentity_t *end = NULL;
-
-        if(level.routeEnd != NULL)
-        {
-            G_FreeEntity(level.routeEnd);
-            level.routeEnd = NULL;
-        }
-
-        end = G_Spawn();
-        end->classname = "route_end";
-        end->think = CheckWinner;
-        end->nextthink = level.time + FRAMETIME;
-
-        VectorCopy( ent->r.currentOrigin, end->r.currentOrigin );
-        level.routeEnd = end;
-
-
-
-        // route end [x-y] [z]
-        if(argc == 2)
-        {
-            // use default range == 300
-            end->horizontalRange = sr_defaultEndAreaRange.integer;
-            end->verticalRange = sr_defaultEndAreaRange.integer;
-
-            CP(va("print \"route: dropped an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
-        } else if(argc == 3)
-        {
-            char rangeStr[MAX_TOKEN_CHARS] = "\0";
-            int range = 0;
-            trap_Argv(2, rangeStr, sizeof(rangeStr));
-            range = atoi(rangeStr);
-
-            if(range)
-            {
-                end->horizontalRange = range;
-                end->verticalRange = range;
-            } else
-            {
-                end->horizontalRange = sr_defaultEndAreaRange.integer;
-                end->verticalRange = sr_defaultEndAreaRange.integer;
-            }
-            CP(va("print \"route: dropped an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
-        } else if(argc == 4)
-        {
-            char horizontalRangeStr[MAX_TOKEN_CHARS] = "\0";
-            char verticalRangeStr[MAX_TOKEN_CHARS] = "\0";
-
-            int horizontalRange = atoi(horizontalRangeStr);
-            int verticalRange = atoi(verticalRangeStr);
-
-            trap_Argv(2, horizontalRangeStr, sizeof(horizontalRangeStr));
-            trap_Argv(3, verticalRangeStr, sizeof(verticalRangeStr));            
-
-            horizontalRange = atoi(horizontalRangeStr);
-            verticalRange = atoi(verticalRangeStr);
-
-            if(horizontalRange)
-            {
-                end->horizontalRange = horizontalRange;
-            } else
-            {
-                end->horizontalRange = sr_defaultEndAreaRange.integer;
-            }
-
-            if(verticalRange)
-            {
-                end->verticalRange = verticalRange;
-            } else
-            {
-                end->verticalRange = sr_defaultEndAreaRange.integer;
-            }
-            CP(va("cp \"^5Added an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
-        }
-
-
+        RouteMakerEnd(ent);
     } else if(!Q_stricmp(arg, "clear"))
     {
-        int i = 0;
-        if(level.routeBegin != NULL)
-        {
-            G_FreeEntity(level.routeBegin);
-            level.routeBegin = NULL;
-        }
-        if(level.routeEnd != NULL)
-        {
-            G_FreeEntity(level.routeEnd);
-            level.routeEnd = NULL;
-        }
-        for(; i < MAX_CHECKPOINTS; i++)
-        {
-            if(level.checkpoints[i])
-            {
-                G_FreeEntity(level.checkpoints[i]);
-                level.checkpoints[i] = NULL;
-                level.numCheckpoints = 0;
-            }
-        }
-        CP("print \"Cleared routes.\n\"");
+        RouteMakerClear(ent);
     } else if(!Q_stricmp(arg, "clearcp")) 
     {
-        int i = 0;
-        for(; i < MAX_CHECKPOINTS; i++)
-        {
-            if(level.checkpoints[i])
-            {
-                G_FreeEntity(level.checkpoints[i]);
-                level.checkpoints[i] = NULL;
-                level.numCheckpoints = 0;
-            }
-        }
-    } else if(!Q_stricmp(arg, "show"))
-    {
-        if(level.routeBegin && level.routeEnd)
-        {
-            CP(va("print \"Begin: (%d, %d, %d) End: (%d, %d, %d)\n\"", 
-                level.routeBegin->s.origin[0],
-                level.routeBegin->s.origin[1],
-                level.routeBegin->s.origin[2],
-                level.routeEnd->s.origin[0],
-                level.routeEnd->s.origin[1],
-                level.routeEnd->s.origin[2]));
-        }
-
-        if(!level.routeBegin)
-        {
-            CP("print \"route: no begin.\n\"");
-        } 
-
-        if(!level.routeEnd)
-        {
-            CP("print \"route: no end.\n\"");
-        }
-
+        RouteMakerClearCP(ent);
     } else if(!Q_stricmp(arg, "cp"))
     {
         RouteMakerCheckpoints( ent );

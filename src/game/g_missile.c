@@ -1414,7 +1414,6 @@ G_ExplodeSatchels
 */
 qboolean G_ExplodeSatchels(gentity_t* ent) {
 	gentity_t* e;
-	vec3_t dist;
 	int i;
 	qboolean blown = qfalse;
 
@@ -1432,10 +1431,13 @@ qboolean G_ExplodeSatchels(gentity_t* ent) {
 			continue;
 		}
 
-		VectorSubtract(e->r.currentOrigin, ent->r.currentOrigin, dist);
-		if( VectorLengthSquared(dist) > SQR(2000)) {
-			continue;
-		}
+
+// Zero: we don't really need this. Just makes it possible for people
+// to accidentally drop a satchel just before race starts. (issue 1)
+//         VectorSubtract(e->r.currentOrigin, ent->r.currentOrigin, dist);
+//         if( VectorLengthSquared(dist) > SQR(2000)) {
+//             continue;
+//         }
 
 		if ( e->parent != ent ) {
 			continue;
