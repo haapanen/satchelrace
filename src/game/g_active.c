@@ -846,6 +846,73 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 	*/
 }
 
+void HandleClientGravity( gclient_t * client ) 
+{
+    if(client->powerups[PW_LOWGRAVITY] > level.time)
+    {
+        client->ps.gravity = sr_pw_lowGravity.integer;
+    } else
+    {
+        client->ps.gravity = g_gravity.value;
+    }
+
+    if(client->powerups[PW_GRAVITY] > level.time)
+    {
+        client->ps.gravity = sr_pw_gravity.integer;
+    }
+}
+
+void HandleClientSpeed( gentity_t *ent ) 
+{
+    gclient_t *client = ent->client;
+    if(!client->satchelOnGround) 
+    {
+        client->ps.speed = sr_noSatchelSpeed.value;
+    } else
+    {
+        float speed = g_speed.value;
+        if(client->satchelEnt)
+        {
+            vec3_t dist;
+
+            VectorSubtract( ent->r.currentOrigin, ent->client->satchelEnt->r.currentOrigin, dist );
+            if ( VectorLengthSquared( dist ) > SQR( sr_satchelDistance.value ) ) {
+                speed = sr_noSatchelSpeed.value;
+            }
+        }
+
+        // set speed
+        client->ps.speed = speed;
+    }
+
+    if(client->powerups[PW_NOSLOW] > level.time)
+    {
+        client->ps.speed = g_speed.value;
+    }
+
+    if(client->powerups[PW_SLOW] > level.time)
+    {
+        client->ps.speed = client->ps.speed * (sr_pw_slowPercent.value/100);
+        if(client->ps.speed < 0)
+        {
+            client->ps.speed = 0;
+        }
+    }
+
+    if(level.rootPlayers > level.time)
+    {
+        if(client->powerups[PW_ROOT_PROTECTION] < level.time)
+        {
+            client->ps.speed = 0;
+        }
+    }
+
+    if(client->noclip)
+    {
+        client->ps.speed = g_speed.value;
+    }
+}
+
 // DHM - Nerve
 void WolfFindMedic( gentity_t *self ) {
 	int i, medic=-1;
@@ -1068,65 +1135,9 @@ void ClientThink_real( gentity_t *ent ) {
 
 	client->ps.aiState = AISTATE_COMBAT;
 
-    if(client->powerups[PW_LOWGRAVITY] > level.time)
-    {
-        client->ps.gravity = sr_pw_lowGravity.integer;
-    } else
-    {
-        client->ps.gravity = g_gravity.value;
-    }
+    HandleClientGravity( client );
 
-    if(client->powerups[PW_GRAVITY] > level.time)
-    {
-        client->ps.gravity = sr_pw_gravity.integer;
-    }
-
-    if(!client->satchelOnGround) 
-    {
-        client->ps.speed = sr_noSatchelSpeed.value;
-    } else
-    {
-        float speed = g_speed.value;
-        if(ent->client->satchelEnt)
-        {
-            vec3_t dist;
-
-            VectorSubtract( ent->r.currentOrigin, ent->client->satchelEnt->r.currentOrigin, dist );
-            if ( VectorLengthSquared( dist ) > SQR( sr_satchelDistance.value ) ) {
-                speed = sr_noSatchelSpeed.value;
-            }
-        }
-
-        // set speed
-        client->ps.speed = speed;
-    }
-
-    if(client->powerups[PW_NOSLOW] > level.time)
-    {
-        client->ps.speed = g_speed.value;
-    }
-
-    if(client->powerups[PW_SLOW] > level.time)
-    {
-        client->ps.speed = client->ps.speed * (sr_pw_slowPercent.value/100);
-        if(client->ps.speed < 0)
-        {
-            client->ps.speed = 0;
-        }
-    }
-
-    if(level.rootPlayers > level.time)
-    {
-        if(client->powerups[PW_ROOT_PROTECTION] < level.time)
-        {
-            client->ps.speed = 0;
-        }
-    }
-
-    if(client->noclip)
-    {
-        client->ps.speed = g_speed.value;
-    }
+    HandleClientSpeed( ent );
 
 	if( client->speedScale )				// Goalitem speed scale
 		client->ps.speed *= (client->speedScale * 0.01);
@@ -1393,7 +1404,8 @@ void ClientThink_real( gentity_t *ent ) {
     // -1 = begin
     // 0-19 = cp
     // 20 = end
-    if(!ent->client->sess.racing && ent->client->sess.nextCp <= level.numCheckpoints)
+    if(!ent->client->sess.racing && ent->client->sess.showingRoute && 
+        ent->client->sess.nextCp <= level.numCheckpoints)
     {
         if(ent->client->sess.lastRouteSpotTime + ent->client->sess.timeBetweenRouteSpotsMS < level.time )
         {
@@ -1419,6 +1431,7 @@ void ClientThink_real( gentity_t *ent ) {
                     VectorCopy(level.routeEnd->r.currentOrigin, ent->client->ps.origin);
                     SetClientViewAngle(ent, level.routeEnd->r.currentAngles);
                 }
+                ent->client->sess.showingRoute = qfalse;
             }
 
             ent->client->sess.nextCp++;

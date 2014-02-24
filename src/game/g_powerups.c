@@ -4,8 +4,11 @@ typedef struct Powerup_s
 {
     const char *name;
     const char *text;
+    // for model
+    satchelRacePowerup_t pw;
     gentity_t *(*spawn)( gentity_t *spawner, void (*think)(gentity_t *self) );
     void (*think)(gentity_t *self);
+    void (*touch)(gentity_t *self, gentity_t *player, trace_t *trace);
 } Powerup_t;
 
 gentity_t *spawner_noSlow( gentity_t *spawner, void (*think)(gentity_t *self) );
@@ -15,7 +18,6 @@ gentity_t *spawner_slow( gentity_t *spawner, void (*think)(gentity_t *self) );
 gentity_t *spawner_gravity( gentity_t *spawner, void (*think)(gentity_t *self) );
 gentity_t *spawner_satchelUnboost( gentity_t *spawner, void (*think)(gentity_t *self) );
 gentity_t *spawner_root( gentity_t *spawner, void (*think)(gentity_t *self) );
-gentity_t *spawner_random( gentity_t *spawner, void (*think)(gentity_t *self) );
 
 
 void think_noSlow( gentity_t *self );
@@ -25,16 +27,23 @@ void think_satchelBoost( gentity_t *self );
 void think_satchelUnboost( gentity_t *self );
 void think_slow( gentity_t *self );
 void think_gravity( gentity_t *self );
-void think_random( gentity_t *self );
+
+void TouchPowerupGravity(gentity_t *self, gentity_t *player, trace_t *trace);
+void TouchPowerupLowGravity(gentity_t *self, gentity_t *player, trace_t *trace);
+void TouchPowerupNoSlow(gentity_t *self, gentity_t *player, trace_t *trace);
+void TouchPowerupRoot(gentity_t *self, gentity_t *player, trace_t *trace);
+void TouchPowerupSatchelBoost(gentity_t *self, gentity_t *player, trace_t *trace);
+void TouchPowerupSatchelUnboost(gentity_t *self, gentity_t *player, trace_t *trace);
+void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace);
 
 static const Powerup_t powerups[] = {
-    {"noslow", "No Slow", spawner_noSlow, think_noSlow},
-    {"lowgravity", "Low Gravity", spawner_lowGravity, think_lowGravity},
-    {"satchelboost", "Satchel Boost", spawner_satchelBoost, think_satchelBoost},
-    {"slow", "Slow Others", spawner_slow, think_slow},
-    {"gravity", "Gravity", spawner_gravity, think_gravity},
-    {"satchelunboost", "Satchel Unboost", spawner_satchelUnboost, think_satchelUnboost},
-    {"root", "Root", spawner_root, think_root}
+    {"noslow", "No Slow", NUM_SR_POWERUP_TYPES, spawner_noSlow, think_noSlow, TouchPowerupNoSlow},
+    {"lowgravity", "Low Gravity", NUM_SR_POWERUP_TYPES, spawner_lowGravity, think_lowGravity, TouchPowerupLowGravity},
+    {"satchelboost", "Satchel Boost", NUM_SR_POWERUP_TYPES, spawner_satchelBoost, think_satchelBoost, TouchPowerupSatchelBoost},
+    {"slow", "Slow Others", NUM_SR_POWERUP_TYPES, spawner_slow, think_slow, TouchPowerupSlow},
+    {"gravity", "Gravity", NUM_SR_POWERUP_TYPES, spawner_gravity, think_gravity, TouchPowerupGravity},
+    {"satchelunboost", "Satchel Unboost", NUM_SR_POWERUP_TYPES, spawner_satchelUnboost, think_satchelUnboost, TouchPowerupSatchelUnboost},
+    {"root", "Root", NUM_SR_POWERUP_TYPES, spawner_root, think_root, TouchPowerupRoot}
 };
 static int numPowerups = sizeof(powerups)/sizeof(Powerup_t);
 
@@ -218,7 +227,7 @@ void think_noSlow( gentity_t *self )
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
     
-    item = BG_FindItemForPowerup( PW_RANDOM );
+    item = BG_FindItemForPowerup( self->powerupType );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -248,7 +257,7 @@ void think_lowGravity( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_RANDOM );
+    item = BG_FindItemForPowerup( self->powerupType );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -280,7 +289,7 @@ void think_root( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_RANDOM );
+    item = BG_FindItemForPowerup( self->powerupType );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -310,7 +319,7 @@ void think_satchelBoost( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_RANDOM );
+    item = BG_FindItemForPowerup( self->powerupType );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -338,7 +347,7 @@ void TouchPowerupSatchelUnboost(gentity_t *self, gentity_t *player, trace_t *tra
             continue;
         } else
         {
-            player->client->powerups[PW_SATCHELUNBOOST] = sr_pw_satchelUnboost.integer;
+            target->client->powerups[PW_SATCHELUNBOOST] = sr_pw_satchelUnboost.integer;
         }
     }
 
@@ -353,7 +362,7 @@ void think_satchelUnboost( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_RANDOM );
+    item = BG_FindItemForPowerup( self->powerupType );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -378,10 +387,11 @@ void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace)
 
         if(target == player)
         {
+            player->client->powerups[PW_SLOW] = 0;
             continue;
         } else
         {
-            player->client->powerups[PW_SLOW] = level.time + sr_pw_slowDuration.integer;
+            target->client->powerups[PW_SLOW] = level.time + sr_pw_slowDuration.integer;
         }
     }
 
@@ -396,7 +406,7 @@ void think_slow( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_RANDOM );
+    item = BG_FindItemForPowerup( self->powerupType );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -424,7 +434,7 @@ void TouchPowerupGravity(gentity_t *self, gentity_t *player, trace_t *trace)
             continue;
         } else
         {
-            player->client->powerups[PW_GRAVITY] = level.time + sr_pw_gravityDuration.integer;
+            target->client->powerups[PW_GRAVITY] = level.time + sr_pw_gravityDuration.integer;
         }
     }
 
@@ -439,7 +449,7 @@ void think_gravity( gentity_t *self )
     gentity_t *dropped = NULL;
 
     // FIXME: wrong PW_
-    item = BG_FindItemForPowerup( PW_RANDOM );
+    item = BG_FindItemForPowerup( self->powerupType );
     if(!item)
     {
         G_Printf("Error: couldn't find powerup.\n");
@@ -447,6 +457,33 @@ void think_gravity( gentity_t *self )
     }
 
     self->child = DropPowerup(self, item, TouchPowerupGravity, qfalse);
+}
+
+void think_random( gentity_t *self )
+{
+    gitem_t *item = NULL;
+    gentity_t *dropped = NULL;
+    int i = rand() % numPowerups;
+
+    // FIXME: wrong PW_
+    item = BG_FindItemForPowerup( PW_RANDOM );
+    if(!item)
+    {
+        G_Printf("Error: couldn't find powerup model.\n");
+        return;
+    }
+
+    self->child = DropPowerup(self, item, powerups[i].touch, qfalse);
+}
+
+gentity_t *SpawnRandomPowerupSpawner( gentity_t *spawner ) 
+{
+    gentity_t *powerupSpawner = G_Spawn();
+    powerupSpawner->classname = "powerup_random_spawner";
+    powerupSpawner->think = think_random;
+    powerupSpawner->child = NULL;
+    G_SetOrigin(powerupSpawner, spawner->r.currentOrigin);
+    return powerupSpawner;
 }
 
 void Cmd_Powerup_f( gentity_t * ent ) 
@@ -467,6 +504,34 @@ void Cmd_Powerup_f( gentity_t * ent )
     }
 
     trap_Argv(1, arg, sizeof(arg));
+
+    // Special case, spawn random pwup
+    if(!Q_stricmp(arg, "random"))
+    {
+        int index = rand() % numPowerups;
+
+        if(powerups[index].spawn && powerups[index].think)
+        {
+            if(level.numPowerups == MAX_POWERUPS)
+            {
+                CP("print \"^1error: ^7too many powerups spawned.\n\"");
+                return;
+            }
+            level.powerups[level.numPowerups] = powerups[index].spawn(ent, powerups[index].think);
+            level.powerups[level.numPowerups]->powerupType = powerups[index].pw;
+            level.numPowerups++;
+            CP("cp \"^5Spawned a random powerup\n\"");
+        }
+    }
+
+    // TODO: special case, spawn random spawner that spawns random pwups
+    if(!Q_stricmp(arg, "any"))
+    {
+        level.powerups[level.numPowerups] = SpawnRandomPowerupSpawner( ent );
+        level.numPowerups++;
+        CP("cp \"^5Spawned a random powerup\n\"");
+    }
+
     for(; i < numPowerups; i++)
     {
         if(!Q_stricmp(arg, powerups[i].name))
@@ -479,8 +544,9 @@ void Cmd_Powerup_f( gentity_t * ent )
                     return;
                 }
                 level.powerups[level.numPowerups] = powerups[i].spawn(ent, powerups[i].think);
+                level.powerups[level.numPowerups]->powerupType = powerups[i].pw;
                 level.numPowerups++;
-                CP(va("cp \"^5Spawned %s powerup\n\"", powerups[i].text));
+                CP(va("cp \"^5Spawned a %s powerup\n\"", powerups[i].text));
             } else
             {
                 G_LogPrintf("Undefined powerup: %s\n", arg);

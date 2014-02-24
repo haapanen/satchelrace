@@ -673,7 +673,8 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 
 	char	*name = ConcatArgs( 1 );
 
-    if( !ent->client->sess.noclipAllowed && !ent->client->sess.routeMaker )
+    if( !ent->client->sess.noclipAllowed && !ent->client->sess.routeMaker 
+        && !ent->client->sess.racing )
     {
         if ( !CheatsOk( ent ) ) {
             return;
@@ -3959,6 +3960,7 @@ void Cmd_ShowRoute_f( gentity_t * ent )
 
 void Cmd_StopShowRoute_f( gentity_t * ent ) 
 {
+    ent->client->sess.showingRoute = qfalse;
     ent->client->sess.nextCp = MAX_CHECKPOINTS + 1;
 }
 
