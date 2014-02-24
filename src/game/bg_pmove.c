@@ -458,7 +458,7 @@ static void PM_Friction( void ) {
 
 	// apply ground friction
 	if ( pm->waterlevel <= 1 ) {
-		if ( pml.walking && !(pml.groundTrace.surfaceFlags & SURF_SLICK) ) {
+		if ( pml.walking && !(pml.groundTrace.surfaceFlags & SURF_SLICK) && !pm->powerupSlick ) {
 			// if getting knocked back, no friction
 			if ( ! (pm->ps->pm_flags & PMF_TIME_KNOCKBACK) ) {
 				control = speed < pm_stopspeed ? pm_stopspeed : speed;
@@ -1435,7 +1435,8 @@ static void PM_WalkMove( void ) {
 
 	// when a player gets hit, they temporarily lose
 	// full control, which allows them to be moved a bit
-	if ( ( pml.groundTrace.surfaceFlags & SURF_SLICK ) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK ) {
+	if ( ( pml.groundTrace.surfaceFlags & SURF_SLICK ) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK
+        || pm->powerupSlick == qtrue ) {
 		accelerate = pm_airaccelerate;
 	} 
 	else {
@@ -1447,7 +1448,8 @@ static void PM_WalkMove( void ) {
 	//Com_Printf("velocity = %1.1f %1.1f %1.1f\n", pm->ps->velocity[0], pm->ps->velocity[1], pm->ps->velocity[2]);
 	//Com_Printf("velocity1 = %1.1f\n", VectorLength(pm->ps->velocity));
 
-	if ( ( pml.groundTrace.surfaceFlags & SURF_SLICK ) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK ) {
+	if ( ( pml.groundTrace.surfaceFlags & SURF_SLICK ) || pm->ps->pm_flags & PMF_TIME_KNOCKBACK
+        || pm->powerupSlick == qtrue ) {
 		pm->ps->velocity[2] -= pm->ps->gravity * pml.frametime;
 	} 
 	else {
@@ -4069,7 +4071,7 @@ static void PM_Weapon( void ) {
 		// checks for delayed weapons that have already been fired are return'ed above.
 		return;
 
-	if( !(pm->ps->eFlags & EF_PRONE) && (pml.groundTrace.surfaceFlags & SURF_SLICK) ) { 
+	if( !(pm->ps->eFlags & EF_PRONE) && (pml.groundTrace.surfaceFlags & SURF_SLICK) || pm->powerupSlick ) { 
 		float fwdmove_knockback = 0.f;
 		float bckmove_knockback = 0.f;
 

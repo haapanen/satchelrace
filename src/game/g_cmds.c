@@ -3526,7 +3526,7 @@ void CheckWinner(gentity_t *self)
 				msec = msec - min * 60000;
 				sec = msec / 1000;
 				msec = msec - sec * 1000;
-				trap_SendServerCommand(-1, va("cpm \"%s ^7reached the end in %02d:%02d:%03d.\n\"", 
+				trap_SendServerCommand(-1, va("cpm \"%s ^7reached the ^1end^7 in %02d:%02d:%03d.\n\"", 
 					ent->client->pers.netname, min, sec, msec));
 				ent->client->sess.racing = qfalse;
 				// Reset powerups
@@ -3611,7 +3611,7 @@ void CheckRacersNearCP(gentity_t *self)
 			 {
 				 if(ent->client->sess.checkpointVisited[currentCP - 1])
 				 {
-					 trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
+					 trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
 					 min, sec, msec));
 					 ent->client->sess.checkpointVisited[self->position] = qtrue;
 				 }
@@ -3622,7 +3622,7 @@ void CheckRacersNearCP(gentity_t *self)
 			 }
 			 else if(currentCP == 0)
 			 {
-				  trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
+				  trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
 					 min, sec, msec));
 				  ent->client->sess.checkpointVisited[self->position] = qtrue;
 			 }
@@ -3980,6 +3980,7 @@ void Cmd_ShowRoute_f( gentity_t * ent )
 	travelTime = ent->client->sess.timeBetweenRouteSpotsSec * (level.numCheckpoints + 2);
 	CP(va("cp \"^5Estimated time to show route: %d seconds\n\"", travelTime));
 	ent->client->sess.nextCp = -1;
+    ent->client->sess.showingRoute = qtrue;
 }
 
 

@@ -582,6 +582,8 @@ typedef struct {
 	int			pmove_fixed;
 	int			pmove_msec;
 
+    qboolean    powerupSlick;
+
 	// callbacks to test the world
 	// these will be different functions during game and cgame
 	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
@@ -1500,6 +1502,7 @@ typedef enum {
     PW_SATCHELUNBOOST,
     PW_SLOW,
     PW_GRAVITY,
+    PW_SLICK,
     ROUTE_STARTPOINT,
     ROUTE_CHECKPOINT,
     ROUTE_ENDPOINT,

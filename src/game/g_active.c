@@ -1233,6 +1233,14 @@ void ClientThink_real( gentity_t *ent ) {
 
 	pm.leadership = qfalse;
 
+    if( client->powerups[PW_SLICK] > level.time )
+    {
+        pm.powerupSlick = qtrue;
+    } else
+    {
+        pm.powerupSlick = qfalse;
+    }
+
 // sta acqu-sdk (issue 18): remove unused code
 //#ifdef SAVEGAME_SUPPORT
 //	if( g_gametype.integer == GT_SINGLE_PLAYER && g_reloading.integer )

@@ -1485,6 +1485,8 @@ void SaveRoute( const char *routeName )
     }
 
     trap_FS_FCloseFile(f);
+
+    G_Printf("Saved route %s\n", routeName);
 }
 
 
@@ -1808,7 +1810,8 @@ void LoadRoute( const char *routeName )
         CreatePowerupSpawner( tempPw );
     }
     free(cnf2);
-    G_Printf("Loaded route: %s\n", routeName);
+    AP(va("cpm \"^8SR^7: Loaded route %s\n\"", routeName));
+    G_Printf("Loaded route %s\n", routeName);
 }
 
 void DeleteRoute( const char *routeName )

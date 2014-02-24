@@ -4282,6 +4282,7 @@ void FireWeapon( gentity_t *ent ) {
             ent->client->satchelOnGround = qfalse;
             ent->client->satchelEnt = NULL;
             ent->client->powerups[PW_SATCHELBOOST]--;
+            ent->client->powerups[PW_SATCHELUNBOOST]--;
 		}
 		break;
 	case WP_TRIPMINE:
