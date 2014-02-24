@@ -3196,8 +3196,8 @@ void Cmd_WeaponStat_f ( gentity_t* ent ) {
 	}
 	trap_Argv( 1, buffer, 16 );
 	stat = atoi(buffer);
-
-	trap_SendServerCommand( ent-g_entities, va( "rws %i %i", ent->client->sess.aWeaponStats[stat].atts, ent->client->sess.aWeaponStats[stat].hits ) );
+    if(stat >= 0 && stat < WS_MAX) 
+        trap_SendServerCommand( ent-g_entities, va( "rws %i %i", ent->client->sess.aWeaponStats[stat].atts, ent->client->sess.aWeaponStats[stat].hits ) );
 }
 
 void Cmd_IntermissionWeaponStats_f ( gentity_t* ent ) {
