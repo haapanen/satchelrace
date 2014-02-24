@@ -3488,23 +3488,29 @@ void CheckWinner(gentity_t *self)
 
         if( ent->client->sess.racing )
         {
-            int i = 0;
-            int msec = 0;
-            int sec = 0;
-            int min = 0;
-            msec = level.time - ent->client->sess.raceStartTime;
-            min = msec / 60000;
-            msec = msec - min * 60000;
-            sec = msec / 1000;
-            msec = msec - sec * 1000;
-            trap_SendServerCommand(-1, va("cpm \"%s ^7reached the end in %02d:%02d:%03d.\n\"", 
-                ent->client->pers.netname, min, sec, msec));
-            ent->client->sess.racing = qfalse;
-            // Reset powerups
-            for(; i < NUM_SR_POWERUP_TYPES; i++)
-            {
-                ent->client->powerups[i] = 0;
-            }
+			trap_SendServerCommand(-1, va("cpm \"%d amount of checkpoints.\n\"", 
+					level.numCheckpoints));
+			if(ent->client->sess.checkpointVisited[level.numCheckpoints] == qtrue) //Vallz: for some reason not working at the moment
+			{
+				int i = 0;
+				int msec = 0;
+				int sec = 0;
+				int min = 0;
+				msec = level.time - ent->client->sess.raceStartTime;
+				min = msec / 60000;
+				msec = msec - min * 60000;
+				sec = msec / 1000;
+				msec = msec - sec * 1000;
+				trap_SendServerCommand(-1, va("cpm \"%s ^7reached the end in %02d:%02d:%03d.\n\"", 
+					ent->client->pers.netname, min, sec, msec));
+				ent->client->sess.racing = qfalse;
+				// Reset powerups
+				for(; i < NUM_SR_POWERUP_TYPES; i++)
+				{
+					ent->client->powerups[i] = 0;
+				}
+			}
+          
         } 
     }
 
@@ -3513,6 +3519,8 @@ void CheckWinner(gentity_t *self)
 
 void CheckRacersNearCP(gentity_t *self)
 {
+	int currentCP = 1;
+	int k = 0;
     int i = 0;
     int count = 0;
     vec3_t range = {self->horizontalRange, self->horizontalRange, self->verticalRange};
@@ -3538,14 +3546,39 @@ void CheckRacersNearCP(gentity_t *self)
 
         if( ent->client->sess.racing && !ent->client->sess.checkpointVisited[self->position] )
         {
-            msec = level.time - ent->client->sess.raceStartTime;
-            min = msec / 60000;
-            msec = msec - min * 60000;
-            sec = msec / 1000;
-            msec = msec - sec * 1000;
-            trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
-                min, sec, msec));
-            ent->client->sess.checkpointVisited[self->position] = qtrue;
+			
+			currentCP = self->position;
+			
+			if(currentCP != 0)
+			 {
+				 if(ent->client->sess.checkpointVisited[currentCP - 1])
+				 {
+					 msec = level.time - ent->client->sess.raceStartTime;
+					 min = msec / 60000;
+					 msec = msec - min * 60000;
+					 sec = msec / 1000;
+					 msec = msec - sec * 1000;
+					 trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
+					 min, sec, msec));
+					 ent->client->sess.checkpointVisited[self->position] = qtrue;
+				 }
+			 }
+			 else if(currentCP == 0)
+			 {
+				  msec = level.time - ent->client->sess.raceStartTime;
+				  min = msec / 60000;
+				  msec = msec - min * 60000;
+				  sec = msec / 1000;
+				  msec = msec - sec * 1000;
+				  trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
+					 min, sec, msec));
+				  ent->client->sess.checkpointVisited[self->position] = qtrue;
+			 }
+			 else
+			 {
+				 CP("cp \"^1You missed a checkpoint, go back and visit it before visiting this one.\n\"");
+			 }
+			
         } 
     }
 
