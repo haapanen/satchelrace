@@ -1633,3 +1633,48 @@ qboolean G_MatchOnePlayer(int *plist, char *err, int len)
     }
     return qtrue;
 }
+
+static char bigTextBuffer[100000];
+
+void DecolorString( char *in, char *out)
+{
+    while(*in) {
+        if(*in == 27 || *in == '^') {
+            in++;		// skip color code
+            if(*in) in++;
+            continue;
+        }
+        *out++ = *in++;
+    }
+    *out = 0;
+}
+
+void BeginBufferPrint() {
+    bigTextBuffer[0] = '\0';
+}
+
+void FinishBufferPrint(gentity_t *ent) {
+    trap_SendServerCommand(ent->client->ps.clientNum, 
+        va("print \"%s\n\"", bigTextBuffer));
+}
+
+void BufferPrint(gentity_t *ent, char *string) {
+    if(!ent) {
+        char string2[MAX_STRING_CHARS];
+        DecolorString(string, string2);
+
+        if(strlen(string2) + strlen(bigTextBuffer) > 239) {
+            CP(va("print \"%s\"", bigTextBuffer));
+            //    PrintTo(ent, bigTextBuffer);
+            bigTextBuffer[0] = '\0';
+        }
+        Q_strcat(bigTextBuffer, sizeof(bigTextBuffer), string2);
+    } else {
+        if(strlen(string) + strlen(bigTextBuffer) >= 1009) {
+            CP(va("print \"%s\"", bigTextBuffer));
+            // PrintTo(ent, bigTextBuffer);
+            bigTextBuffer[0] = '\0';
+        }
+        Q_strcat(bigTextBuffer, sizeof(bigTextBuffer), string);
+    }
+}

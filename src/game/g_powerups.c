@@ -120,6 +120,7 @@ gentity_t *DropPowerup( gentity_t *ent, gitem_t *item,
 
     powerup->parent = ent;
     trap_LinkEntity(powerup);
+    return powerup;
 }
 
 gentity_t * spawner_noSlow( gentity_t *spawner, void (*think)(gentity_t *self) )

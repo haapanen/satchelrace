@@ -3488,9 +3488,7 @@ void CheckWinner(gentity_t *self)
 
         if( ent->client->sess.racing )
         {
-			trap_SendServerCommand(-1, va("cpm \"%d amount of checkpoints.\n\"", 
-					level.numCheckpoints));
-			if(ent->client->sess.checkpointVisited[level.numCheckpoints] == qtrue) //Vallz: for some reason not working at the moment
+			if(ent->client->sess.checkpointVisited[level.numCheckpoints - 1] == qtrue)
 			{
 				int i = 0;
 				int msec = 0;
@@ -3509,7 +3507,36 @@ void CheckWinner(gentity_t *self)
 				{
 					ent->client->powerups[i] = 0;
 				}
-			}
+            } else
+            {
+                // Kind of messy but checks if client has visited all checkpoints.
+                int i = 0;
+                int checkpointsVisited[MAX_CHECKPOINTS];
+                int checkpointsNotVisited = 0;
+                char buf[MAX_TOKEN_CHARS] = "^5You skipped the following checkpoints: ";
+                for(; i < level.numCheckpoints; i++)
+                {
+                    if(ent->client->sess.checkpointVisited[i] == qfalse)
+                    {
+                        checkpointsVisited[checkpointsNotVisited++] =
+                            i;
+                    }
+                }
+                
+                for(i = 0; i < checkpointsNotVisited; i++)
+                {
+                    if(i == checkpointsNotVisited - 1)
+                    {
+                        Q_strcat(buf, sizeof(buf), va("%d", checkpointsVisited[i] + 1));
+                    } else
+                    {
+                        Q_strcat(buf, sizeof(buf), va("%d, ", checkpointsVisited[i] + 1));
+                    }
+                }
+                
+                G_PrintClientSpammyCenterPrint(ent->client->ps.clientNum,
+                    va("%s", buf));
+            }
           
         } 
     }
@@ -3546,18 +3573,17 @@ void CheckRacersNearCP(gentity_t *self)
 
         if( ent->client->sess.racing && !ent->client->sess.checkpointVisited[self->position] )
         {
-			
+            msec = level.time - ent->client->sess.raceStartTime;
+            min = msec / 60000;
+            msec = msec - min * 60000;
+            sec = msec / 1000;
+            msec = msec - sec * 1000;
 			currentCP = self->position;
 			
 			if(currentCP != 0)
 			 {
 				 if(ent->client->sess.checkpointVisited[currentCP - 1])
 				 {
-					 msec = level.time - ent->client->sess.raceStartTime;
-					 min = msec / 60000;
-					 msec = msec - min * 60000;
-					 sec = msec / 1000;
-					 msec = msec - sec * 1000;
 					 trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
 					 min, sec, msec));
 					 ent->client->sess.checkpointVisited[self->position] = qtrue;
@@ -3565,11 +3591,6 @@ void CheckRacersNearCP(gentity_t *self)
 			 }
 			 else if(currentCP == 0)
 			 {
-				  msec = level.time - ent->client->sess.raceStartTime;
-				  min = msec / 60000;
-				  msec = msec - min * 60000;
-				  sec = msec / 1000;
-				  msec = msec - sec * 1000;
 				  trap_SendServerCommand(-1, va("cpm \"%s ^7reached checkpoint %d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
 					 min, sec, msec));
 				  ent->client->sess.checkpointVisited[self->position] = qtrue;

@@ -1374,6 +1374,9 @@ qboolean G_MapIsValidCampaignStartMap( void );
 team_t G_GetTeamFromEntity( gentity_t *ent );
 int ClientNumbersFromString( const char *s, int *plist);
 qboolean G_MatchOnePlayer(int *plist, char *err, int len) ;
+void BeginBufferPrint();
+void FinishBufferPrint(gentity_t *ent);
+void BufferPrint(gentity_t *ent, char *string);
 //
 // g_combat.c
 //
