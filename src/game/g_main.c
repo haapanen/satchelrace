@@ -3888,6 +3888,11 @@ void CheckSatchelRunStatus()
                     {
                         target->client->sess.checkpointVisited[j] = qfalse;
                     }
+
+                    if(target->client->noclip)
+                    {
+                        target->client->noclip = qfalse;
+                    }
                 }
             }
 

@@ -673,7 +673,8 @@ void Cmd_Noclip_f( gentity_t *ent ) {
 
 	char	*name = ConcatArgs( 1 );
 
-    if( !ent->client->sess.noclipAllowed && !ent->client->sess.routeMaker )
+    if( !ent->client->sess.noclipAllowed && !ent->client->sess.routeMaker 
+        && !ent->client->sess.racing )
     {
         if ( !CheatsOk( ent ) ) {
             return;

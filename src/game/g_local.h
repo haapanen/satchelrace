@@ -498,6 +498,8 @@ struct gentity_s {
 
     // Zero: so we can clear powerups on startgame
     gentity_t *child;
+    satchelRacePowerup_t powerupType;
+
 
 #ifdef OMNIBOT_SUPPORT
 	// sta acqu-sdk (issue 3): omnibot support
