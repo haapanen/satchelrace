@@ -1,4 +1,13 @@
-﻿W:ETSDK+ - enhanced ETSDK
+﻿Satchel race is a Wolfenstein: Enemy Territory modification for racing with satchels. It is actively developed by:
+
+Zero: programmer
+Vallz: programmer
+Tuomas: Modelling
+
+We are looking for more developers. Feel free to contact us. :)
+
+Mod is based on:
+W:ETSDK+ - enhanced ETSDK
 
 ETSDK+ is a project to improve ETSDK version 2.6 from the game Wolfenstein: Enemy Territory.
 
