@@ -3617,7 +3617,7 @@ void CheckRacersNearCP(gentity_t *self)
 				 }
 				 else
 				 {
-					 CP("cp \"^1You missed a checkpoint, go back and visit it before visiting this one.\n\"");
+					 CP("cp \"^7You missed a ^3checkpoint^7, go back and visit it before visiting this one.\n\"");
 				 }
 			 }
 			 else if(currentCP == 0)
@@ -3726,7 +3726,7 @@ void RouteMakerCheckpoints( gentity_t * ent )
         {
             checkpoint->verticalRange = sr_defaultEndAreaRange.integer;
         }
-        CP(va("cp \"^5Added a checkpoint (%d, %d)\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
+        CP(va("cp \"^7Added a ^3checkpoint ^7(%d, %d)\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
     }
         
     G_SetOrigin(checkpoint, ent->r.currentOrigin);
@@ -3737,7 +3737,7 @@ void RouteMakerCheckpoints( gentity_t * ent )
 //     VectorCopy( ent->client->ps.viewangles, checkpoint->r.currentAngles );
     level.checkpoints[level.numCheckpoints] = checkpoint;
     level.numCheckpoints++;
-    CP(va("cp \"^5Added a checkpoint (%d, %d).\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
+    CP(va("cp \"^7Added a ^3checkpoint ^7(%d, %d).\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
 }
 
 void RouteMakerBegin( gentity_t * ent ) 
@@ -3763,7 +3763,7 @@ void RouteMakerBegin( gentity_t * ent )
     trap_LinkEntity(begin);
 
     level.routeBegin = begin;
-    CP("cp \"^5Added a start spot\n\"");
+    CP("cp \"^7Added a ^2start ^7spot\n\"");
 }
 
 void RouteMakerEnd( gentity_t *ent )
@@ -3862,7 +3862,7 @@ void RouteMakerEnd( gentity_t *ent )
             end->verticalRange = sr_defaultEndAreaRange.integer;
         }
     }
-    CP(va("cp \"^5Added an end spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
+    CP(va("cp \"^7Added an ^1end ^7spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
 }
 
 void RouteMakerClear( gentity_t * ent ) 
@@ -3888,7 +3888,7 @@ void RouteMakerClear( gentity_t * ent )
     }
     level.numCheckpoints = 0;
     ClearPowerups();
-    CP("print \"Cleared routes.\n\"");
+    CP("print \"^8SR^7: cleared routes.\n\"");
 }
 
 void RouteMakerClearCP( gentity_t * ent ) 
