@@ -3465,6 +3465,32 @@ void Cmd_SwapPlacesWithBot_f( gentity_t *ent, int botNum ) {
 	client->pers.lastReinforceTime = 0;
 }
 
+void ClearRoute()
+{
+    // clear route.
+    int i = 0;
+    if(level.routeBegin != NULL)
+    {
+        G_FreeEntity(level.routeBegin);
+        level.routeBegin = NULL;
+    }
+    if(level.routeEnd != NULL)
+    {
+        G_FreeEntity(level.routeEnd);
+        level.routeEnd = NULL;
+    }
+    for(; i < MAX_CHECKPOINTS; i++)
+    {
+        if(level.checkpoints[i])
+        {
+            G_FreeEntity(level.checkpoints[i]);
+            level.checkpoints[i] = NULL;
+        }
+    }
+    level.numCheckpoints = 0;
+    ClearPowerups();
+}
+
 void CheckWinner(gentity_t *self)
 {
     int i = 0;

@@ -1310,6 +1310,534 @@ void Svcmd_RouteMaker_f()
         "cp \"^5You can make routes now.\n\"");
 }
 
+// From etpub
+void WriteString(const char *s, fileHandle_t f)
+{
+    char buf[MAX_STRING_CHARS];
+
+    buf[0] = '\0';
+    if(s[0]) {
+        //Q_strcat(buf, sizeof(buf), s);
+        Q_strncpyz(buf, s, sizeof(buf));
+        trap_FS_Write(buf, strlen(buf), f);
+    }
+    trap_FS_Write("\n", 1, f);
+}
+
+void WriteInt(int v, fileHandle_t f)
+{
+    char buf[32];
+
+    Com_sprintf(buf, 32, "%d", v);
+    //sprintf(buf, "%d", v);
+    if(buf[0]) trap_FS_Write(buf, strlen(buf), f);
+    trap_FS_Write("\n", 1, f);
+}
+
+void WriteFloat(float v, fileHandle_t f)
+{
+    char buf[32];
+
+    Com_sprintf(buf, 32, "%f", v);
+    //sprintf(buf, "%f", v);
+    if(buf[0]) trap_FS_Write(buf, strlen(buf), f);
+    trap_FS_Write("\n", 1, f);
+}
+
+void SaveRoute( const char *routeName )
+{
+    fileHandle_t f = 0;
+    int i = 0;
+    // TODO: .route, else people could write over qagame..
+    int len = trap_FS_FOpenFile(routeName, &f, FS_WRITE);
+
+    if(len < 0)
+    {
+        G_Printf("Couldn't open file \"%s\" to save a race route.\n",
+            routeName);
+        return;
+    } else if(len > 0)
+    {
+        G_Printf("Route with name \"%s\" exists.", routeName);
+        return;
+    }
+
+    // Write startpoint
+    if(!level.routeBegin || !level.routeEnd ||
+        !level.numCheckpoints)
+    {
+        G_Printf("No begin, end or checkpoints defined\n");
+        return;
+    }
+    // Location and angles is all we need
+    trap_FS_Write("// ", 3, f);
+    WriteString(routeName, f);
+    trap_FS_Write("[begin]\n", 8, f);
+    
+    // Position
+    trap_FS_Write("posx = ", 7, f);
+    WriteFloat(level.routeBegin->r.currentOrigin[0], f);
+
+    trap_FS_Write("posy = ", 7, f);
+    WriteFloat(level.routeBegin->r.currentOrigin[1], f);
+
+    trap_FS_Write("posz = ", 7, f);
+    WriteFloat(level.routeBegin->r.currentOrigin[2], f);
+
+    // Angles
+    trap_FS_Write("angx = ", 7, f);
+    WriteFloat(level.routeBegin->r.currentAngles[0], f);
+
+    trap_FS_Write("angy = ", 7, f);
+    WriteFloat(level.routeBegin->r.currentAngles[1], f);
+
+    trap_FS_Write("angz = ", 7, f);
+    WriteFloat(level.routeBegin->r.currentAngles[2], f);
+
+    trap_FS_Write("\n", 1, f);
+
+    // Endpoint, we need pos, angles and size
+    trap_FS_Write("[end]\n", 6, f);
+
+    // Position
+    trap_FS_Write("posx = ", 7, f);
+    WriteFloat(level.routeEnd->r.currentOrigin[0], f);
+
+    trap_FS_Write("posy = ", 7, f);
+    WriteFloat(level.routeEnd->r.currentOrigin[1], f);
+
+    trap_FS_Write("posz = ", 7, f);
+    WriteFloat(level.routeEnd->r.currentOrigin[2], f);
+
+    // Angles
+    trap_FS_Write("angx = ", 7, f);
+    WriteFloat(level.routeEnd->r.currentAngles[0], f);
+
+    trap_FS_Write("angy = ", 7, f);
+    WriteFloat(level.routeEnd->r.currentAngles[1], f);
+
+    trap_FS_Write("angz = ", 7, f);
+    WriteFloat(level.routeEnd->r.currentAngles[2], f);
+
+    // Size
+    trap_FS_Write("horizontal = ", 13, f);
+    WriteInt(level.routeEnd->horizontalRange, f);
+
+    trap_FS_Write("vertical = ", 11, f);
+    WriteInt(level.routeEnd->verticalRange, f);
+
+    trap_FS_Write("\n", 1, f);
+
+    for(i = 0; i < level.numCheckpoints; i++)
+    {
+        // We need position and size
+        trap_FS_Write("[cp]\n", 5, f);
+
+        // Position
+        trap_FS_Write("posx = ", 7, f);
+        WriteFloat(level.checkpoints[i]->r.currentOrigin[0], f);
+
+        trap_FS_Write("posy = ", 7, f);
+        WriteFloat(level.checkpoints[i]->r.currentOrigin[1], f);
+
+        trap_FS_Write("posz = ", 7, f);
+        WriteFloat(level.checkpoints[i]->r.currentOrigin[2], f);
+
+        // Angles
+        trap_FS_Write("angx = ", 7, f);
+        WriteFloat(level.checkpoints[i]->r.currentAngles[0], f);
+
+        trap_FS_Write("angy = ", 7, f);
+        WriteFloat(level.checkpoints[i]->r.currentAngles[1], f);
+
+        trap_FS_Write("angz = ", 7, f);
+        WriteFloat(level.checkpoints[i]->r.currentAngles[2], f);
+
+        // Size
+        trap_FS_Write("horizontal = ", 13, f);
+        WriteInt(level.checkpoints[i]->horizontalRange, f);
+
+        trap_FS_Write("vertical = ", 11, f);
+        WriteInt(level.checkpoints[i]->verticalRange, f);
+
+        trap_FS_Write("\n", 1, f);
+    }
+
+    for(i = 0; i < level.numPowerups; i++)
+    {
+        // We need position and type
+        trap_FS_Write("[pw]\n", 5, f);
+
+        // Position
+        trap_FS_Write("posx = ", 7, f);
+        WriteFloat(level.powerups[i]->r.currentOrigin[0], f);
+
+        trap_FS_Write("posy = ", 7, f);
+        WriteFloat(level.powerups[i]->r.currentOrigin[1], f);
+
+        trap_FS_Write("posz = ", 7, f);
+        WriteFloat(level.powerups[i]->r.currentOrigin[2], f);
+
+        trap_FS_Write("type = ", 7, f);
+        WriteInt(level.powerups[i]->powerupType, f);
+
+        trap_FS_Write("\n", 1, f);
+    }
+
+    trap_FS_FCloseFile(f);
+}
+
+
+// From etpub
+void ReadString(char **cnf, char *s, int size)
+{
+    char *t;
+
+    //COM_MatchToken(cnf, "=");
+    t = COM_ParseExt(cnf, qfalse);
+    if(!strcmp(t, "=")) {
+        t = COM_ParseExt(cnf, qfalse);
+    }
+    else {
+        G_Printf("readconfig: warning missing = before "
+            "\"%s\" on line %d\n",
+            t,
+            COM_GetCurrentParseLine());
+    }
+    s[0] = '\0';
+    while(t[0]) {
+        if((s[0] == '\0' && strlen(t) <= size) ||
+            (strlen(t)+strlen(s) < size)) {
+
+                Q_strcat(s, size, t);
+                Q_strcat(s, size, " ");
+        }
+        t = COM_ParseExt(cnf, qfalse);
+    }
+    // trim the trailing space
+    if(strlen(s) > 0 && s[strlen(s)-1] == ' ')
+        s[strlen(s)-1] = '\0';
+}
+
+void ReadInt(char **cnf, int *v)
+{
+    char *t;
+
+    //COM_MatchToken(cnf, "=");
+    t = COM_ParseExt(cnf, qfalse);
+    if(!strcmp(t, "=")) {
+        t = COM_ParseExt(cnf, qfalse);
+    }
+    else {
+        G_Printf("readconfig: warning missing = before "
+            "\"%s\" on line %d\n",
+            t,
+            COM_GetCurrentParseLine());
+    }
+    *v = atoi(t);
+}
+
+void ReadFloat(char **cnf, float *v)
+{
+    char *t;
+
+    //COM_MatchToken(cnf, "=");
+    t = COM_ParseExt(cnf, qfalse);
+    if(!strcmp(t, "=")) {
+        t = COM_ParseExt(cnf, qfalse);
+    }
+    else {
+        G_Printf("readconfig: warning missing = before "
+            "\"%s\" on line %d\n",
+            t,
+            COM_GetCurrentParseLine());
+    }
+    *v = atof(t);
+}
+
+void CheckWinner(gentity_t *self);
+void CheckRacersNearCP(gentity_t *self);
+void LoadRoute( const char *routeName )
+{
+    fileHandle_t f = 0;
+    int cpCount = 0;
+    int pwCount = 0;
+
+    char *cnf = NULL, *cnf2 = NULL;
+    char *t = NULL;
+    qboolean beginOpen = qfalse;
+    qboolean endOpen = qfalse;
+    qboolean cpOpen = qfalse;
+    qboolean pwOpen = qfalse;
+    gentity_t *begin = NULL;
+    gentity_t *end = NULL;
+    gentity_t *tempCp = NULL;
+    gentity_t *tempPw = NULL;
+
+    int len = trap_FS_FOpenFile(routeName, &f, FS_READ);
+    if(len < 0)
+    {
+        G_Printf("Couldn't find route \"%s\".\n", routeName);
+        return;
+    }
+
+    cnf = malloc(len + 1);
+    cnf2 = cnf;
+
+    trap_FS_Read(cnf, len, f);
+    cnf[len] = 0;
+    trap_FS_FCloseFile(f);
+
+    ClearRoute();
+
+    COM_BeginParseSession( "route" );
+
+    t = COM_Parse(&cnf);
+    while(*t)
+    {
+        if( !Q_stricmp(t, "[begin]") ||
+            !Q_stricmp(t, "[end]") ||
+            !Q_stricmp(t, "[cp]") || 
+            !Q_stricmp(t, "[pw]" ) )
+        {
+            if(beginOpen)
+            {
+                level.routeBegin = begin;
+                G_SetOrigin(begin, begin->r.currentOrigin);
+                G_SetAngle(begin, begin->r.currentAngles);
+                trap_LinkEntity(begin);
+            } else if(endOpen)
+            {
+                level.routeEnd = end;
+                G_SetOrigin(end, end->r.currentOrigin);
+                G_SetAngle(end, end->r.currentAngles);
+                trap_LinkEntity(end);
+            } else if(cpOpen)
+            {
+                level.checkpoints[level.numCheckpoints++] = tempCp; 
+                G_SetOrigin(tempCp, tempCp->r.currentOrigin);
+                G_SetAngle(tempCp, tempCp->r.currentAngles);
+
+                trap_LinkEntity(tempCp);
+            } else if(pwOpen)
+            {
+                level.powerups[level.numPowerups++] = tempPw;
+            }
+            beginOpen = endOpen = cpOpen = pwOpen = qfalse;
+        }
+
+        if(beginOpen)
+        {
+            if(!Q_stricmp(t, "posx"))
+            {
+                ReadFloat(&cnf, &begin->r.currentOrigin[0]);
+            } else if(!Q_stricmp(t, "posy"))
+            {
+                ReadFloat(&cnf, &begin->r.currentOrigin[1]);
+            } else if(!Q_stricmp(t, "posz"))
+            {
+                ReadFloat(&cnf, &begin->r.currentOrigin[2]);
+            } else if(!Q_stricmp(t, "angx"))
+            {
+                ReadFloat(&cnf, &begin->r.currentAngles[0]);
+            } else if(!Q_stricmp(t, "angy"))
+            {
+                ReadFloat(&cnf, &begin->r.currentAngles[1]);
+            } else if(!Q_stricmp(t, "angz"))
+            {
+                ReadFloat(&cnf, &begin->r.currentAngles[2]);
+            } else
+            {
+                G_Printf("Error: %s\n", t);
+                G_Printf("route: parse error near %s on line %d\n",
+                    t, COM_GetCurrentParseLine());
+            }
+        } else if(endOpen)
+        {
+            if(!Q_stricmp(t, "posx"))
+            {
+                ReadFloat(&cnf, &end->r.currentOrigin[0]);
+            } else if(!Q_stricmp(t, "posy"))
+            {
+                ReadFloat(&cnf, &end->r.currentOrigin[1]);
+            } else if(!Q_stricmp(t, "posz"))
+            {
+                ReadFloat(&cnf, &end->r.currentOrigin[2]);
+            } else if(!Q_stricmp(t, "angx"))
+            {
+                ReadFloat(&cnf, &end->r.currentAngles[0]);
+            } else if(!Q_stricmp(t, "angy"))
+            {
+                ReadFloat(&cnf, &end->r.currentAngles[1]);
+            } else if(!Q_stricmp(t, "angz"))
+            {
+                ReadFloat(&cnf, &end->r.currentAngles[2]);
+            } else if(!Q_stricmp(t, "horizontal"))
+            {
+                ReadInt(&cnf, &end->horizontalRange);
+            } else if(!Q_stricmp(t, "vertical"))
+            {
+                ReadInt(&cnf, &end->verticalRange);
+            } else
+            {
+                G_Printf("Error: %s\n", t);
+                G_Printf("route: parse error near %s on line %d\n",
+                    t, COM_GetCurrentParseLine());
+            }
+        } else if(cpOpen)
+        {
+            if(!Q_stricmp(t, "posx"))
+            {
+                ReadFloat(&cnf, &tempCp->r.currentOrigin[0]);
+            } else if(!Q_stricmp(t, "posy"))
+            {
+                ReadFloat(&cnf, &tempCp->r.currentOrigin[1]);
+            } else if(!Q_stricmp(t, "posz"))
+            {
+                ReadFloat(&cnf, &tempCp->r.currentOrigin[2]);
+            } else if(!Q_stricmp(t, "angx"))
+            {
+                ReadFloat(&cnf, &tempCp->r.currentAngles[0]);
+            } else if(!Q_stricmp(t, "angy"))
+            {
+                ReadFloat(&cnf, &tempCp->r.currentAngles[1]);
+            } else if(!Q_stricmp(t, "angz"))
+            {
+                ReadFloat(&cnf, &tempCp->r.currentAngles[2]);
+            } else if(!Q_stricmp(t, "horizontal"))
+            {
+                ReadInt(&cnf, &tempCp->horizontalRange);
+            } else if(!Q_stricmp(t, "vertical"))
+            {
+                ReadInt(&cnf, &tempCp->verticalRange);
+            } else
+            {
+                G_Printf("Error: %s\n", t);
+                G_Printf("route: parse error near %s on line %d\n",
+                    t, COM_GetCurrentParseLine());
+            }
+        } else if(pwOpen)
+        {
+            if(!Q_stricmp(t, "posx"))
+            {
+                ReadFloat(&cnf, &tempPw->r.currentOrigin[0]);
+            } else if(!Q_stricmp(t, "posy"))
+            {
+                ReadFloat(&cnf, &tempPw->r.currentOrigin[1]);
+            } else if(!Q_stricmp(t, "posz"))
+            {
+                ReadFloat(&cnf, &tempPw->r.currentOrigin[2]);
+            } else if(!Q_stricmp(t, "type"))
+            {
+                ReadInt(&cnf, (int*)(&tempPw->powerupType));
+            }
+        }
+
+        if(!Q_stricmp(t, "[begin]"))
+        {
+            begin = G_Spawn();
+            begin->classname = "route_begin";
+            begin->s.eType = ET_ITEM;
+            begin->item = BG_FindItemForPowerup( ROUTE_STARTPOINT );
+            begin->s.modelindex = begin->item - bg_itemlist;
+            begin->s.otherEntityNum2 = 1;
+            beginOpen = qtrue;
+        } else if(!Q_stricmp(t, "[end]"))
+        {
+            end = G_Spawn();
+            end->classname = "route_end";
+            end->think = CheckWinner;
+            end->nextthink = level.time + FRAMETIME;
+            end->s.eType = ET_ITEM;
+            end->item = BG_FindItemForPowerup( ROUTE_ENDPOINT );
+            end->s.modelindex = end->item - bg_itemlist;
+            end->s.otherEntityNum2 = 1;
+            endOpen = qtrue;
+        } else if(!Q_stricmp(t, "[cp]"))
+        {
+            tempCp = G_Spawn();
+            tempCp->classname = "route_cp";
+            tempCp->position = level.numCheckpoints;
+            tempCp->think = CheckRacersNearCP;
+            tempCp->nextthink = level.time + FRAMETIME;
+            // Experimentary
+            tempCp->s.eType = ET_ITEM;
+            tempCp->item = BG_FindItemForPowerup( ROUTE_CHECKPOINT );
+            tempCp->s.modelindex = tempCp->item - bg_itemlist;
+            tempCp->s.otherEntityNum2 = 1;
+            cpOpen = qtrue;
+        } else if(!Q_stricmp(t, "[pw]"))
+        {
+            tempPw = G_Spawn();
+        }
+
+        t = COM_Parse(&cnf);
+    }
+    if(beginOpen)
+    {
+        level.routeBegin = begin;
+        G_SetOrigin(begin, begin->r.currentOrigin);
+        G_SetAngle(begin, begin->r.currentAngles);
+        trap_LinkEntity(begin);
+    } 
+
+    if(endOpen)
+    {
+        level.routeEnd = end;
+        G_SetOrigin(end, end->r.currentOrigin);
+        G_SetAngle(end, end->r.currentAngles);
+        trap_LinkEntity(end);
+    }
+
+    if(cpOpen)
+    {
+        level.checkpoints[level.numCheckpoints++] = tempCp;
+        G_SetOrigin(tempCp, tempCp->r.currentOrigin);
+        G_SetAngle(tempCp, tempCp->r.currentAngles);
+
+        trap_LinkEntity(tempCp);
+    }
+
+    if(pwOpen)
+    {
+        level.powerups[level.numPowerups++] = tempPw;
+    }
+    free(cnf2);
+    G_Printf("Loaded route: %s\n", routeName);
+}
+
+void DeleteRoute( const char *routeName )
+{
+
+}
+
+void Svcmd_Route_f() 
+{
+    // route save name
+    int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS] = "\0";
+    char name[MAX_TOKEN_CHARS] = "\0";
+    if(argc != 3)
+    {
+        G_Printf("usage: route save name");
+        return;
+    }
+
+    trap_Argv(1, arg, sizeof(arg));
+    trap_Argv(2, name, sizeof(name));
+
+    if(!Q_stricmp(arg, "save"))
+    {
+        SaveRoute( name );
+    } else if(!Q_stricmp(arg, "load"))
+    {
+        LoadRoute( name );
+    } else if(!Q_stricmp(arg, "delete"))
+    {
+        DeleteRoute( name );
+    }
+}
+
 void Svcmd_MoveAll_f()
 {
     int i = 0;
@@ -1557,6 +2085,11 @@ qboolean	ConsoleCommand( void ) {
 
     if( !Q_stricmp( cmd, "routemaker")) {
         Svcmd_RouteMaker_f();
+        return qtrue;
+    }
+
+    if( !Q_stricmp( cmd, "route")) {
+        Svcmd_Route_f();
         return qtrue;
     }
 
