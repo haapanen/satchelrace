@@ -562,42 +562,46 @@ void PrintPowerupHelp( gentity_t *ent )
     FinishBufferPrint(ent);
 }
 
-void PrintPowerupInfo( gentity_t *ent, char *myString )
+void PrintPowerupInfo( gentity_t *ent, char *targetPW )
 {
 	int i = 0;
 	BeginBufferPrint();
 	
-	if(Q_stricmp("noslow", myString) == 0 || Q_stricmp("lowgravity", myString) == 0 || Q_stricmp("satchelboost", myString) == 0 || Q_stricmp("satchelunboost", myString) == 0 
-		|| Q_stricmp("slow", myString) == 0 || Q_stricmp("gravity", myString) == 0 || Q_stricmp("root", myString) == 0)
+	if(Q_stricmp("noslow", targetPW) == 0 || Q_stricmp("lowgravity", targetPW) == 0 || Q_stricmp("satchelboost", targetPW) == 0 || Q_stricmp("satchelunboost", targetPW) == 0 
+		|| Q_stricmp("slow", targetPW) == 0 || Q_stricmp("gravity", targetPW) == 0 || Q_stricmp("root", targetPW) == 0 || Q_stricmp("slick", targetPW) == 0)
 	{
-		BufferPrint(ent, va("^5Currently showing information for: %s\n ", myString));
-		if(Q_stricmp("noslow", myString) == 0)
+		BufferPrint(ent, va("^5Currently showing information for: %s\n ", targetPW));
+		if(Q_stricmp("noslow", targetPW) == 0)
 		{
 			BufferPrint(ent, va("^7Removes your slowing effects for %.2f seconds.\n",  (float)sr_pw_noSlowDuration.integer / 1000));
 		}
-		else if(Q_stricmp("lowgravity", myString) == 0)
+		else if(Q_stricmp("lowgravity", targetPW) == 0)
 		{
 			BufferPrint(ent, va("^7Decreases your gravity to %d for %.2f seconds.\n", sr_pw_lowGravity.integer, (float)sr_pw_lowGravityDuration.integer / 1000));
 		}
-		else if(Q_stricmp("satchelboost", myString) == 0)
+		else if(Q_stricmp("satchelboost", targetPW) == 0)
 		{
 			BufferPrint(ent, va("^7Increases your blast force by %dx for next %d satchel/s.\n",  sr_pw_satchelBoostKnockback.integer, sr_pw_satchelBoost.integer));
 		}
-		else if(Q_stricmp("satchelunboost", myString) == 0)
+		else if(Q_stricmp("satchelunboost", targetPW) == 0)
 		{
 			BufferPrint(ent, va("^7Decreases the opponents satchel blast force by %dx for next %d satchel/s.\n",  sr_pw_satchelUnboostKnockback.integer, sr_pw_satchelUnboost.integer));
 		}
-		else if(Q_stricmp("slow", myString) == 0)
+		else if(Q_stricmp("slow", targetPW) == 0)
 		{
 			BufferPrint(ent, va("^7Decreases the opponents speed by %d percent for %.2f seconds.\n",  sr_pw_slowPercent.integer, (float)sr_pw_slowDuration.integer / 1000));
 		}
-		else if(Q_stricmp("gravity", myString) == 0)
+		else if(Q_stricmp("gravity", targetPW) == 0)
 		{
 			BufferPrint(ent, va("^7Increases the opponents gravity to %d for %.2f seconds.\n",  sr_pw_gravity.integer, (float)sr_pw_gravityDuration.integer / 1000));
 		}
-		else if(Q_stricmp("root", myString) == 0)
+		else if(Q_stricmp("root", targetPW) == 0)
 		{
 			BufferPrint(ent, va("^7Stops the enemy from moving for %.2f seconds.\n",  (float)sr_pw_rootDuration.integer / 1000));
+		}
+		else if(Q_stricmp("slick", targetPW) == 0)
+		{
+			BufferPrint(ent, va("^7Makes the ground slippery for opposing players for %.2f seconds\n",  (float)sr_pw_slickDuration.integer / 1000));
 		}
 	}
 	else
