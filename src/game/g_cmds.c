@@ -4028,11 +4028,6 @@ void ClientCommand( int clientNum ) {
 	}
 
 	if( Q_stricmp (cmd, "say_team") == 0 ) {
-		if( ent->client->sess.sessionTeam == TEAM_SPECTATOR || ent->client->sess.sessionTeam == TEAM_FREE ) {
-			trap_SendServerCommand( ent-g_entities, "print \"Can't team chat as spectator\n\"\n" );
-			return;
-		}
-
 		if( !ent->client->sess.muted ) {
 			Cmd_Say_f (ent, SAY_TEAM, qfalse);
 		}
@@ -4043,11 +4038,6 @@ void ClientCommand( int clientNum ) {
 		}
 		return;
 	} else if (Q_stricmp (cmd, "vsay_team") == 0) {
-		if( ent->client->sess.sessionTeam == TEAM_SPECTATOR || ent->client->sess.sessionTeam == TEAM_FREE ) {
-			trap_SendServerCommand( ent-g_entities, "print \"Can't team chat as spectator\n\"\n" );
-			return;
-		}
-
 		if( !ent->client->sess.muted) {
 			Cmd_Voice_f (ent, SAY_TEAM, qfalse, qfalse);
 		}
