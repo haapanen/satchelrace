@@ -486,6 +486,23 @@ gentity_t *SpawnRandomPowerupSpawner( gentity_t *spawner )
     return powerupSpawner;
 }
 
+void PrintPowerupHelp( gentity_t *ent )
+{
+    int i = 0;
+    BeginBufferPrint();
+    BufferPrint(ent, "Powerup:\n");
+    BufferPrint(ent, "Usage: /powerup [name|any|random]\n");
+    BufferPrint(ent, "name: spawns a specified powerup.\n");
+    BufferPrint(ent, "list of powerups: ");
+    for(; i < numPowerups; i++)
+    {
+        BufferPrint(ent, va("%s ", powerups[i].name));
+    }
+    BufferPrint(ent, "\nany: spawns a powerup that can be any powerup.\n");
+    BufferPrint(ent, "random: spawns a random powerup that is always the same.");
+    FinishBufferPrint(ent);
+}
+
 void Cmd_Powerup_f( gentity_t * ent ) 
 {
     int i = 0;
@@ -505,6 +522,12 @@ void Cmd_Powerup_f( gentity_t * ent )
 
     trap_Argv(1, arg, sizeof(arg));
 
+    if(!Q_stricmp(arg, "help"))
+    {
+        PrintPowerupHelp(ent);
+        return;
+    }
+
     // Special case, spawn random pwup
     if(!Q_stricmp(arg, "random"))
     {
@@ -522,14 +545,15 @@ void Cmd_Powerup_f( gentity_t * ent )
             level.numPowerups++;
             CP("cp \"^5Spawned a random powerup\n\"");
         }
+        return;
     }
 
-    // TODO: special case, spawn random spawner that spawns random pwups
     if(!Q_stricmp(arg, "any"))
     {
         level.powerups[level.numPowerups] = SpawnRandomPowerupSpawner( ent );
         level.numPowerups++;
         CP("cp \"^5Spawned a random powerup\n\"");
+        return;
     }
 
     for(; i < numPowerups; i++)
