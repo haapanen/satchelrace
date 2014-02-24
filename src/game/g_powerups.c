@@ -503,11 +503,59 @@ void PrintPowerupHelp( gentity_t *ent )
     FinishBufferPrint(ent);
 }
 
+void PrintPowerupInfo( gentity_t *ent, char *myString )
+{
+	int i = 0;
+	BeginBufferPrint();
+	BufferPrint(ent, va("Current pwup: %s\n", myString));
+	if(Q_stricmp("noslow", myString) == 0 || Q_stricmp("lowgravity", myString) == 0 || Q_stricmp("satchelboost", myString) == 0 || Q_stricmp("satchelunboost", myString) == 0 
+		|| Q_stricmp("slow", myString) == 0 || Q_stricmp("gravity", myString) == 0 || Q_stricmp("root", myString) == 0)
+	{
+		BufferPrint(ent, va("^5Currently showing information for: %s\n ", myString));
+		if(Q_stricmp("noslow", myString) == 0)
+		{
+			BufferPrint(ent, va("^7Removes your slowing effects for %d seconds.\n",  sr_pw_noSlowDuration.integer / 1000));
+		}
+		else if(Q_stricmp("lowgravity", myString) == 0)
+		{
+			BufferPrint(ent, va("^7Decreases your gravity to %d for %d seconds.\n", sr_pw_lowGravity.integer, sr_pw_lowGravityDuration.integer / 1000));
+		}
+		else if(Q_stricmp("satchelboost", myString) == 0)
+		{
+			BufferPrint(ent, va("^7Increases your blast force by %dx for next %d satchel/s.\n",  sr_pw_satchelBoostKnockback.integer, sr_pw_satchelBoost.integer));
+		}
+		else if(Q_stricmp("satchelunboost", myString) == 0)
+		{
+			BufferPrint(ent, va("^7Decreases the opponents satchel blast force by %dx for next %d satchel/s.\n",  sr_pw_satchelUnboostKnockback.integer, sr_pw_satchelUnboost.integer));
+		}
+		else if(Q_stricmp("slow", myString) == 0)
+		{
+			BufferPrint(ent, va("^7Decreases the opponents speed by %d percent for %d seconds.\n",  sr_pw_slowPercent.integer, sr_pw_slowDuration.integer / 1000));
+		}
+		else if(Q_stricmp("gravity", myString) == 0)
+		{
+			BufferPrint(ent, va("^7Increases the opponents gravity to %d for %d seconds.\n",  sr_pw_gravity.integer, sr_pw_gravityDuration.integer / 1000));
+		}
+		else if(Q_stricmp("root", myString) == 0)
+		{
+			BufferPrint(ent, va("^7Stops the enemy from moving for %d seconds.\n",  sr_pw_rootDuration.integer / 1000));
+		}
+	}
+	else
+	{
+		BufferPrint(ent, "Invalid powerup.\n");
+    }
+    
+	
+    FinishBufferPrint(ent);
+}
+
 void Cmd_Powerup_f( gentity_t * ent ) 
 {
     int i = 0;
     int argc = trap_Argc();
     char arg[MAX_TOKEN_CHARS] = "\0";
+	char arg2[MAX_TOKEN_CHARS] = "\0";
 
     if( !ent->client->sess.routeMaker )
     {
@@ -519,7 +567,7 @@ void Cmd_Powerup_f( gentity_t * ent )
         CP("print \"usage: ^7powerup [type]\n\"");
         return;
     }
-
+	
     trap_Argv(1, arg, sizeof(arg));
 
     if(!Q_stricmp(arg, "help"))
@@ -527,6 +575,14 @@ void Cmd_Powerup_f( gentity_t * ent )
         PrintPowerupHelp(ent);
         return;
     }
+	
+	
+	if(!Q_stricmp(arg, "info"))
+	{
+		trap_Argv(2, arg, sizeof(arg));
+		PrintPowerupInfo(ent, arg);
+		return;
+	}
 
     // Special case, spawn random pwup
     if(!Q_stricmp(arg, "random"))
