@@ -3588,6 +3588,10 @@ void CheckRacersNearCP(gentity_t *self)
 					 min, sec, msec));
 					 ent->client->sess.checkpointVisited[self->position] = qtrue;
 				 }
+				 else
+				 {
+					 CP("cp \"^1You missed a checkpoint, go back and visit it before visiting this one.\n\"");
+				 }
 			 }
 			 else if(currentCP == 0)
 			 {
@@ -3595,10 +3599,7 @@ void CheckRacersNearCP(gentity_t *self)
 					 min, sec, msec));
 				  ent->client->sess.checkpointVisited[self->position] = qtrue;
 			 }
-			 else
-			 {
-				 CP("cp \"^1You missed a checkpoint, go back and visit it before visiting this one.\n\"");
-			 }
+			 
 			
         } 
     }
