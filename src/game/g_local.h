@@ -631,6 +631,7 @@ typedef struct {
 
     // Show route
     int nextCp;
+    qboolean showingRoute;
     int lastRouteSpotTime;
     int timeBetweenRouteSpotsMS;
 	int timeBetweenRouteSpotsSec;

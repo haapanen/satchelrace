@@ -1404,7 +1404,8 @@ void ClientThink_real( gentity_t *ent ) {
     // -1 = begin
     // 0-19 = cp
     // 20 = end
-    if(!ent->client->sess.racing && ent->client->sess.nextCp <= level.numCheckpoints)
+    if(!ent->client->sess.racing && ent->client->sess.showingRoute && 
+        ent->client->sess.nextCp <= level.numCheckpoints)
     {
         if(ent->client->sess.lastRouteSpotTime + ent->client->sess.timeBetweenRouteSpotsMS < level.time )
         {
@@ -1430,6 +1431,7 @@ void ClientThink_real( gentity_t *ent ) {
                     VectorCopy(level.routeEnd->r.currentOrigin, ent->client->ps.origin);
                     SetClientViewAngle(ent, level.routeEnd->r.currentAngles);
                 }
+                ent->client->sess.showingRoute = qfalse;
             }
 
             ent->client->sess.nextCp++;

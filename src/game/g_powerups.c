@@ -347,7 +347,7 @@ void TouchPowerupSatchelUnboost(gentity_t *self, gentity_t *player, trace_t *tra
             continue;
         } else
         {
-            player->client->powerups[PW_SATCHELUNBOOST] = sr_pw_satchelUnboost.integer;
+            target->client->powerups[PW_SATCHELUNBOOST] = sr_pw_satchelUnboost.integer;
         }
     }
 
@@ -387,10 +387,11 @@ void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace)
 
         if(target == player)
         {
+            player->client->powerups[PW_SLOW] = 0;
             continue;
         } else
         {
-            player->client->powerups[PW_SLOW] = level.time + sr_pw_slowDuration.integer;
+            target->client->powerups[PW_SLOW] = level.time + sr_pw_slowDuration.integer;
         }
     }
 
@@ -433,7 +434,7 @@ void TouchPowerupGravity(gentity_t *self, gentity_t *player, trace_t *trace)
             continue;
         } else
         {
-            player->client->powerups[PW_GRAVITY] = level.time + sr_pw_gravityDuration.integer;
+            target->client->powerups[PW_GRAVITY] = level.time + sr_pw_gravityDuration.integer;
         }
     }
 

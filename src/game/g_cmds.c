@@ -3960,6 +3960,7 @@ void Cmd_ShowRoute_f( gentity_t * ent )
 
 void Cmd_StopShowRoute_f( gentity_t * ent ) 
 {
+    ent->client->sess.showingRoute = qfalse;
     ent->client->sess.nextCp = MAX_CHECKPOINTS + 1;
 }
 
