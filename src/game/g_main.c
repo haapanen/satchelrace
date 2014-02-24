@@ -535,7 +535,7 @@ cvarTable_t		gameCvarTable[] = {
     { &sr_defaultEndAreaRange, "sr_defaultEndAreaRange", "300", CVAR_ARCHIVE },
     { &sr_startTime, "sr_startTime", "5000", CVAR_ARCHIVE },
     // Powerups
-    { &sr_pw_noSlowDuration, "sr_pw_noSlowDuration", "6500", CVAR_ARCHIVE },
+    { &sr_pw_noSlowDuration, "sr_pw_noSlowDuration", "7000", CVAR_ARCHIVE },
 
     { &sr_pw_lowGravityDuration, "sr_pw_lowGravityDuration", "10000", CVAR_ARCHIVE},
     { &sr_pw_lowGravity, "sr_pw_lowGravity", "600", CVAR_ARCHIVE },
