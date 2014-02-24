@@ -1621,7 +1621,9 @@ void LoadRoute( const char *routeName )
                 trap_LinkEntity(tempCp);
             } else if(pwOpen)
             {
-                level.powerups[level.numPowerups++] = tempPw;
+                 G_SetOrigin(tempPw, tempPw->r.currentOrigin);
+                 tempPw->powerupModelType = NUM_SR_POWERUP_TYPES;
+                 CreatePowerupSpawner( tempPw );
             }
             beginOpen = endOpen = cpOpen = pwOpen = qfalse;
         }
@@ -1769,6 +1771,7 @@ void LoadRoute( const char *routeName )
         } else if(!Q_stricmp(t, "[pw]"))
         {
             tempPw = G_Spawn();
+            pwOpen = qtrue;
         }
 
         t = COM_Parse(&cnf);
@@ -1800,7 +1803,9 @@ void LoadRoute( const char *routeName )
 
     if(pwOpen)
     {
-        level.powerups[level.numPowerups++] = tempPw;
+        G_SetOrigin(tempPw, tempPw->r.currentOrigin);
+        tempPw->powerupModelType = NUM_SR_POWERUP_TYPES;
+        CreatePowerupSpawner( tempPw );
     }
     free(cnf2);
     G_Printf("Loaded route: %s\n", routeName);

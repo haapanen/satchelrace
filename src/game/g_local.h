@@ -499,6 +499,7 @@ struct gentity_s {
     // Zero: so we can clear powerups on startgame
     gentity_t *child;
     satchelRacePowerup_t powerupType;
+    satchelRacePowerup_t powerupModelType;
 
 
 #ifdef OMNIBOT_SUPPORT
@@ -1775,6 +1776,7 @@ gentity_t *G_FindVector(gentity_t *from, int fieldofs, const vec3_t match);
 void Cmd_Powerup_f( gentity_t * ent );
 void ClearPowerups();
 void ClearPowerupItems();
+void CreatePowerupSpawner( gentity_t * powerup );
 
 // g_props.c
 void Props_Chair_Skyboxtouch (gentity_t *ent);

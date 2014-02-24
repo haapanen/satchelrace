@@ -6,6 +6,7 @@ typedef struct Powerup_s
     const char *text;
     // for model
     satchelRacePowerup_t pw;
+    satchelRacePowerup_t modelIndex;
     gentity_t *(*spawn)( gentity_t *spawner, void (*think)(gentity_t *self) );
     void (*think)(gentity_t *self);
     void (*touch)(gentity_t *self, gentity_t *player, trace_t *trace);
@@ -37,13 +38,13 @@ void TouchPowerupSatchelUnboost(gentity_t *self, gentity_t *player, trace_t *tra
 void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace);
 
 static const Powerup_t powerups[] = {
-    {"noslow", "No Slow", NUM_SR_POWERUP_TYPES, spawner_noSlow, think_noSlow, TouchPowerupNoSlow},
-    {"lowgravity", "Low Gravity", NUM_SR_POWERUP_TYPES, spawner_lowGravity, think_lowGravity, TouchPowerupLowGravity},
-    {"satchelboost", "Satchel Boost", NUM_SR_POWERUP_TYPES, spawner_satchelBoost, think_satchelBoost, TouchPowerupSatchelBoost},
-    {"slow", "Slow Others", NUM_SR_POWERUP_TYPES, spawner_slow, think_slow, TouchPowerupSlow},
-    {"gravity", "Gravity", NUM_SR_POWERUP_TYPES, spawner_gravity, think_gravity, TouchPowerupGravity},
-    {"satchelunboost", "Satchel Unboost", NUM_SR_POWERUP_TYPES, spawner_satchelUnboost, think_satchelUnboost, TouchPowerupSatchelUnboost},
-    {"root", "Root", NUM_SR_POWERUP_TYPES, spawner_root, think_root, TouchPowerupRoot}
+    {"noslow", "No Slow", PW_NOSLOW, NUM_SR_POWERUP_TYPES, spawner_noSlow, think_noSlow, TouchPowerupNoSlow},
+    {"lowgravity", "Low Gravity", PW_NOSLOW, NUM_SR_POWERUP_TYPES, spawner_lowGravity, think_lowGravity, TouchPowerupLowGravity},
+    {"satchelboost", "Satchel Boost", PW_SATCHELBOOST, NUM_SR_POWERUP_TYPES, spawner_satchelBoost, think_satchelBoost, TouchPowerupSatchelBoost},
+    {"slow", "Slow Others", PW_SLOW, NUM_SR_POWERUP_TYPES, spawner_slow, think_slow, TouchPowerupSlow},
+    {"gravity", "Gravity", PW_GRAVITY, NUM_SR_POWERUP_TYPES, spawner_gravity, think_gravity, TouchPowerupGravity},
+    {"satchelunboost", "Satchel Unboost", PW_SATCHELBOOST, NUM_SR_POWERUP_TYPES, spawner_satchelUnboost, think_satchelUnboost, TouchPowerupSatchelUnboost},
+    {"root", "Root", PW_ROOT_PROTECTION, NUM_SR_POWERUP_TYPES, spawner_root, think_root, TouchPowerupRoot}
 };
 static int numPowerups = sizeof(powerups)/sizeof(Powerup_t);
 
@@ -550,6 +551,30 @@ void PrintPowerupInfo( gentity_t *ent, char *myString )
     FinishBufferPrint(ent);
 }
 
+void CreatePowerupSpawner( gentity_t * powerup ) 
+{
+    int i = 0;
+
+    if(powerup->powerupType == PW_RANDOM)
+    {
+        powerup->think = think_random;
+        powerup->child = NULL;
+        level.powerups[level.numPowerups++] = powerup;
+        return;
+    }
+
+    // lets find the correct pwup by id
+    for(i = 0; i < numPowerups; i++)
+    {
+        if(powerups[i].pw == powerup->powerupType)
+        {
+            powerup->think = powerups[i].think;
+            powerup->child = NULL;
+            level.powerups[level.numPowerups++] = powerup;
+        }
+    }
+}
+
 void Cmd_Powerup_f( gentity_t * ent ) 
 {
     int i = 0;
@@ -598,6 +623,7 @@ void Cmd_Powerup_f( gentity_t * ent )
             }
             level.powerups[level.numPowerups] = powerups[index].spawn(ent, powerups[index].think);
             level.powerups[level.numPowerups]->powerupType = powerups[index].pw;
+            level.powerups[level.numPowerups]->powerupModelType = powerups[index].modelIndex;
             level.numPowerups++;
             CP("cp \"^5Spawned a random powerup\n\"");
         }
@@ -607,6 +633,8 @@ void Cmd_Powerup_f( gentity_t * ent )
     if(!Q_stricmp(arg, "any"))
     {
         level.powerups[level.numPowerups] = SpawnRandomPowerupSpawner( ent );
+        level.powerups[level.numPowerups]->powerupType = PW_RANDOM;
+        level.powerups[level.numPowerups]->powerupModelType = PW_RANDOM;
         level.numPowerups++;
         CP("cp \"^5Spawned a random powerup\n\"");
         return;
@@ -625,6 +653,7 @@ void Cmd_Powerup_f( gentity_t * ent )
                 }
                 level.powerups[level.numPowerups] = powerups[i].spawn(ent, powerups[i].think);
                 level.powerups[level.numPowerups]->powerupType = powerups[i].pw;
+                level.powerups[level.numPowerups]->powerupModelType = powerups[i].modelIndex;
                 level.numPowerups++;
                 CP(va("cp \"^5Spawned a %s powerup\n\"", powerups[i].text));
             } else
