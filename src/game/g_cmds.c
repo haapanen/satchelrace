@@ -3765,19 +3765,6 @@ void RouteMakerBegin( gentity_t * ent )
         level.routeBegin = NULL;
     }
 
-    begin = G_Spawn();
-    begin->classname = "route_begin";
-    // Experimentary
-    begin->s.eType = ET_ITEM;
-    begin->item = BG_FindItemForPowerup( ROUTE_STARTPOINT );
-    begin->s.modelindex = begin->item - bg_itemlist;
-    begin->s.otherEntityNum2 = 1;
-    G_SetOrigin(begin, ent->r.currentOrigin);
-    G_SetAngle(begin, ent->client->ps.viewangles);
-    trap_LinkEntity(begin);
-
-    level.routeBegin = begin;
-    
     if(argc == 3)
     {
         trap_Argv(2, arg, sizeof(arg));
@@ -3796,6 +3783,19 @@ void RouteMakerBegin( gentity_t * ent )
         CP("cp \"^7Added a ^2start ^7spot and cleared the route.\n\"");
         CP("print \"^7If you do not wish to clear the route when you define a start spot, do /route begin -keep\n\"");
     }
+
+    begin = G_Spawn();
+    begin->classname = "route_begin";
+    // Experimentary
+    begin->s.eType = ET_ITEM;
+    begin->item = BG_FindItemForPowerup( ROUTE_STARTPOINT );
+    begin->s.modelindex = begin->item - bg_itemlist;
+    begin->s.otherEntityNum2 = 1;
+    G_SetOrigin(begin, ent->r.currentOrigin);
+    G_SetAngle(begin, ent->client->ps.viewangles);
+    trap_LinkEntity(begin);
+
+    level.routeBegin = begin;
 }
 
 void RouteMakerEnd( gentity_t *ent )
