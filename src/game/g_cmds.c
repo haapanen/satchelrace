@@ -2048,6 +2048,7 @@ qboolean Cmd_CallVote_f( gentity_t *ent, unsigned int dwCommand, qboolean fRefCo
 		level.voteInfo.vote_fn(NULL, 0, NULL, NULL, qfalse);
 
 		G_globalSound("sound/misc/referee.wav");
+	
 	} else {
 		level.voteInfo.voteYes = 1;
 		AP(va("print \"[lof]%s^7 [lon]called a vote.[lof]  Voting for: %s\n\"", ent->client->pers.netname, level.voteInfo.voteString));
@@ -3983,7 +3984,39 @@ void Cmd_ShowRoute_f( gentity_t * ent )
     ent->client->sess.showingRoute = qtrue;
 }
 
+void Cmd_RestartRun_f( gentity_t * ent )
+{
+	int i;
+	if(level.numCheckpoints >= 0)
+	{
+		//Resetting CPS
+		for(i = 0; i < level.numCheckpoints; i++)
+		{
+			ent->client->sess.checkpointVisited[i] = qfalse;
+		}
+		//Timers
+		if(ent->client->sess.raceStartTime > 0)
+		{
+			ent->client->sess.raceStartTime = level.time + 10;
+		}
+		
+		//Teleporting to beginning
+	    ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
+		VectorCopy(level.routeBegin->r.currentOrigin, ent->client->ps.origin);
+		SetClientViewAngle(ent, level.routeBegin->r.currentAngles);
 
+		//If he has already ended the run, put him to racing status again.
+		if(!ent->client->sess.racing)
+		{
+			ent->client->sess.racing = qtrue;
+		}
+
+		//Give message to server that he reset his run
+	    trap_SendServerCommand(-1, va("cpm \"%s ^1 has reset his run. ", ent->client->pers.netname));
+		CP("cp \"^5Your run has been successfully reset.\n\"");
+	}
+	
+}
 
 void Cmd_StopShowRoute_f( gentity_t * ent ) 
 {
@@ -4139,6 +4172,12 @@ void ClientCommand( int clientNum ) {
         Cmd_StopShowRoute_f( ent );
         return;
     }
+
+	if(!Q_stricmp(cmd, "restartrun"))
+	{
+		Cmd_RestartRun_f( ent );
+		return;
+	}
 
     if( !Q_stricmp(cmd, "showroute"))
     {
