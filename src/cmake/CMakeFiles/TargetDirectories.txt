@@ -1,3 +1,0 @@
-/home/etjump/github/satchelrace/src/cmake/CMakeFiles/cgame.mp.i386.dir
-/home/etjump/github/satchelrace/src/cmake/CMakeFiles/qagame.mp.i386.dir
-/home/etjump/github/satchelrace/src/cmake/CMakeFiles/ui.mp.i386.dir
