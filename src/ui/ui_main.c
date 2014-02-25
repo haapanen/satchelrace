@@ -4973,11 +4973,19 @@ void UI_RunMenuScript(char **args) {
 			if (uiInfo.playerIndex >= 0 && uiInfo.playerIndex < uiInfo.playerCount) {
 				trap_Cmd_ExecuteText( EXEC_APPEND, va("rcon kick \"%s\"\n",uiInfo.playerNames[uiInfo.playerIndex]) );
 			}
-		} else if (Q_stricmp(name, "refKick") == 0) {
-			if (uiInfo.playerIndex >= 0 && uiInfo.playerIndex < uiInfo.playerCount) {
-				trap_Cmd_ExecuteText( EXEC_APPEND, va("ref kick \"%s\"\n",uiInfo.playerNames[uiInfo.playerIndex]) );
-			}			
-		} else if (Q_stricmp(name, "rconBan") == 0) {
+        } else if (Q_stricmp(name, "refKick") == 0) {
+            if (uiInfo.playerIndex >= 0 && uiInfo.playerIndex < uiInfo.playerCount) {
+                trap_Cmd_ExecuteText( EXEC_APPEND, va("ref kick \"%s\"\n",uiInfo.playerNames[uiInfo.playerIndex]) );
+            }			
+        } else if (Q_stricmp(name, "voteRouteMaker") == 0) {
+            if (uiInfo.playerIndex >= 0 && uiInfo.playerIndex < uiInfo.playerCount) {
+                trap_Cmd_ExecuteText( EXEC_APPEND, va("callvote routemaker \"%s\"\n",uiInfo.playerNames[uiInfo.playerIndex]) );
+            }			
+        } else if (Q_stricmp(name, "refRouteMaker") == 0) {
+            if (uiInfo.playerIndex >= 0 && uiInfo.playerIndex < uiInfo.playerCount) {
+                trap_Cmd_ExecuteText( EXEC_APPEND, va("ref routemaker \"%s\"\n",uiInfo.playerNames[uiInfo.playerIndex]) );
+            }			
+        } else if (Q_stricmp(name, "rconBan") == 0) {
 			if (uiInfo.playerIndex >= 0 && uiInfo.playerIndex < uiInfo.playerCount) {
 				trap_Cmd_ExecuteText( EXEC_APPEND, va("rcon ban \"%s\"\n",uiInfo.playerNames[uiInfo.playerIndex]) );
 			}
@@ -7843,6 +7851,14 @@ void _UI_SetActiveMenu( uiMenuCommand_t menu ) {
 			// TTimo - changing the auto-update strategy to a modal prompt
 			Menus_OpenByName( "wm_autoupdate_modal" );
 			return;
+
+        case UIMENU_WM_ROUTE_MAKER:
+            uiInfo.uiDC.cursorx = 639;
+            uiInfo.uiDC.cursory = 479;
+            trap_Key_SetCatcher( KEYCATCH_UI );
+            Menus_CloseAll();
+            Menus_OpenByName( "wm_quickroute");
+            return;
 		// -NERVE - SMF
 		
 		// ydnar: say, team say, etc

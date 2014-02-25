@@ -617,6 +617,11 @@ void CreatePowerupSpawner( gentity_t * powerup )
 {
     int i = 0;
 
+    if(level.numPowerups == MAX_POWERUPS)
+    {
+        return;
+    }
+
     if(powerup->powerupType == PW_RANDOM)
     {
         powerup->think = think_random;
@@ -646,6 +651,7 @@ void Cmd_Powerup_f( gentity_t * ent )
 
     if( !ent->client->sess.routeMaker )
     {
+        CP("cp \"^7You need to be a route maker to create powerups.\n\"");
         return;
     }
 

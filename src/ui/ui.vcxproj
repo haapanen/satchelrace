@@ -93,6 +93,9 @@
       <DataExecutionPrevention />
       <ImportLibrary>.\Release/ui_mp_x86.lib</ImportLibrary>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "C:\Users\Jussi\Documents\GitHub\satchelrace\src\build\ui_mp_x86.dll" "C:\ET\Mapping\satchelrace"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>

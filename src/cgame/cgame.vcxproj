@@ -92,6 +92,9 @@
       <DataExecutionPrevention />
       <ImportLibrary>.\Release/cgame_mp_x86.lib</ImportLibrary>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "C:\Users\Jussi\Documents\GitHub\satchelrace\src\build\cgame_mp_x86.dll" "C:\ET\Mapping\satchelrace"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>

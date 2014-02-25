@@ -1551,6 +1551,8 @@ void Svcmd_ShuffleTeams_f(void);
 // sta acqu-sdk (issue 9): lua support
 char *ConcatArgs( int start );
 // end acqu-sdk (issue 9)
+qboolean LoadRoute( const char *routeName );
+qboolean SaveRoute( const char *routeName );
 
 
 //
@@ -2718,6 +2720,8 @@ int G_AntiLag_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2,
 int G_BalancedTeams_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 int G_StartGame_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd );
 int G_RouteMaker_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd );
+int G_LoadRoute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
+int G_SaveRoute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd);
 
 
 void G_LinkDebris( void );

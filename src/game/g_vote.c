@@ -71,6 +71,8 @@ static const vote_reference_t aVoteInfo[] = {
 	{ 0x1ff, "balancedteams",G_BalancedTeams_v,	"Balanced Teams",	" <0|1>^7\n  Toggles team balance forcing" },
     { 0x1ff, "startgame", G_StartGame_v, "Start Game", "^7\n Starts satchel race." },
     { 0x1ff, "routemaker", G_RouteMaker_v, "Route maker", "<played_id>^7\n Elects a player to have route maker abilities." },
+    { 0x1ff, "loadroute", G_LoadRoute_v, "Load route", "<routename>^7\nVotes for a new route to be loaded."},
+    { 0x1ff, "saveroute", G_SaveRoute_v, "Save route", "<routename>^7\nVotes for current route to be saved." },
 	{ 0, 0, NULL, 0 }
 };
 
@@ -1141,7 +1143,7 @@ int G_RouteMaker_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *a
             AP( va( "cp \"%s^7 is now a route maker\n\"", cl->pers.netname ) );
 
             ResetRacingState();
-            AP("cpm \"^8SR^7: new routemaker has been voted. Racing has stopped.\n\"");
+            AP("cpm \"^8SR^7: new routemaker has been chosen. Racing has stopped.\n\"");
 
             ClientUserinfoChanged( atoi( level.voteInfo.vote_value ) );
 
@@ -1149,4 +1151,37 @@ int G_RouteMaker_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *a
         }
     }
     return( G_OK );
+}
+
+// *** Map - simpleton: we dont verify map is allowed/exists ***
+int G_LoadRoute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd)
+{
+    // Vote request (vote is being initiated)
+    if(arg) {
+        Com_sprintf(level.voteInfo.vote_value, VOTE_MAXSTRING, "%s.route", arg2);
+
+        // Vote action (vote has passed)
+    } else {
+        if(!LoadRoute(level.voteInfo.vote_value))
+        {
+            AP(va("cpm \"^7Couldn't find route \"%s\".\n\"", level.voteInfo.vote_value));
+        }
+    }
+    return(G_OK);
+}
+
+int G_SaveRoute_v(gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd)
+{
+    // Vote request (vote is being initiated)
+    if(arg) {
+        Com_sprintf(level.voteInfo.vote_value, VOTE_MAXSTRING, "%s.route", arg2);
+
+        // Vote action (vote has passed)
+    } else {
+        if(!SaveRoute(level.voteInfo.vote_value))
+        {
+            AP(va("cpm \"^7Couldn't save route \"%s\". Route with that name already exists.\n\"", level.voteInfo.vote_value));
+        }
+    }
+    return(G_OK);
 }

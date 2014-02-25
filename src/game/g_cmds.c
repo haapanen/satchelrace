@@ -3950,6 +3950,7 @@ void Cmd_Route_f( gentity_t * ent )
     char arg[MAX_TOKEN_CHARS] = "\0";
     if( !ent->client->sess.routeMaker )
     {
+        CP("cp \"^7You need to be a route maker to create routes.\n\"");
         return;
     }
 
@@ -3961,7 +3962,7 @@ void Cmd_Route_f( gentity_t * ent )
     if(argc < 2)
     {
         CP("print \"usage: /route [begin|end|cp|clear|clearcp|clearpw]\n\"");
-        return;
+        return; 
     }
 
     trap_Argv(1, arg, sizeof(arg));

@@ -2300,6 +2300,8 @@ typedef enum {
 
 	UIMENU_WM_AUTOUPDATE,
 
+    UIMENU_WM_ROUTE_MAKER,
+
 	// ydnar: say, team say, etc
 	UIMENU_INGAME_MESSAGEMODE,
 } uiMenuCommand_t;

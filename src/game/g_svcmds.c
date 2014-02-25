@@ -1344,7 +1344,7 @@ void WriteFloat(float v, fileHandle_t f)
     trap_FS_Write("\n", 1, f);
 }
 
-void SaveRoute( const char *routeName )
+qboolean SaveRoute( const char *routeName )
 {
     fileHandle_t f = 0;
     int i = 0;
@@ -1355,11 +1355,11 @@ void SaveRoute( const char *routeName )
     {
         G_Printf("Couldn't open file \"%s\" to save a race route.\n",
             routeName);
-        return;
+        return qfalse;
     } else if(len > 0)
     {
         G_Printf("Route with name \"%s\" exists.", routeName);
-        return;
+        return qfalse;
     }
 
     // Write startpoint
@@ -1367,7 +1367,7 @@ void SaveRoute( const char *routeName )
         !level.numCheckpoints)
     {
         G_Printf("No begin, end or checkpoints defined\n");
-        return;
+        return qfalse;
     }
     // Location and angles is all we need
     trap_FS_Write("// ", 3, f);
@@ -1487,6 +1487,8 @@ void SaveRoute( const char *routeName )
     trap_FS_FCloseFile(f);
 
     G_Printf("Saved route %s\n", routeName);
+    AP(va("cpm \"^8SR^7: Saved route %s\n\"", routeName));
+    return qtrue;
 }
 
 
@@ -1559,7 +1561,7 @@ void ReadFloat(char **cnf, float *v)
 
 void CheckWinner(gentity_t *self);
 void CheckRacersNearCP(gentity_t *self);
-void LoadRoute( const char *routeName )
+qboolean LoadRoute( const char *routeName )
 {
     fileHandle_t f = 0;
     int cpCount = 0;
@@ -1580,7 +1582,7 @@ void LoadRoute( const char *routeName )
     if(len < 0)
     {
         G_Printf("Couldn't find route \"%s\".\n", routeName);
-        return;
+        return qfalse;
     }
 
     cnf = malloc(len + 1);
@@ -1812,6 +1814,7 @@ void LoadRoute( const char *routeName )
     free(cnf2);
     AP(va("cpm \"^8SR^7: Loaded route %s\n\"", routeName));
     G_Printf("Loaded route %s\n", routeName);
+    return qtrue;
 }
 
 void DeleteRoute( const char *routeName )
@@ -1833,6 +1836,8 @@ void Svcmd_Route_f()
 
     trap_Argv(1, arg, sizeof(arg));
     trap_Argv(2, name, sizeof(name));
+
+    Q_strcat(name, sizeof(name), ".route");
 
     if(!Q_stricmp(arg, "save"))
     {

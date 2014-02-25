@@ -56,6 +56,10 @@
 	loadMenu { "ui/wm_ftquickmessage.menu" }
 	loadMenu { "ui/wm_ftquickmessageAlt.menu" }
 
+	// route
+	loadMenu { "ui/wm_quickroute.menu" }
+	loadMenu { "ui/wm_quickpwups.menu" }
+
 	// ingame
 	loadMenu { "ui/ingame_main.menu" }
 	loadMenu { "ui/ingame_vote.menu" }

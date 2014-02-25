@@ -905,6 +905,12 @@ static void CG_CPM_f( void ) {
 	CG_AddPMItem( PM_MESSAGE, CG_Argv(1), cgs.media.voiceChatShader );
 }
 
+void CG_QuickRoute_f( void ) {
+
+    CG_EventHandling( CGAME_EVENT_NONE, qfalse );
+    trap_UI_Popup( UIMENU_WM_ROUTE_MAKER );
+}
+
 #ifdef CAMTRACE_SUPPORT
 // sta acqu-sdk (issue 12): camtrace support
 void CG_ToggleDemocam( void ) {
@@ -1052,6 +1058,7 @@ static consoleCommand_t	commands[] =
 	{ "undoSpeaker", CG_UndoSpeaker_f },
 	{ "cpm", CG_CPM_f },
 	{ "forcetapout", CG_ForceTapOut_f },
+    { "wm_quickroute", CG_QuickRoute_f },
 
 #ifdef CAMTRACE_SUPPORT
 	// sta acqu-sdk (issue 12): camtrace support
