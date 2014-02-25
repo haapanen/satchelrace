@@ -3492,6 +3492,16 @@ void ClearRoute()
     ClearPowerups();
 }
 
+void ResetRacingState() 
+{
+    int i = 0;
+    for(; i < level.numConnectedClients; i++)
+    {
+        int clientNum = level.sortedClients[i];
+        (g_entities + clientNum)->client->sess.racing = qfalse;
+    }
+}
+
 void CheckWinner(gentity_t *self)
 {
     int i = 0;
@@ -3664,8 +3674,8 @@ void RouteMakerCheckpoints( gentity_t * ent )
     checkpoint->s.otherEntityNum2 = 1;
     if(trap_Argc() == 2)
     {
-        checkpoint->horizontalRange = sr_defaultEndAreaRange.integer;
-        checkpoint->verticalRange = sr_defaultEndAreaRange.integer;
+        checkpoint->horizontalRange = sr_defaultAreaRange.integer;
+        checkpoint->verticalRange = sr_defaultAreaRange.integer;
     } else if(trap_Argc() == 3)
     {
         char rangeStr[MAX_TOKEN_CHARS] = "\0";
@@ -3695,8 +3705,8 @@ void RouteMakerCheckpoints( gentity_t * ent )
             checkpoint->verticalRange = RANGE_LARGE;
         } else
         {
-            checkpoint->horizontalRange = sr_defaultEndAreaRange.integer;
-            checkpoint->verticalRange = sr_defaultEndAreaRange.integer;
+            checkpoint->horizontalRange = sr_defaultAreaRange.integer;
+            checkpoint->verticalRange = sr_defaultAreaRange.integer;
         }
     } else if(trap_Argc() == 4)
     {
@@ -3717,7 +3727,7 @@ void RouteMakerCheckpoints( gentity_t * ent )
             checkpoint->horizontalRange = horizontalRange;
         } else
         {
-            checkpoint->horizontalRange = sr_defaultEndAreaRange.integer;
+            checkpoint->horizontalRange = sr_defaultAreaRange.integer;
         }
 
         if(verticalRange)
@@ -3725,7 +3735,7 @@ void RouteMakerCheckpoints( gentity_t * ent )
             checkpoint->verticalRange = verticalRange;
         } else
         {
-            checkpoint->verticalRange = sr_defaultEndAreaRange.integer;
+            checkpoint->verticalRange = sr_defaultAreaRange.integer;
         }
         CP(va("cp \"^7Added a ^3checkpoint ^7(%d, %d)\n\"", checkpoint->horizontalRange, checkpoint->verticalRange));
     }
@@ -3798,8 +3808,8 @@ void RouteMakerEnd( gentity_t *ent )
     if(argc == 2)
     {
         // use default range == 300
-        end->horizontalRange = sr_defaultEndAreaRange.integer;
-        end->verticalRange = sr_defaultEndAreaRange.integer;
+        end->horizontalRange = sr_defaultAreaRange.integer;
+        end->verticalRange = sr_defaultAreaRange.integer;
 
     } else if(argc == 3)
     {
@@ -3830,8 +3840,8 @@ void RouteMakerEnd( gentity_t *ent )
             end->verticalRange = RANGE_LARGE;
         } else
         {
-            end->horizontalRange = sr_defaultEndAreaRange.integer;
-            end->verticalRange = sr_defaultEndAreaRange.integer;
+            end->horizontalRange = sr_defaultAreaRange.integer;
+            end->verticalRange = sr_defaultAreaRange.integer;
         }
     } else if(argc == 4)
     {
@@ -3852,7 +3862,7 @@ void RouteMakerEnd( gentity_t *ent )
             end->horizontalRange = horizontalRange;
         } else
         {
-            end->horizontalRange = sr_defaultEndAreaRange.integer;
+            end->horizontalRange = sr_defaultAreaRange.integer;
         }
 
         if(verticalRange)
@@ -3860,7 +3870,7 @@ void RouteMakerEnd( gentity_t *ent )
             end->verticalRange = verticalRange;
         } else
         {
-            end->verticalRange = sr_defaultEndAreaRange.integer;
+            end->verticalRange = sr_defaultAreaRange.integer;
         }
     }
     CP(va("cp \"^7Added an ^1end ^7spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange));
@@ -3906,6 +3916,13 @@ void RouteMakerClearCP( gentity_t * ent )
     }
 }
 
+void RouteMakerClearPW( gentity_t * ent ) 
+{
+    ClearPowerups();
+    trap_SendServerCommand(ent->client->ps.clientNum,
+        "print \"^8SR^7: deleted all powerups\n\"");
+}
+
 void Cmd_Route_f( gentity_t * ent ) 
 {
     int argc = trap_Argc();
@@ -3940,6 +3957,9 @@ void Cmd_Route_f( gentity_t * ent )
     } else if(!Q_stricmp(arg, "clearcp")) 
     {
         RouteMakerClearCP(ent);
+    } else if (!Q_stricmp(arg, "clearpw"))
+    {
+        RouteMakerClearPW(ent);
     } else if(!Q_stricmp(arg, "cp"))
     {
         RouteMakerCheckpoints( ent );

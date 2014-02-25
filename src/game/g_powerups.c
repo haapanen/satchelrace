@@ -119,9 +119,9 @@ gentity_t *DropPowerup( gentity_t *ent, gitem_t *item,
         powerup->s.pos.trType = TR_GRAVITY;
     }
 
-    VectorSet( powerup->r.mins, -ITEM_RADIUS, -ITEM_RADIUS, 0 );			//----(SA)	so items sit on the ground
-    VectorSet( powerup->r.maxs, ITEM_RADIUS, ITEM_RADIUS, 2*ITEM_RADIUS );	//----(SA)	so items sit on the ground
-    powerup->r.contents = CONTENTS_TRIGGER|CONTENTS_ITEM;
+    VectorSet( powerup->r.mins, -POWERUP_ITEM_RADIUS, -POWERUP_ITEM_RADIUS, 0 );			//----(SA)	so items sit on the ground
+    VectorSet( powerup->r.maxs, POWERUP_ITEM_RADIUS, POWERUP_ITEM_RADIUS, 2*POWERUP_ITEM_RADIUS );	//----(SA)	so items sit on the ground
+    powerup->r.contents = CONTENTS_TRIGGER | CONTENTS_ITEM;
 
     powerup->clipmask = CONTENTS_SOLID | CONTENTS_MISSILECLIP;	
 
@@ -231,7 +231,7 @@ void TouchPowerupNoSlow(gentity_t *self, gentity_t *player, trace_t *trace)
     }
 
     player->client->powerups[PW_NOSLOW] = level.time + sr_pw_noSlowDuration.integer;
-
+     
     AP(va("chat \"%s ^7picked up a ^5No Slow ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);

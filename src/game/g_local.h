@@ -1289,6 +1289,7 @@ void G_EntitySoundNoCut( gentity_t *ent, const char *soundId, int volume );
 int ClientNumberFromString( gentity_t *to, char *s );
 void SanitizeString( char *in, char *out, qboolean fToLower );
 void ClearRoute();
+void ResetRacingState();
 
 //
 // g_items.c
@@ -2028,7 +2029,7 @@ extern vmCvar_t lua_allowedModules;
 extern vmCvar_t sr_noSatchelSpeed;
 extern vmCvar_t sr_satchelDistance;
 extern vmCvar_t sr_smokeBounce;
-extern vmCvar_t sr_defaultEndAreaRange;
+extern vmCvar_t sr_defaultAreaRange;
 extern vmCvar_t sr_startTime;
 
 // Powerups

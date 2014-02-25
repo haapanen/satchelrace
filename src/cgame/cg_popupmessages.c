@@ -86,7 +86,7 @@ void CG_InitPM( void ) {
 int CG_TimeForPopup( popupMessageType_t type ) {
 	switch( type ) {
 		default:
-			return 1000;
+			return sr_popupTime.integer;
 	}
 }
 
@@ -117,7 +117,7 @@ void CG_UpdatePMLists( void ) {
 
 				CG_AddToListFront( &cg_pmOldList, listItem );
 			} else {
-				if( cg.time > t + PM_WAITTIME + PM_FADETIME ) {
+				if( cg.time > t + sr_popupStayTime.integer + sr_popupFadeTime.integer ) {
 					// we're gone completely
 					cg_pmWaitingList = NULL;
 					listItem->inuse = qfalse;
@@ -132,7 +132,7 @@ void CG_UpdatePMLists( void ) {
 	listItem = cg_pmOldList;
 	lastItem = NULL;
 	while( listItem ) {
-		int t = (CG_TimeForPopup( listItem->type ) + listItem->time + PM_WAITTIME + PM_FADETIME);
+		int t = (CG_TimeForPopup( listItem->type ) + listItem->time + sr_popupStayTime.integer + sr_popupFadeTime.integer);
 		if( cg.time > t ) {
 			// nuke this, and everything below it (though there shouldn't BE anything below us anyway)
 			pmListItem_t* next;
@@ -174,7 +174,7 @@ void CG_UpdatePMLists( void ) {
 				listItem2->inuse = qfalse;
 				listItem2->next = NULL;
 			} else {
-				if( cg.time > t + PM_WAITTIME + PM_FADETIME ) {
+				if( cg.time > t + sr_popupStayTime.integer + sr_popupFadeTime.integer ) {
 					// we're gone completely
 					cg_pmWaitingListBig = NULL;
 					listItem2->inuse = qfalse;
@@ -364,9 +364,9 @@ void CG_DrawPMItems( void ) {
 		return;
 	}
 
-	t = cg_pmWaitingList->time + CG_TimeForPopup( cg_pmWaitingList->type ) + PM_WAITTIME;
+	t = cg_pmWaitingList->time + CG_TimeForPopup( cg_pmWaitingList->type ) + sr_popupStayTime.integer;
 	if( cg.time > t ) {
-		colourText[3] = colour[3] = 1 - ((cg.time - t) / (float)PM_FADETIME);
+		colourText[3] = colour[3] = 1 - ((cg.time - t) / (float)sr_popupFadeTime.integer);
 	}
 
 	trap_R_SetColor( colourText );
@@ -377,9 +377,9 @@ void CG_DrawPMItems( void ) {
 	for( i = 0; i < 4 && listItem; i++, listItem = listItem->next ) {
 		y -= size + 2;
 
-		t = listItem->time + CG_TimeForPopup( listItem->type ) + PM_WAITTIME;
+		t = listItem->time + CG_TimeForPopup( listItem->type ) + sr_popupStayTime.integer;
 		if( cg.time > t ) {
-			colourText[3] = colour[3] = 1 - ((cg.time - t) / (float)PM_FADETIME);
+			colourText[3] = colour[3] = 1 - ((cg.time - t) / (float)sr_popupFadeTime.integer);
 		} else {
 			colourText[3] = colour[3] = 1.f;
 		}

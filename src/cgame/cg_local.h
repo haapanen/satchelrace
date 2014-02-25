@@ -2265,6 +2265,10 @@ extern	vmCvar_t		cg_recording_statusline;
 extern vmCvar_t			cg_hitSounds;
 // end acqu-sdk (issue 20)
 
+extern vmCvar_t         sr_popupTime;
+extern vmCvar_t         sr_popupStayTime;
+extern vmCvar_t         sr_popupFadeTime;
+
 //
 // cg_main.c
 //

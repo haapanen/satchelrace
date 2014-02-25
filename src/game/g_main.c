@@ -256,7 +256,7 @@ vmCvar_t lua_allowedModules;
 vmCvar_t sr_noSatchelSpeed;
 vmCvar_t sr_satchelDistance;
 vmCvar_t sr_smokeBounce;
-vmCvar_t sr_defaultEndAreaRange;
+vmCvar_t sr_defaultAreaRange;
 vmCvar_t sr_startTime;
 // powerups
 vmCvar_t sr_pw_noSlowDuration;
@@ -534,7 +534,7 @@ cvarTable_t		gameCvarTable[] = {
     { &sr_noSatchelSpeed, "sr_noSatchelSpeed", "50", CVAR_ARCHIVE },
     { &sr_satchelDistance, "sr_satchelDistance", "300", CVAR_ARCHIVE },
     { &sr_smokeBounce, "sr_smokeBounce", "0", CVAR_ARCHIVE },
-    { &sr_defaultEndAreaRange, "sr_defaultEndAreaRange", "300", CVAR_ARCHIVE },
+    { &sr_defaultAreaRange, "sr_defaultEndAreaRange", "100", CVAR_ARCHIVE },
     { &sr_startTime, "sr_startTime", "5000", CVAR_ARCHIVE },
     // Powerups
     { &sr_pw_noSlowDuration, "sr_pw_noSlowDuration", "7000", CVAR_ARCHIVE },

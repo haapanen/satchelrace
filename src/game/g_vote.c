@@ -1094,7 +1094,6 @@ int G_StartGame_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *ar
     return( G_OK );
 }
 
-
 int G_RouteMaker_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *arg2, qboolean fRefereeCmd ) {
     // Vote request (vote is being initiated)
     if ( arg ) {
@@ -1140,6 +1139,10 @@ int G_RouteMaker_v( gentity_t *ent, unsigned int dwVoteIndex, char *arg, char *a
             }
             cl->sess.routeMaker = qtrue;
             AP( va( "cp \"%s^7 is now a route maker\n\"", cl->pers.netname ) );
+
+            ResetRacingState();
+            AP("cpm \"^8SR^7: new routemaker has been voted. Racing has stopped.\n\"");
+
             ClientUserinfoChanged( atoi( level.voteInfo.vote_value ) );
 
 

@@ -302,6 +302,10 @@ vmCvar_t	cg_recording_statusline;
 vmCvar_t	cg_hitSounds;
 // end acqu-sdk (issue 20)
 
+vmCvar_t sr_popupTime;
+vmCvar_t sr_popupStayTime;
+vmCvar_t sr_popupFadeTime;
+
 typedef struct {
 	vmCvar_t	*vmCvar;
 	char		*cvarName;
@@ -536,6 +540,10 @@ cvarTable_t		cvarTable[] = {
 	// sta acqu-sdk (issue 20): hitsounds
 	{ &cg_hitSounds, "cg_hitSounds", "1", CVAR_ARCHIVE | CVAR_USERINFO },
 	// end acqu-sdk (issue 20)
+
+    { &sr_popupTime, "sr_popupTime", "0", CVAR_ARCHIVE },
+    { &sr_popupStayTime, "sr_popupStayTime", "2000", CVAR_ARCHIVE },
+    { &sr_popupFadeTime, "sr_popupFadeTime", "2500", CVAR_ARCHIVE }
 };
 
 int		cvarTableSize = sizeof( cvarTable ) / sizeof( cvarTable[0] );
