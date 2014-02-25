@@ -232,7 +232,7 @@ void TouchPowerupNoSlow(gentity_t *self, gentity_t *player, trace_t *trace)
 
     player->client->powerups[PW_NOSLOW] = level.time + sr_pw_noSlowDuration.integer;
 
-    AP(va("cpm \"%s ^7picked up a ^5No Slow ^7powerup\n\"", player->client->pers.netname));
+    AP(va("chat \"%s ^7picked up a ^5No Slow ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);
 }
@@ -261,7 +261,7 @@ void TouchPowerupLowGravity(gentity_t *self, gentity_t *player, trace_t *trace)
 
     player->client->powerups[PW_LOWGRAVITY] = level.time + sr_pw_lowGravityDuration.integer;
 
-    AP(va("cpm \"%s ^7picked up a ^5Low Gravity ^7powerup\n\"", player->client->pers.netname));
+    AP(va("chat \"%s ^7picked up a ^5Low Gravity ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);
 }
@@ -293,7 +293,7 @@ void TouchPowerupRoot(gentity_t *self, gentity_t *player, trace_t *trace)
 
     level.rootPlayers = level.time + sr_pw_rootDuration.integer;
 
-    AP(va("cpm \"%s ^7picked up a ^5Root ^7powerup\n\"", player->client->pers.netname));
+    AP(va("chat \"%s ^7picked up a ^5Root ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);
 }
@@ -323,7 +323,7 @@ void TouchPowerupSatchelBoost(gentity_t *self, gentity_t *player, trace_t *trace
 
     player->client->powerups[PW_SATCHELBOOST] = sr_pw_satchelBoost.integer;
 
-    AP(va("cpm \"%s ^7picked up a ^5Satchel Boost ^7powerup\n\"", player->client->pers.netname));
+    AP(va("chat \"%s ^7picked up a ^5Satchel Boost ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);
 }
@@ -366,7 +366,7 @@ void TouchPowerupSatchelUnboost(gentity_t *self, gentity_t *player, trace_t *tra
         }
     }
 
-    AP(va("cpm \"%s ^7picked up a ^5Satchel Unboost ^7powerup\n\"", player->client->pers.netname));
+    AP(va("chat \"%s ^7picked up a ^5Satchel Unboost ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);
 }
@@ -410,7 +410,7 @@ void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace)
         }
     }
 
-    AP(va("cpm \"%s ^7picked up a ^5Slow ^7powerup\n\"", player->client->pers.netname));
+    AP(va("chat \"%s ^7picked up a ^5Slow ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);
 }
@@ -453,7 +453,7 @@ void TouchPowerupGravity(gentity_t *self, gentity_t *player, trace_t *trace)
         }
     }
 
-    AP(va("cpm \"%s ^7picked up a ^5Slow ^7powerup\n\"", player->client->pers.netname));
+    AP(va("chat \"%s ^7picked up a ^5Slow ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);
 }
@@ -496,7 +496,7 @@ void TouchPowerupSlick(gentity_t *self, gentity_t *player, trace_t *trace)
         }
     }
 
-    AP(va("cpm \"%s ^7picked up a ^5Slick ^7powerup\n\"", player->client->pers.netname));
+    AP(va("chat \"%s ^7picked up a ^5Slick ^7powerup\"", player->client->pers.netname));
     self->parent->child = NULL;
     G_FreeEntity(self);
 }
