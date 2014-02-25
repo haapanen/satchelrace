@@ -3753,6 +3753,9 @@ void RouteMakerCheckpoints( gentity_t * ent )
 
 void RouteMakerBegin( gentity_t * ent ) 
 {
+    int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS];
+    qboolean keepRoute = qfalse;
     gentity_t *begin = NULL;
     // gitem_t *item = BG_FindItemForClassName("route_begin");
 
@@ -3774,7 +3777,25 @@ void RouteMakerBegin( gentity_t * ent )
     trap_LinkEntity(begin);
 
     level.routeBegin = begin;
-    CP("cp \"^7Added a ^2start ^7spot\n\"");
+    
+    if(argc == 3)
+    {
+        trap_Argv(2, arg, sizeof(arg));
+        if(!Q_stricmp(arg, "-keep"))
+        {
+            keepRoute = qtrue;
+        }
+    }
+
+    if(keepRoute)
+    {
+        CP("cp \"^7Added a ^2start ^7spot.\n\"");
+    } else
+    {
+        ClearRoute();
+        CP("cp \"^7Added a ^2start ^7spot and cleared the route.\n\"");
+        CP("print \"^7If you do not wish to clear the route when you define a start spot, do /route begin -keep\n\"");
+    }
 }
 
 void RouteMakerEnd( gentity_t *ent )
@@ -3939,7 +3960,7 @@ void Cmd_Route_f( gentity_t * ent )
 
     if(argc < 2)
     {
-        CP("print \"usage: /route [begin|end|cp|clear|clearcp]\n\"");
+        CP("print \"usage: /route [begin|end|cp|clear|clearcp|clearpw]\n\"");
         return;
     }
 
@@ -3965,7 +3986,7 @@ void Cmd_Route_f( gentity_t * ent )
         RouteMakerCheckpoints( ent );
     } else
     {
-        CP(va("print \"incorrect parameter \"%s\"\n\"", arg));
+        CP("print \"usage: /route [begin|end|cp|clear|clearcp|clearpw]\n\"");
         return;
     }
 }

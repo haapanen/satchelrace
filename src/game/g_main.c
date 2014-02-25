@@ -3884,6 +3884,7 @@ void CheckSatchelRunStatus()
                 {
                     target->client->ps.eFlags ^= EF_TELEPORT_BIT;
                     VectorCopy(level.routeBegin->r.currentOrigin, target->client->ps.origin);
+                    SetClientViewAngle(target, level.routeBegin->r.currentAngles);
 
                     target->client->sess.racing = qtrue;
                     target->client->sess.raceStartTime = level.time;
