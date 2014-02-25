@@ -17,7 +17,7 @@
 //void GetBotAutonomies(int clientNum, int *weapAutonomy, int *moveAutonomy);
 // end acqu-sdk (issue 11)
 
-qboolean G_IsOnFireteam(int entityNum, fireteamData_t** teamNum);
+qboolean G_IsOnFireteam(int entityNum, fireteamData_t** teamNum); 
 
 /*
 ==================

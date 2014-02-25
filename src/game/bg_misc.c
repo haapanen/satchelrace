@@ -2597,6 +2597,155 @@ model="models/flags/b_flag.md3"
         //		{0,0,0,0,0}
     },
 
+    {
+        "noslow_powerup",
+            "",
+        { 
+            "models/satchelrace/noslow_powerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "No slow",		// pickup
+        0,
+        IT_POWERUP,
+        PW_NOSLOW,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "gravity_powerup",
+            "",
+        { 
+            "models/satchelrace/gravity_powerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "Gravity",		// pickup
+        0,
+        IT_POWERUP,
+        PW_GRAVITY,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "lowgravity_powerup",
+            "",
+        { 
+            "models/satchelrace/lowgravity_powerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "Low Gravity",		// pickup
+        0,
+        IT_POWERUP,
+        PW_LOWGRAVITY,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "root_powerup",
+            "",
+        { 
+            "models/satchelrace/root_powerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "Root",		// pickup
+        0,
+        IT_POWERUP,
+        PW_ROOT_PROTECTION,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "satchelboost_powerup",
+            "",
+        { 
+            "models/satchelrace/satchelboost_powerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "Satchel Boost",		// pickup
+        0,
+        IT_POWERUP,
+        PW_SATCHELBOOST,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "satchelunboost_powerup",
+            "",
+        { 
+            "models/satchelrace/satchelunboost_powerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "Satchel Unboost",		// pickup
+        0,
+        IT_POWERUP,
+        PW_SATCHELUNBOOST,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+    {
+        "slow_powerup",
+            "",
+        { 
+            "models/satchelrace/slow_powerup.md3",
+                0,
+                0
+        },
+        "",	// icon
+        NULL,				// ammo icon
+        "Slow Others",		// pickup
+        0,
+        IT_POWERUP,
+        PW_SLOW,
+        0,
+        0,
+        "",					// precache
+        "",	// sounds
+        //		{0,0,0,0,0}
+    },
+
+
+
 //     {
 //         "powerup_noslow",
 //             "",

@@ -41,13 +41,13 @@ void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace);
 void TouchPowerupSlick(gentity_t *self, gentity_t *player, trace_t *trace);
 
 static const Powerup_t powerups[] = {
-    {"noslow", "No Slow", PW_NOSLOW, NUM_SR_POWERUP_TYPES, spawner_noSlow, think_noSlow, TouchPowerupNoSlow},
-    {"lowgravity", "Low Gravity", PW_NOSLOW, NUM_SR_POWERUP_TYPES, spawner_lowGravity, think_lowGravity, TouchPowerupLowGravity},
-    {"satchelboost", "Satchel Boost", PW_SATCHELBOOST, NUM_SR_POWERUP_TYPES, spawner_satchelBoost, think_satchelBoost, TouchPowerupSatchelBoost},
-    {"slow", "Slow Others", PW_SLOW, NUM_SR_POWERUP_TYPES, spawner_slow, think_slow, TouchPowerupSlow},
-    {"gravity", "Gravity", PW_GRAVITY, NUM_SR_POWERUP_TYPES, spawner_gravity, think_gravity, TouchPowerupGravity},
-    {"satchelunboost", "Satchel Unboost", PW_SATCHELBOOST, NUM_SR_POWERUP_TYPES, spawner_satchelUnboost, think_satchelUnboost, TouchPowerupSatchelUnboost},
-    {"root", "Root", PW_ROOT_PROTECTION, NUM_SR_POWERUP_TYPES, spawner_root, think_root, TouchPowerupRoot},
+    {"noslow", "No Slow", PW_NOSLOW, PW_NOSLOW, spawner_noSlow, think_noSlow, TouchPowerupNoSlow},
+    {"lowgravity", "Low Gravity", PW_NOSLOW, PW_LOWGRAVITY, spawner_lowGravity, think_lowGravity, TouchPowerupLowGravity},
+    {"satchelboost", "Satchel Boost", PW_SATCHELBOOST, PW_SATCHELBOOST, spawner_satchelBoost, think_satchelBoost, TouchPowerupSatchelBoost},
+    {"slow", "Slow Others", PW_SLOW, PW_SLOW, spawner_slow, think_slow, TouchPowerupSlow},
+    {"gravity", "Gravity", PW_GRAVITY, PW_GRAVITY, spawner_gravity, think_gravity, TouchPowerupGravity},
+    {"satchelunboost", "Satchel Unboost", PW_SATCHELBOOST, PW_SATCHELUNBOOST, spawner_satchelUnboost, think_satchelUnboost, TouchPowerupSatchelUnboost},
+    {"root", "Root", PW_ROOT_PROTECTION, PW_ROOT_PROTECTION, spawner_root, think_root, TouchPowerupRoot},
     {"slick", "Slick Others", PW_SLICK, NUM_SR_POWERUP_TYPES, spawner_slick, think_slick, TouchPowerupSlick}
 };
 static int numPowerups = sizeof(powerups)/sizeof(Powerup_t);

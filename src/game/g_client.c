@@ -584,7 +584,7 @@ reinforce
 void reinforce(gentity_t *ent) {
 	int p, team;// numDeployable=0, finished=0; // TTimo unused
 	char *classname;
-	gclient_t *rclient;
+	gclient_t *rclient; 
 	char	userinfo[MAX_INFO_STRING], *respawnStr;
 
 	if (ent->r.svFlags & SVF_BOT) {
