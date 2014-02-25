@@ -2042,9 +2042,25 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 		spawn_origin[2] += 9;	// spawns seem to be sunk into ground?
 		VectorCopy( ent->s.angles, spawn_angles );
 	} else if( ent->client->sess.racing ) {
+        int k = 0;
         ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
 
-        VectorCopy(level.routeBegin->r.currentOrigin, spawn_origin);
+        if(ent->client->sess.checkpointVisited[0] == qfalse)
+        {
+            VectorCopy(level.routeBegin->r.currentOrigin, spawn_origin); 
+        } else
+        {
+            // Find latest checkpoint
+            for(; k < level.numCheckpoints; k++)
+            {
+                if(ent->client->sess.checkpointVisited[k] == qfalse)
+                {
+                    VectorCopy(level.checkpoints[k-1]->r.currentOrigin, spawn_origin);
+                    break;
+                }
+            }
+        }        
+        
         VectorCopy( ent->s.angles, spawn_angles );
     } else {
 		// Arnout: let's just be sure it does the right thing at all times. (well maybe not the right thing, but at least not the bad thing!)
