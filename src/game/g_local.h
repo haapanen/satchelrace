@@ -2057,6 +2057,8 @@ extern vmCvar_t sr_pw_gravity;
 
 extern vmCvar_t sr_pw_slickDuration;
 
+extern vmCvar_t sr_permaSlick;
+
 void	trap_Printf( const char *fmt );
 void	trap_Error( const char *fmt );
 int		trap_Milliseconds( void );

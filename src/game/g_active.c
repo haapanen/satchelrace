@@ -1233,7 +1233,7 @@ void ClientThink_real( gentity_t *ent ) {
 
 	pm.leadership = qfalse;
 
-    if( client->powerups[PW_SLICK] > level.time )
+    if( client->powerups[PW_SLICK] > level.time || sr_permaSlick.integer )
     {
         pm.powerupSlick = qtrue;
     } else
