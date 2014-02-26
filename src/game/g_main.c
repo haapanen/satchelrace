@@ -2792,6 +2792,12 @@ void LogExit( const char *string ) {
 	if ( g_gamestate.integer != GS_PLAYING )
 		return;
 
+    // Let's just never end the game
+    if( qtrue )
+    {
+        return;
+    }
+
 	G_LogPrintf( "Exit: %s\n", string );
 
 #ifdef XPSAVE_SUPPORT
