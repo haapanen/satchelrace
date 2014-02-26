@@ -565,11 +565,20 @@ void PrintPowerupHelp( gentity_t *ent )
 void PrintPowerupInfo( gentity_t *ent, char *targetPW )
 {
 	int i = 0;
+	int allowArg = 0;
 	BeginBufferPrint();
 	
-	if(Q_stricmp("noslow", targetPW) == 0 || Q_stricmp("lowgravity", targetPW) == 0 || Q_stricmp("satchelboost", targetPW) == 0 || Q_stricmp("satchelunboost", targetPW) == 0 
-		|| Q_stricmp("slow", targetPW) == 0 || Q_stricmp("gravity", targetPW) == 0 || Q_stricmp("root", targetPW) == 0 || Q_stricmp("slick", targetPW) == 0)
+	for(; i < numPowerups; i++)
+    {
+       if(Q_stricmp(powerups[i].name, targetPW) == 0)
+	   {
+		   allowArg = 1;
+	   }
+    }
+	
+	if(allowArg == 1)
 	{
+		allowArg = 0;
 		BufferPrint(ent, va("^5Currently showing information for: %s\n ", targetPW));
 		if(Q_stricmp("noslow", targetPW) == 0)
 		{

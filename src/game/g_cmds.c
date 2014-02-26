@@ -4029,7 +4029,7 @@ void Cmd_ShowRoute_f( gentity_t * ent )
 void Cmd_RestartRun_f( gentity_t * ent )
 {
 	int i;
-	if(level.numCheckpoints >= 0)
+	if(level.numCheckpoints > 0)
 	{
 		//Resetting CPS
 		for(i = 0; i < level.numCheckpoints; i++)
@@ -4043,7 +4043,7 @@ void Cmd_RestartRun_f( gentity_t * ent )
 		}
 		
 		//Teleporting to beginning
-	    ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
+		ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
 		VectorCopy(level.routeBegin->r.currentOrigin, ent->client->ps.origin);
 		SetClientViewAngle(ent, level.routeBegin->r.currentAngles);
 
@@ -4052,10 +4052,10 @@ void Cmd_RestartRun_f( gentity_t * ent )
 		{
 			ent->client->sess.racing = qtrue;
 		}
-
+		
 		//Give message to server that he reset his run
-	    trap_SendServerCommand(-1, va("cpm \"%s ^1 has reset his run. ", ent->client->pers.netname));
-		CP("cp \"^5Your run has been successfully reset.\n\"");
+	    trap_SendServerCommand(-1, va("cpm \"%s^7has restarted his run.", ent->client->pers.netname));
+		CP("cp \"^5Your run has been successfully restarted.\n\"");
 	}
 	
 }
