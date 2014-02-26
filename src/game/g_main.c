@@ -3886,6 +3886,11 @@ void CheckSatchelRunStatus()
                 int clientNum = level.sortedClients[i];
                 gentity_t *target = g_entities + clientNum;
 
+                for(j = 0; j < level.numCheckpoints; j++)
+                {
+                    target->client->sess.checkpointVisited[j] = qfalse;
+                }
+
                 if(target->client->sess.sessionTeam != TEAM_SPECTATOR)
                 {
                     target->client->ps.eFlags ^= EF_TELEPORT_BIT;
@@ -3895,16 +3900,13 @@ void CheckSatchelRunStatus()
                     target->client->sess.racing = qtrue;
                     target->client->sess.raceStartTime = level.time;
 
-                    for(j = 0; j < level.numCheckpoints; j++)
-                    {
-                        target->client->sess.checkpointVisited[j] = qfalse;
-                    }
-
                     if(target->client->noclip)
                     {
                         target->client->noclip = qfalse;
                     }
                 }
+
+                target->client->sess.routeMaker = qfalse;
             }
 
             for(i = 0; i < level.numPowerups; i++)
@@ -3926,7 +3928,7 @@ void CheckSatchelRunStatus()
             }
 
             level.raceIsStarting = qfalse;
-            trap_SendServerCommand(-1, "cp \"^5Race started!\n\"");
+            trap_SendServerCommand(-1, "cp \"^7Race started!\n\"");
         }
     }
 }
