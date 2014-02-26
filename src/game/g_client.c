@@ -2041,7 +2041,10 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 		VectorCopy( ent->r.currentOrigin, spawn_origin );
 		spawn_origin[2] += 9;	// spawns seem to be sunk into ground?
 		VectorCopy( ent->s.angles, spawn_angles );
-	} else if( ent->client->sess.racing ) {
+	} 
+    // Zero: && level.routeBegin is needed incase client is still
+    // racing but somebody cleared route
+    else if( ent->client->sess.racing && level.routeBegin ) {
         int k = 0;
         ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
 

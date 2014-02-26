@@ -197,6 +197,7 @@ FILE(GLOB QAGAME_SRC
 	"game/q_shared.c"
 
 	"game/g_powerups.c"
+	"game/g_route.c"
 )
 
 FILE(GLOB UI_SRC

@@ -186,6 +186,7 @@
     <ClCompile Include="g_powerups.c" />
     <ClCompile Include="g_props.c" />
     <ClCompile Include="g_referee.c" />
+    <ClCompile Include="g_route.c" />
     <ClCompile Include="g_script.c" />
     <ClCompile Include="g_script_actions.c" />
     <ClCompile Include="g_session.c" />
