@@ -113,15 +113,7 @@ void CheckWinner(gentity_t *self)
 
 void CheckRacersNearCP(gentity_t *self)
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    int currentCP = 1;
-=======
 	int currentCP = 1;
->>>>>>> 0323c38b1e85ce876fde5770e13ebb3c0b31715f
-=======
-	int currentCP = 1;
->>>>>>> 0323c38b1e85ce876fde5770e13ebb3c0b31715f
     int i = 0;
     int count = 0;
 	int visitedCP = 0;
