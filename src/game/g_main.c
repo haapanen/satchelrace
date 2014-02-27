@@ -3912,7 +3912,7 @@ void CheckSatchelRunStatus()
                         target->client->noclip = qfalse;
                     }
                 }
-
+				target->client->sess.visitedCheckpoints = 0;
                 target->client->sess.routeMaker = qfalse;
             }
 

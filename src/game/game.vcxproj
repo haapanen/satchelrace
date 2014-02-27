@@ -93,7 +93,8 @@
       <ImportLibrary>.\Debug/qagame_mp_x86.lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y "C:\Users\Jussi\Documents\GitHub\satchelrace\src\build\*.dll" "C:\ET\Mapping\satchelrace"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
