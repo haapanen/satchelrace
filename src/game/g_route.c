@@ -24,68 +24,99 @@ void CheckWinner(gentity_t *self)
 
         if( ent->client->sess.racing )
         {
-            if(ent->client->sess.checkpointVisited[level.numCheckpoints - 1] == qtrue)
-            {
-                int i = 0;
-                int msec = 0;
-                int sec = 0;
-                int min = 0;
-                msec = level.time - ent->client->sess.raceStartTime;
-                min = msec / 60000;
-                msec = msec - min * 60000;
-                sec = msec / 1000;
-                msec = msec - sec * 1000;
-                trap_SendServerCommand(-1, va("cpm \"%s ^7reached the ^1end^7 in %02d:%02d:%03d.\n\"", 
-                    ent->client->pers.netname, min, sec, msec));
-                ent->client->sess.racing = qfalse;
-                // Reset powerups
-                for(; i < NUM_SR_POWERUP_TYPES; i++)
-                {
-                    ent->client->powerups[i] = 0;
-                }
-            } else
-            {
-                // Kind of messy but checks if client has visited all checkpoints.
-                int i = 0;
-                int checkpointsVisited[MAX_CHECKPOINTS];
-                int checkpointsNotVisited = 0;
-                char buf[MAX_TOKEN_CHARS] = "^5You skipped the following checkpoints: ";
-                for(; i < level.numCheckpoints; i++)
-                {
-                    if(ent->client->sess.checkpointVisited[i] == qfalse)
-                    {
-                        checkpointsVisited[checkpointsNotVisited++] =
-                            i;
-                    }
-                }
-
-                for(i = 0; i < checkpointsNotVisited; i++)
-                {
-                    if(i == checkpointsNotVisited - 1)
-                    {
-                        Q_strcat(buf, sizeof(buf), va("%d", checkpointsVisited[i] + 1));
-                    } else
-                    {
-                        Q_strcat(buf, sizeof(buf), va("%d, ", checkpointsVisited[i] + 1));
-                    }
-                }
-
-                G_PrintClientSpammyCenterPrint(ent->client->ps.clientNum,
-                    va("%s", buf));
-            }
-
+			int i = 0;
+			int msec = 0;
+			int sec = 0;
+			int min = 0;
+			int missedCP = 0;
+			msec = level.time - ent->client->sess.raceStartTime;
+			min = msec / 60000;
+			msec = msec - min * 60000;
+			sec = msec / 1000;
+			msec = msec - sec * 1000;
+			if(routeSettings.cpOrder == qtrue)
+			{
+				if(ent->client->sess.checkpointVisited[level.numCheckpoints - 1] == qtrue)
+				{
+				
+					trap_SendServerCommand(-1, va("cpm \"%s ^7reached the ^1end^7 in %02d:%02d:%03d.\n\"", 
+						ent->client->pers.netname, min, sec, msec));
+					ent->client->sess.racing = qfalse;
+					// Reset powerups
+					for(; i < NUM_SR_POWERUP_TYPES; i++)
+					{
+						ent->client->powerups[i] = 0;
+					}
+				} else
+				{
+					// Kind of messy but checks if client has visited all checkpoints.
+					int i = 0;
+					int checkpointsVisited[MAX_CHECKPOINTS];
+					int checkpointsNotVisited = 0;
+					char buf[MAX_TOKEN_CHARS] = "^5You skipped the following checkpoints: ";
+					for(; i < level.numCheckpoints; i++)
+					{
+						if(ent->client->sess.checkpointVisited[i] == qfalse)
+						{
+							checkpointsVisited[checkpointsNotVisited++] =
+								i;
+						}
+					}
+                
+					for(i = 0; i < checkpointsNotVisited; i++)
+					{
+						if(i == checkpointsNotVisited - 1)
+						{
+							Q_strcat(buf, sizeof(buf), va("%d", checkpointsVisited[i] + 1));
+						} else
+						{
+							Q_strcat(buf, sizeof(buf), va("%d, ", checkpointsVisited[i] + 1));
+						}
+					}
+                
+					G_PrintClientSpammyCenterPrint(ent->client->ps.clientNum,
+						va("%s", buf));
+				}
+          
         } 
+			else if(routeSettings.cpOrder == qfalse)
+			{
+				if(ent->client->sess.visitedCheckpoints == level.numCheckpoints)
+				{
+					trap_SendServerCommand(-1, va("cpm \"%s ^7reached the ^1end^7 in %02d:%02d:%03d.\n\"", 
+						ent->client->pers.netname, min, sec, msec));
+					ent->client->sess.racing = qfalse;
+					// Reset powerups
+					for(; i < NUM_SR_POWERUP_TYPES; i++)
+					{
+						ent->client->powerups[i] = 0;
+					}
+					// Reset visited checkpoints
+					ent->client->sess.visitedCheckpoints = 0;
+				}
+				else
+				{
+					missedCP = level.numCheckpoints - ent->client->sess.visitedCheckpoints;
+					CP(va("cp \"^5You missed ^7%d ^5checkpoint/s.\n\ ", missedCP));
+				}
+			}
+			else
+			{
+				return;
+			}
+	  }
     }
 
     self->nextthink = FRAMETIME;
 }
 
+
 void CheckRacersNearCP(gentity_t *self)
 {
-    int currentCP = 1;
-    int k = 0;
+	int currentCP = 1;
     int i = 0;
     int count = 0;
+	int visitedCP = 0;
     vec3_t range = {self->horizontalRange, self->horizontalRange, self->verticalRange};
     vec3_t mins = {0, 0, 0};
     vec3_t maxs = {0, 0, 0};
@@ -96,6 +127,7 @@ void CheckRacersNearCP(gentity_t *self)
 
     count = trap_EntitiesInBox(mins, maxs, entityList, MAX_GENTITIES);
 
+	
     for ( i = 0; i < count; i++ ) {
         int msec = 0;
         int sec = 0;
@@ -107,6 +139,7 @@ void CheckRacersNearCP(gentity_t *self)
             continue;
         }
 
+
         if( ent->client->sess.racing && !ent->client->sess.checkpointVisited[self->position] )
         {
             msec = level.time - ent->client->sess.raceStartTime;
@@ -114,31 +147,47 @@ void CheckRacersNearCP(gentity_t *self)
             msec = msec - min * 60000;
             sec = msec / 1000;
             msec = msec - sec * 1000;
-            currentCP = self->position;
-
-            if(currentCP != 0)
-            {
-                if(ent->client->sess.checkpointVisited[currentCP - 1])
-                {
-                    trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
-                        min, sec, msec));
-                    ent->client->sess.checkpointVisited[self->position] = qtrue;
-                }
-                else
-                {
-                    CP("cp \"^7You missed a ^3checkpoint^7, go back and visit it before visiting this one.\n\"");
-                }
-            }
-            else if(currentCP == 0)
-            {
-                trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
-                    min, sec, msec));
-                ent->client->sess.checkpointVisited[self->position] = qtrue;
-            }
-
-
-        } 
-    }
+			currentCP = self->position;
+			
+			if(routeSettings.cpOrder == qtrue)
+			{
+				if(currentCP != 0)
+				 {
+					 if(ent->client->sess.checkpointVisited[currentCP - 1])
+					 {
+						 trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
+						 min, sec, msec));
+						 ent->client->sess.checkpointVisited[self->position] = qtrue;
+					 }
+					 else
+					 {
+						 CP("cp \"^7You missed a ^3checkpoint^7, go back and visit it before visiting this one.\n\"");
+					 }
+				 }
+				 
+				else if(currentCP == 0)
+				 {
+					  trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
+						 min, sec, msec));
+					  ent->client->sess.checkpointVisited[self->position] = qtrue;
+				 }
+			 
+			
+		    } 
+			else if(routeSettings.cpOrder == qfalse)
+			{
+				ent->client->sess.visitedCheckpoints++;
+				trap_SendServerCommand(-1, va("cpm \"%s ^7reached a ^3checkpoint in %02d:%02d:%03d (%d out of %d checkpoints).\n\"", ent->client->pers.netname,  
+						 min, sec, msec, ent->client->sess.visitedCheckpoints, level.numCheckpoints));
+			    ent->client->sess.checkpointVisited[self->position] = qtrue;
+			}
+			else
+			{
+				routeSettings.cpOrder = qtrue;
+				return;
+			}
+      }
+	}
 
     self->nextthink = FRAMETIME;
 }
@@ -147,6 +196,26 @@ void CheckRacersNearCP(gentity_t *self)
 #define RANGE_SMALL 100
 #define RANGE_MEDIUM 300
 #define RANGE_LARGE 500
+
+void RouteMakerCheckpointsOrder( gentity_t *ent, char *getValue )
+{
+	int state = atoi(getValue);
+    if(state == 1)
+	{
+		routeSettings.cpOrder = qtrue;
+		CP("cp \"^7Checkpoint order: ^2On\n\"");
+	}
+	else if (state == 0)
+	{
+		routeSettings.cpOrder = qfalse;
+		CP("cp \"^7Checkpoint order: ^1Off\n\"");
+	}
+	else
+	{
+		CP("print \"^7Invalid usage. CPOrder : 1(true) or 0(false)");
+		routeSettings.cpOrder = qtrue;
+	}
+}
 
 void RouteMakerCheckpoints( gentity_t * ent ) 
 {
@@ -484,7 +553,12 @@ void Cmd_Route_f( gentity_t * ent )
     } else if(!Q_stricmp(arg, "cp"))
     {
         RouteMakerCheckpoints( ent );
-    } else
+    } else if(!Q_stricmp(arg, "cporder"))
+    {
+        trap_Argv(2, arg, sizeof(arg));
+		RouteMakerCheckpointsOrder(ent, arg);
+	}	
+	else
     {
         CP("print \"usage: /route [begin|end|cp|clear|clearcp|clearpw]\n\"");
         return;
@@ -527,36 +601,41 @@ void Cmd_ShowRoute_f( gentity_t * ent )
 
 void Cmd_RestartRun_f( gentity_t * ent )
 {
-    int i;
-    if(level.numCheckpoints > 0)
-    {
-        //Resetting CPS
-        for(i = 0; i < level.numCheckpoints; i++)
-        {
-            ent->client->sess.checkpointVisited[i] = qfalse;
-        }
-        //Timers
-        if(ent->client->sess.raceStartTime > 0)
-        {
-            ent->client->sess.raceStartTime = level.time + 10;
-        }
+	int i;
+	if(level.numCheckpoints > 0)
+	{
+		if(routeSettings.cpOrder == qfalse)
+		{
+			ent->client->sess.visitedCheckpoints = 0;
+		}
 
-        //Teleporting to beginning
-        ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
-        VectorCopy(level.routeBegin->r.currentOrigin, ent->client->ps.origin);
-        SetClientViewAngle(ent, level.routeBegin->r.currentAngles);
+		//Resetting CPS
+		for(i = 0; i < level.numCheckpoints; i++)
+		{
+			ent->client->sess.checkpointVisited[i] = qfalse;
+		}
+		//Timers
+		if(ent->client->sess.raceStartTime > 0)
+		{
+			ent->client->sess.raceStartTime = level.time + 10;
+		}
+		
+		//Teleporting to beginning
+		ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
+		VectorCopy(level.routeBegin->r.currentOrigin, ent->client->ps.origin);
+		SetClientViewAngle(ent, level.routeBegin->r.currentAngles);
 
-        //If he has already ended the run, put him to racing status again.
-        if(!ent->client->sess.racing)
-        {
-            ent->client->sess.racing = qtrue;
-        }
-
-        //Give message to server that he reset his run
-        trap_SendServerCommand(-1, va("cpm \"%s^7has restarted his run.", ent->client->pers.netname));
-        CP("cp \"^7Your run has been successfully restarted.\n\"");
-    }
-
+		//If he has already ended the run, put him to racing status again.
+		if(!ent->client->sess.racing)
+		{
+			ent->client->sess.racing = qtrue;
+		}
+		
+		//Give message to server that he reset his run
+	    trap_SendServerCommand(-1, va("cpm \"%s^7has restarted his run.", ent->client->pers.netname));
+		CP("cp \"^5Your run has been successfully restarted.\n\"");
+	}
+	
 }
 
 void Cmd_StopShowRoute_f( gentity_t * ent ) 

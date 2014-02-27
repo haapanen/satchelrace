@@ -335,7 +335,7 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
     {
         sess->checkpointVisited[i] = qfalse;
     }
-	
+	sess->visitedCheckpoints = 0;
     sess->nextCp = MAX_CHECKPOINTS + 1;
     sess->showingRoute = qfalse;
 

@@ -629,6 +629,7 @@ typedef struct {
     qboolean racing;
     qboolean checkpointVisited[MAX_CHECKPOINTS];
 	
+	int visitedCheckpoints;
     int raceStartTime;
 
     // Show route
@@ -1241,6 +1242,10 @@ typedef struct
 	int		flags;
 } field_t;
 
+typedef struct { 
+	qboolean cpOrder; 
+} route_t;
+
 #define		G_SpawnString(		key, def, out ) G_SpawnStringExt	( key, def, out, __FILE__, __LINE__ )
 #define		G_SpawnFloat(		key, def, out ) G_SpawnFloatExt		( key, def, out, __FILE__, __LINE__ )
 #define		G_SpawnInt(			key, def, out ) G_SpawnIntExt		( key, def, out, __FILE__, __LINE__ )
@@ -1798,6 +1803,7 @@ void Props_Chair_Skyboxtouch (gentity_t *ent);
 #include "g_team.h" // teamplay specific stuff
 
 extern	level_locals_t	level;
+extern  route_t			routeSettings;
 extern	gentity_t		g_entities[];	//DAJ was explicit set to MAX_ENTITIES
 extern g_campaignInfo_t g_campaigns[];
 extern int				saveGamePending;
