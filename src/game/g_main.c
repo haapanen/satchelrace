@@ -18,6 +18,7 @@
 #endif
 
 level_locals_t	level;
+route_t routeSettings;
 
 typedef struct {
 	vmCvar_t	*vmCvar;
@@ -1767,6 +1768,7 @@ void G_InitSatchelRace()
     level.raceIsStarting = qfalse;
 	level.timeLimit = qfalse;
     level.raceStartTime = 0;
+	routeSettings.cpOrder = qtrue;
     for(; i < MAX_CHECKPOINTS; i++)
     {
         level.checkpoints[i] = NULL;
