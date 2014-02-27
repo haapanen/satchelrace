@@ -130,6 +130,9 @@
 #define MV_PID				0x00FF	// Bits available for player IDs for MultiView windows
 #define MV_SELECTED			0x0100	// MultiView selected window flag is the 9th bit
 
+// Zero: etpubs shoutcaster code
+#define MAX_FLOATING_STRINGS	128
+
 typedef struct {
 	vec4_t colorBorder;			// Window border color
 	vec4_t colorBackground;		// Window fill color
@@ -351,6 +354,9 @@ typedef struct centity_s {
 	// Gordon: tagconnect cleanup..
 	int				tagParent;
 	char			tagName[MAX_QPATH];
+
+    // Zero: shoutcaster code
+    int				floatingStringFadeTime;
 } centity_t;
 
 
@@ -737,6 +743,16 @@ typedef enum {
 	SHOW_SHUTDOWN,
 	SHOW_ON
 } showView_t;
+
+// Zero: etpubs shoutcaster floating strings
+typedef struct floatingString_s
+{
+	const char	*string;
+	float		x;
+	float		y;
+	float		scale;
+	float		alpha;
+} floatingString_t;
 
 void CG_ParseMapEntityInfo( int axis_number, int allied_number );
 
@@ -1190,6 +1206,10 @@ typedef struct {
 	char			objDescription_Allied[MAX_OBJECTIVES][256];
 
 	int				waterundertime;
+
+    // Zero: etpubs shoutcaster mode
+    floatingString_t	floatingStrings[MAX_FLOATING_STRINGS];
+	int					floatingStringCount;
 } cg_t;
 
 #define	NUM_FUNNEL_SPRITES	21
@@ -2433,7 +2453,8 @@ void CG_DrawPlayerWeaponIcon( rectDef_t *rect, qboolean drawHighlighted, int ali
 int CG_CalculateReinfTime( qboolean  menu );
 float CG_CalculateReinfTime_Float( qboolean  menu );
 void CG_Fade( int r, int g, int b, int a, int time, int duration );
-
+void CG_AddFloatingString( centity_t *cent, qboolean isCounter );
+void CG_DrawFloatingStrings( void );
 
 
 
