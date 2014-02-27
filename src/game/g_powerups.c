@@ -12,24 +12,24 @@ typedef struct Powerup_s
     void (*touch)(gentity_t *self, gentity_t *player, trace_t *trace);
 } Powerup_t;
 
-gentity_t *spawner_noSlow( gentity_t *spawner, void (*think)(gentity_t *self) );
-gentity_t *spawner_lowGravity( gentity_t *spawner, void (*think)(gentity_t *self) );
-gentity_t *spawner_satchelBoost( gentity_t *spawner, void (*think)(gentity_t *self) );
-gentity_t *spawner_slow( gentity_t *spawner, void (*think)(gentity_t *self) );
-gentity_t *spawner_gravity( gentity_t *spawner, void (*think)(gentity_t *self) );
-gentity_t *spawner_satchelUnboost( gentity_t *spawner, void (*think)(gentity_t *self) );
-gentity_t *spawner_root( gentity_t *spawner, void (*think)(gentity_t *self) );
-gentity_t *spawner_slick( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *SpawnerNoSlow( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *SpawnerLowGravity( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *SpawnerSatchelBoost( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *SpawnerSlow( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *SpawnerGravity( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *SpawnerSatchelUnboost( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *SpawnerRoot( gentity_t *spawner, void (*think)(gentity_t *self) );
+gentity_t *SpawnerSlick( gentity_t *spawner, void (*think)(gentity_t *self) );
 
 
-void think_noSlow( gentity_t *self );
-void think_lowGravity( gentity_t *self );
-void think_root( gentity_t *self );
-void think_satchelBoost( gentity_t *self );
-void think_satchelUnboost( gentity_t *self );
-void think_slow( gentity_t *self );
-void think_gravity( gentity_t *self );
-void think_slick( gentity_t *self );
+void ThinkNoSlow( gentity_t *self );
+void ThinkLowGravity( gentity_t *self );
+void ThinkRoot( gentity_t *self );
+void ThinkSatchelBoost( gentity_t *self );
+void ThinkSatchelUnboost( gentity_t *self );
+void ThinkSlow( gentity_t *self );
+void ThinkGravity( gentity_t *self );
+void ThinkSlick( gentity_t *self );
 
 void TouchPowerupGravity(gentity_t *self, gentity_t *player, trace_t *trace);
 void TouchPowerupLowGravity(gentity_t *self, gentity_t *player, trace_t *trace);
@@ -41,14 +41,14 @@ void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace);
 void TouchPowerupSlick(gentity_t *self, gentity_t *player, trace_t *trace);
 
 static const Powerup_t powerups[] = {
-    {"noslow", "No Slow", PW_NOSLOW, PW_NOSLOW, spawner_noSlow, think_noSlow, TouchPowerupNoSlow},
-    {"lowgravity", "Low Gravity", PW_NOSLOW, PW_LOWGRAVITY, spawner_lowGravity, think_lowGravity, TouchPowerupLowGravity},
-    {"satchelboost", "Satchel Boost", PW_SATCHELBOOST, PW_SATCHELBOOST, spawner_satchelBoost, think_satchelBoost, TouchPowerupSatchelBoost},
-    {"slow", "Slow Others", PW_SLOW, PW_SLOW, spawner_slow, think_slow, TouchPowerupSlow},
-    {"gravity", "Gravity", PW_GRAVITY, PW_GRAVITY, spawner_gravity, think_gravity, TouchPowerupGravity},
-    {"satchelunboost", "Satchel Unboost", PW_SATCHELBOOST, PW_SATCHELUNBOOST, spawner_satchelUnboost, think_satchelUnboost, TouchPowerupSatchelUnboost},
-    {"root", "Root", PW_ROOT_PROTECTION, PW_ROOT_PROTECTION, spawner_root, think_root, TouchPowerupRoot},
-    {"slick", "Slick Others", PW_SLICK, NUM_SR_POWERUP_TYPES, spawner_slick, think_slick, TouchPowerupSlick}
+    {"noslow", "No Slow", PW_NOSLOW, PW_NOSLOW, SpawnerNoSlow, ThinkNoSlow, TouchPowerupNoSlow},
+    {"lowgravity", "Low Gravity", PW_NOSLOW, PW_LOWGRAVITY, SpawnerLowGravity, ThinkLowGravity, TouchPowerupLowGravity},
+    {"satchelboost", "Satchel Boost", PW_SATCHELBOOST, PW_SATCHELBOOST, SpawnerSatchelBoost, ThinkSatchelBoost, TouchPowerupSatchelBoost},
+    {"slow", "Slow Others", PW_SLOW, PW_SLOW, SpawnerSlow, ThinkSlow, TouchPowerupSlow},
+    {"gravity", "Gravity", PW_GRAVITY, PW_GRAVITY, SpawnerGravity, ThinkGravity, TouchPowerupGravity},
+    {"satchelunboost", "Satchel Unboost", PW_SATCHELBOOST, PW_SATCHELUNBOOST, SpawnerSatchelUnboost, ThinkSatchelUnboost, TouchPowerupSatchelUnboost},
+    {"root", "Root", PW_ROOT_PROTECTION, PW_ROOT_PROTECTION, SpawnerRoot, ThinkRoot, TouchPowerupRoot},
+    {"slick", "Slick Others", PW_SLICK, NUM_SR_POWERUP_TYPES, SpawnerSlick, ThinkSlick, TouchPowerupSlick}
 };
 static int numPowerups = sizeof(powerups)/sizeof(Powerup_t);
 
@@ -137,7 +137,7 @@ gentity_t *DropPowerup( gentity_t *ent, gitem_t *item,
     return powerup;
 }
 
-gentity_t * spawner_noSlow( gentity_t *spawner, void (*think)(gentity_t *self) )
+gentity_t * SpawnerNoSlow( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
     gentity_t *powerupSpawner = G_Spawn();
     powerupSpawner->classname = "powerup_noslow_spawner";
@@ -147,7 +147,7 @@ gentity_t * spawner_noSlow( gentity_t *spawner, void (*think)(gentity_t *self) )
     return powerupSpawner;
 }
 
-gentity_t * spawner_lowGravity( gentity_t *spawner, void (*think)(gentity_t *self) )
+gentity_t * SpawnerLowGravity( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
     gentity_t *powerupSpawner = G_Spawn();
     powerupSpawner->classname = "powerup_lowgravity_spawner";
@@ -157,7 +157,7 @@ gentity_t * spawner_lowGravity( gentity_t *spawner, void (*think)(gentity_t *sel
     return powerupSpawner;
 }
 
-gentity_t * spawner_satchelBoost( gentity_t *spawner, void (*think)(gentity_t *self) )
+gentity_t * SpawnerSatchelBoost( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
     gentity_t *powerupSpawner = G_Spawn();
     powerupSpawner->classname = "powerup_satchelboost_spawner";
@@ -167,7 +167,7 @@ gentity_t * spawner_satchelBoost( gentity_t *spawner, void (*think)(gentity_t *s
     return powerupSpawner;
 }
 
-gentity_t * spawner_slow( gentity_t *spawner, void (*think)(gentity_t *self) )
+gentity_t * SpawnerSlow( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
     gentity_t *powerupSpawner = G_Spawn();
     powerupSpawner->classname = "powerup_slow_spawner";
@@ -177,7 +177,7 @@ gentity_t * spawner_slow( gentity_t *spawner, void (*think)(gentity_t *self) )
     return powerupSpawner;
 }
 
-gentity_t * spawner_gravity( gentity_t *spawner, void (*think)(gentity_t *self) )
+gentity_t * SpawnerGravity( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
     gentity_t *powerupSpawner = G_Spawn();
     powerupSpawner->classname = "powerup_gravity_spawner";
@@ -187,7 +187,7 @@ gentity_t * spawner_gravity( gentity_t *spawner, void (*think)(gentity_t *self) 
     return powerupSpawner;
 }
 
-gentity_t * spawner_satchelUnboost( gentity_t *spawner, void (*think)(gentity_t *self) )
+gentity_t * SpawnerSatchelUnboost( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
     gentity_t *powerupSpawner = G_Spawn();
     powerupSpawner->classname = "powerup_satchelunboost_spawner";
@@ -197,7 +197,7 @@ gentity_t * spawner_satchelUnboost( gentity_t *spawner, void (*think)(gentity_t 
     return powerupSpawner;
 }
 
-gentity_t * spawner_root( gentity_t *spawner, void (*think)(gentity_t *self) )
+gentity_t * SpawnerRoot( gentity_t *spawner, void (*think)(gentity_t *self) )
 {
     gentity_t *powerupSpawner = G_Spawn();
     powerupSpawner->classname = "powerup_lowgravity_spawner";
@@ -207,7 +207,7 @@ gentity_t * spawner_root( gentity_t *spawner, void (*think)(gentity_t *self) )
     return powerupSpawner;
 }
 
-gentity_t *spawner_slick( gentity_t *spawner, void(*think)(gentity_t *self))
+gentity_t *SpawnerSlick( gentity_t *spawner, void(*think)(gentity_t *self))
 {
     gentity_t *powerupSpawner = G_Spawn();
     powerupSpawner->classname = "powerup_slick_spawner";
@@ -237,7 +237,7 @@ void TouchPowerupNoSlow(gentity_t *self, gentity_t *player, trace_t *trace)
     G_FreeEntity(self);
 }
 
-void think_noSlow( gentity_t *self )
+void ThinkNoSlow( gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
@@ -266,7 +266,7 @@ void TouchPowerupLowGravity(gentity_t *self, gentity_t *player, trace_t *trace)
     G_FreeEntity(self);
 }
 
-void think_lowGravity( gentity_t *self )
+void ThinkLowGravity( gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
@@ -298,7 +298,7 @@ void TouchPowerupRoot(gentity_t *self, gentity_t *player, trace_t *trace)
     G_FreeEntity(self);
 }
 
-void think_root( gentity_t *self )
+void ThinkRoot( gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
@@ -328,7 +328,7 @@ void TouchPowerupSatchelBoost(gentity_t *self, gentity_t *player, trace_t *trace
     G_FreeEntity(self);
 }
 
-void think_satchelBoost( gentity_t *self )
+void ThinkSatchelBoost( gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
@@ -371,7 +371,7 @@ void TouchPowerupSatchelUnboost(gentity_t *self, gentity_t *player, trace_t *tra
     G_FreeEntity(self);
 }
 
-void think_satchelUnboost( gentity_t *self )
+void ThinkSatchelUnboost( gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
@@ -415,7 +415,7 @@ void TouchPowerupSlow(gentity_t *self, gentity_t *player, trace_t *trace)
     G_FreeEntity(self);
 }
 
-void think_slow( gentity_t *self )
+void ThinkSlow( gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
@@ -458,7 +458,7 @@ void TouchPowerupGravity(gentity_t *self, gentity_t *player, trace_t *trace)
     G_FreeEntity(self);
 }
 
-void think_gravity( gentity_t *self )
+void ThinkGravity( gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;
@@ -501,7 +501,7 @@ void TouchPowerupSlick(gentity_t *self, gentity_t *player, trace_t *trace)
     G_FreeEntity(self);
 }
 
-void think_slick( gentity_t *self )
+void ThinkSlick( gentity_t *self )
 {
     gitem_t *item = NULL;
     gentity_t *dropped = NULL;

@@ -1589,7 +1589,7 @@ qboolean	ConsoleCommand( void ) {
         return qtrue;
     }
 
-    if( !Q_stricmp( cmd, "route")) {
+    if( !Q_stricmp( cmd, "routes")) {
         Svcmd_Route_f();
         return qtrue;
     }

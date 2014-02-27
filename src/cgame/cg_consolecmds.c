@@ -1237,4 +1237,8 @@ void CG_InitConsoleCommands( void ) {
 	// end acqu-sdk (issue 12)
 #endif
 
+    // Satchel race
+    trap_AddCommand("route");
+    trap_AddCommand("powerup");
+
 }

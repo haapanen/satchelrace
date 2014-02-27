@@ -60,7 +60,7 @@
 #define	ITEM_RADIUS		10 // Rafael changed the radius so that the items would fit in the 3 new containers
 
 // Zero: ITEM_RADIUS was slightly too small for powerups.
-#define POWERUP_ITEM_RADIUS 20
+#define POWERUP_ITEM_RADIUS 30
 
 // RF, zombie getup
 //#define	TIMER_RESPAWN	(38*(1000/15)+100)

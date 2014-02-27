@@ -639,7 +639,6 @@ typedef struct {
     int timeBetweenRouteSpotsMS;
 	int timeBetweenRouteSpotsSec;
 
-
 	qboolean	versionOK;
 } clientSession_t;
 
@@ -989,6 +988,10 @@ typedef struct xpsaveData_s {
 // end acqu-sdk (issue 15)
 #endif
 
+typedef struct { 
+	qboolean cpOrder; 
+} route_t;
+
 typedef struct {
 	struct gclient_s	*clients;		// [maxclients]
 
@@ -1192,6 +1195,8 @@ typedef struct {
 
     int rootPlayers;
 
+    route_t routeSettings;
+
 #ifdef OMNIBOT_SUPPORT
 	// sta acqu-sdk (issue 3): omnibot support
 	qboolean        twoMinute;
@@ -1241,10 +1246,6 @@ typedef struct
 	fieldtype_t	type;
 	int		flags;
 } field_t;
-
-typedef struct { 
-	qboolean cpOrder; 
-} route_t;
 
 #define		G_SpawnString(		key, def, out ) G_SpawnStringExt	( key, def, out, __FILE__, __LINE__ )
 #define		G_SpawnFloat(		key, def, out ) G_SpawnFloatExt		( key, def, out, __FILE__, __LINE__ )
@@ -1803,7 +1804,6 @@ void Props_Chair_Skyboxtouch (gentity_t *ent);
 #include "g_team.h" // teamplay specific stuff
 
 extern	level_locals_t	level;
-extern  route_t			routeSettings;
 extern	gentity_t		g_entities[];	//DAJ was explicit set to MAX_ENTITIES
 extern g_campaignInfo_t g_campaigns[];
 extern int				saveGamePending;
