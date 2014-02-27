@@ -83,7 +83,6 @@ void CheckWinner(gentity_t *self)
 void CheckRacersNearCP(gentity_t *self)
 {
     int currentCP = 1;
-    int k = 0;
     int i = 0;
     int count = 0;
     vec3_t range = {self->horizontalRange, self->horizontalRange, self->verticalRange};
@@ -150,8 +149,6 @@ void CheckRacersNearCP(gentity_t *self)
 
 void RouteMakerCheckpoints( gentity_t * ent ) 
 {
-    int argc = trap_Argc();
-    char arg[MAX_TOKEN_CHARS] = "\0";
     gentity_t *checkpoint = NULL;
 
     if(level.numCheckpoints == MAX_CHECKPOINTS)
@@ -820,8 +817,6 @@ void CheckRacersNearCP(gentity_t *self);
 qboolean LoadRoute( const char *routeName )
 {
     fileHandle_t f = 0;
-    int cpCount = 0;
-    int pwCount = 0;
 
     char *cnf = NULL, *cnf2 = NULL;
     char *t = NULL;
@@ -832,8 +827,8 @@ qboolean LoadRoute( const char *routeName )
     qboolean pwOpen = qfalse;
     gentity_t *begin = NULL;
     gentity_t *end = NULL;
-    gentity_t *tempCp = NULL;
-    gentity_t *tempPw = NULL;
+    gentity_t *checkpoint = NULL;
+    gentity_t *powerup = NULL;
 
     int len = trap_FS_FOpenFile(routeName, &f, FS_READ);
     if(len < 0)
@@ -876,16 +871,16 @@ qboolean LoadRoute( const char *routeName )
                 trap_LinkEntity(end);
             } else if(cpOpen)
             {
-                level.checkpoints[level.numCheckpoints++] = tempCp; 
-                G_SetOrigin(tempCp, tempCp->r.currentOrigin);
-                G_SetAngle(tempCp, tempCp->r.currentAngles);
+                level.checkpoints[level.numCheckpoints++] = checkpoint; 
+                G_SetOrigin(checkpoint, checkpoint->r.currentOrigin);
+                G_SetAngle(checkpoint, checkpoint->r.currentAngles);
 
-                trap_LinkEntity(tempCp);
+                trap_LinkEntity(checkpoint);
             } else if(pwOpen)
             {
-                G_SetOrigin(tempPw, tempPw->r.currentOrigin);
-                tempPw->powerupModelType = NUM_SR_POWERUP_TYPES;
-                CreatePowerupSpawner( tempPw );
+                G_SetOrigin(powerup, powerup->r.currentOrigin);
+                powerup->powerupModelType = NUM_SR_POWERUP_TYPES;
+                CreatePowerupSpawner( powerup );
             }
             beginOpen = endOpen = cpOpen = pwOpen = qfalse;
         }
@@ -894,7 +889,7 @@ qboolean LoadRoute( const char *routeName )
         {
             if(!Q_stricmp(t, "map"))
             {
-
+  
             } else if(!Q_stricmp(t, "knockback"))
             {
 
@@ -972,28 +967,28 @@ qboolean LoadRoute( const char *routeName )
         {
             if(!Q_stricmp(t, "posx"))
             {
-                ReadFloat(&cnf, &tempCp->r.currentOrigin[0]);
+                ReadFloat(&cnf, &checkpoint->r.currentOrigin[0]);
             } else if(!Q_stricmp(t, "posy"))
             {
-                ReadFloat(&cnf, &tempCp->r.currentOrigin[1]);
+                ReadFloat(&cnf, &checkpoint->r.currentOrigin[1]);
             } else if(!Q_stricmp(t, "posz"))
             {
-                ReadFloat(&cnf, &tempCp->r.currentOrigin[2]);
+                ReadFloat(&cnf, &checkpoint->r.currentOrigin[2]);
             } else if(!Q_stricmp(t, "angx"))
             {
-                ReadFloat(&cnf, &tempCp->r.currentAngles[0]);
+                ReadFloat(&cnf, &checkpoint->r.currentAngles[0]);
             } else if(!Q_stricmp(t, "angy"))
             {
-                ReadFloat(&cnf, &tempCp->r.currentAngles[1]);
+                ReadFloat(&cnf, &checkpoint->r.currentAngles[1]);
             } else if(!Q_stricmp(t, "angz"))
             {
-                ReadFloat(&cnf, &tempCp->r.currentAngles[2]);
+                ReadFloat(&cnf, &checkpoint->r.currentAngles[2]);
             } else if(!Q_stricmp(t, "horizontal"))
             {
-                ReadInt(&cnf, &tempCp->horizontalRange);
+                ReadInt(&cnf, &checkpoint->horizontalRange);
             } else if(!Q_stricmp(t, "vertical"))
             {
-                ReadInt(&cnf, &tempCp->verticalRange);
+                ReadInt(&cnf, &checkpoint->verticalRange);
             } else
             {
                 G_Printf("route: parse error near %s on line %d\n",
@@ -1003,16 +998,16 @@ qboolean LoadRoute( const char *routeName )
         {
             if(!Q_stricmp(t, "posx"))
             {
-                ReadFloat(&cnf, &tempPw->r.currentOrigin[0]);
+                ReadFloat(&cnf, &powerup->r.currentOrigin[0]);
             } else if(!Q_stricmp(t, "posy"))
             {
-                ReadFloat(&cnf, &tempPw->r.currentOrigin[1]);
+                ReadFloat(&cnf, &powerup->r.currentOrigin[1]);
             } else if(!Q_stricmp(t, "posz"))
             {
-                ReadFloat(&cnf, &tempPw->r.currentOrigin[2]);
+                ReadFloat(&cnf, &powerup->r.currentOrigin[2]);
             } else if(!Q_stricmp(t, "type"))
             {
-                ReadInt(&cnf, (int*)(&tempPw->powerupType));
+                ReadInt(&cnf, (int*)(&powerup->powerupType));
             }
         }
 
@@ -1041,20 +1036,20 @@ qboolean LoadRoute( const char *routeName )
             endOpen = qtrue;
         } else if(!Q_stricmp(t, "[cp]"))
         {
-            tempCp = G_Spawn();
-            tempCp->classname = "route_cp";
-            tempCp->position = level.numCheckpoints;
-            tempCp->think = CheckRacersNearCP;
-            tempCp->nextthink = level.time + FRAMETIME;
+            checkpoint = G_Spawn();
+            checkpoint->classname = "route_cp";
+            checkpoint->position = level.numCheckpoints;
+            checkpoint->think = CheckRacersNearCP;
+            checkpoint->nextthink = level.time + FRAMETIME;
             // Experimentary
-            tempCp->s.eType = ET_ITEM;
-            tempCp->item = BG_FindItemForPowerup( ROUTE_CHECKPOINT );
-            tempCp->s.modelindex = tempCp->item - bg_itemlist;
-            tempCp->s.otherEntityNum2 = 1;
+            checkpoint->s.eType = ET_ITEM;
+            checkpoint->item = BG_FindItemForPowerup( ROUTE_CHECKPOINT );
+            checkpoint->s.modelindex = checkpoint->item - bg_itemlist;
+            checkpoint->s.otherEntityNum2 = 1;
             cpOpen = qtrue;
         } else if(!Q_stricmp(t, "[pw]"))
         {
-            tempPw = G_Spawn();
+            powerup = G_Spawn();
             pwOpen = qtrue;
         }
 
@@ -1084,18 +1079,18 @@ qboolean LoadRoute( const char *routeName )
 
     if(cpOpen)
     {
-        level.checkpoints[level.numCheckpoints++] = tempCp;
-        G_SetOrigin(tempCp, tempCp->r.currentOrigin);
-        G_SetAngle(tempCp, tempCp->r.currentAngles);
+        level.checkpoints[level.numCheckpoints++] = checkpoint;
+        G_SetOrigin(checkpoint, checkpoint->r.currentOrigin);
+        G_SetAngle(checkpoint, checkpoint->r.currentAngles);
 
-        trap_LinkEntity(tempCp);
+        trap_LinkEntity(checkpoint);
     }
 
     if(pwOpen)
     {
-        G_SetOrigin(tempPw, tempPw->r.currentOrigin);
-        tempPw->powerupModelType = NUM_SR_POWERUP_TYPES;
-        CreatePowerupSpawner( tempPw );
+        G_SetOrigin(powerup, powerup->r.currentOrigin);
+        powerup->powerupModelType = NUM_SR_POWERUP_TYPES;
+        CreatePowerupSpawner( powerup );
     }
     free(cnf2);
     AP(va("cpm \"^8SR^7: Loaded route %s\n\"", routeName));
@@ -1105,5 +1100,5 @@ qboolean LoadRoute( const char *routeName )
 
 void DeleteRoute( const char *routeName )
 {
-
+    
 }
