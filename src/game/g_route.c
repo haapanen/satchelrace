@@ -51,7 +51,7 @@ void ThinkEndpoint(gentity_t *self)
                 }
                 else
                 {
-                    // Kind of messy but checks if client has visited all checkpoints.
+                    // Kind of messy but checks if client has visited all checkpoints. 
                     int i = 0;
                     int checkpointsVisited[MAX_CHECKPOINTS];
                     int checkpointsNotVisited = 0;
@@ -60,8 +60,7 @@ void ThinkEndpoint(gentity_t *self)
                     {
                         if(ent->client->sess.checkpointVisited[i] == qfalse)
                         {
-                            checkpointsVisited[checkpointsNotVisited++] =
-                                i;
+                            checkpointsVisited[checkpointsNotVisited++] = i;
                         }
                     }
 
