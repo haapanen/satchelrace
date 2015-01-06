@@ -4,6 +4,9 @@ void ThinkEndpoint(gentity_t *self)
 {
     int i = 0;
     int count = 0;
+	qboolean forceStopStatus = self->forceStop;
+	qboolean playerStopped = qfalse;
+	qboolean raceFinished = qfalse;
     vec3_t range = {self->horizontalRange, self->horizontalRange, self->verticalRange};
     vec3_t mins = {0, 0, 0};
     vec3_t maxs = {0, 0, 0};
@@ -40,14 +43,21 @@ void ThinkEndpoint(gentity_t *self)
             {
                 if(ent->client->sess.checkpointVisited[level.numCheckpoints - 1] == qtrue)
                 {
-                    trap_SendServerCommand(-1, va("cpm \"%s ^7reached the ^1end^7 in %02d:%02d:%03d.\n\"",
-                                                  ent->client->pers.netname, min, sec, msec));
-                    ent->client->sess.racing = qfalse;
-                    // Reset powerups
-                    for(; i < NUM_SR_POWERUP_TYPES; i++)
-                    {
-                        ent->client->powerups[i] = 0;
-                    }
+					if(forceStopStatus)
+					{
+						if(!VectorLength(ent->client->ps.velocity) > 0)
+							playerStopped = qtrue;
+
+						if(playerStopped)
+						{
+							raceFinished = qtrue;
+						}					
+					}
+					else
+					{
+						raceFinished = qtrue;
+					}
+                
                 }
                 else
                 {
@@ -84,16 +94,18 @@ void ThinkEndpoint(gentity_t *self)
             {
                 if(ent->client->sess.visitedCheckpoints == level.numCheckpoints)
                 {
-                    trap_SendServerCommand(-1, va("cpm \"%s ^7reached the ^1end^7 in %02d:%02d:%03d.\n\"",
-                                                  ent->client->pers.netname, min, sec, msec));
-                    ent->client->sess.racing = qfalse;
-                    // Reset powerups
-                    for(; i < NUM_SR_POWERUP_TYPES; i++)
-                    {
-                        ent->client->powerups[i] = 0;
-                    }
-                    // Reset visited checkpoints
-                    ent->client->sess.visitedCheckpoints = 0;
+					if(forceStopStatus)
+					{
+						if(!VectorLength(ent->client->ps.velocity) > 0)
+							playerStopped = qtrue;
+
+						if(playerStopped)
+							raceFinished = qtrue;					
+					}
+					else
+					{
+						raceFinished = qtrue;
+					}
                 }
                 else
                 {
@@ -105,6 +117,18 @@ void ThinkEndpoint(gentity_t *self)
             {
                 return;
             }
+
+			if(raceFinished)
+			{
+				trap_SendServerCommand(-1, va("cpm \"%s ^7reached the ^1end^7 in %02d:%02d:%03d.\n\"",
+                                                  ent->client->pers.netname, min, sec, msec));
+				ent->client->sess.racing = qfalse;
+				// Reset powerups
+				for(; i < NUM_SR_POWERUP_TYPES; i++)
+				{
+					ent->client->powerups[i] = 0;
+				}
+			}
         }
     }
 
@@ -402,7 +426,7 @@ void RouteMakerEnd( gentity_t *ent )
         end->horizontalRange = sr_defaultAreaRange.integer;
         end->verticalRange = sr_defaultAreaRange.integer;
     }
-    else if(argc == 3)
+    else if(argc >= 3)
     {
         char rangeStr[MAX_TOKEN_CHARS ] = "\0";
         int range = 0;
@@ -436,42 +460,59 @@ void RouteMakerEnd( gentity_t *ent )
         }
         else
         {
-            end->horizontalRange = sr_defaultAreaRange.integer;
-            end->verticalRange = sr_defaultAreaRange.integer;
-        }
-    }
-    else if(argc == 4)
+			/* Vallz: A little design flaw, I'll fix later.
+            char horizontalRangeStr[MAX_TOKEN_CHARS ] = "\0";
+			char verticalRangeStr[MAX_TOKEN_CHARS ] = "\0";
+
+			int horizontalRange = atoi(horizontalRangeStr);
+			int verticalRange = atoi(verticalRangeStr);
+
+			trap_Argv(2, horizontalRangeStr, sizeof(horizontalRangeStr));
+			trap_Argv(3, verticalRangeStr, sizeof(verticalRangeStr));
+
+			horizontalRange = atoi(horizontalRangeStr);
+			verticalRange = atoi(verticalRangeStr);
+
+			if(horizontalRange)
+			{
+				end->horizontalRange = horizontalRange;
+			}
+			else
+			{
+				end->horizontalRange = sr_defaultAreaRange.integer;
+			}
+
+			if(verticalRange)
+			{
+				end->verticalRange = verticalRange;
+			}
+			else
+			{
+				end->verticalRange = sr_defaultAreaRange.integer;
+			}
+			}
+			*/
+		}
+	}
+	if(argc == 4)
     {
-        char horizontalRangeStr[MAX_TOKEN_CHARS ] = "\0";
-        char verticalRangeStr[MAX_TOKEN_CHARS ] = "\0";
+        //ForceStop
+		char forceStopInputStr[MAX_TOKEN_CHARS ] = "\0";
+		trap_Argv(3, forceStopInputStr, sizeof(forceStopInputStr));
+		if(!Q_stricmp(forceStopInputStr, "1"))
+		{
+			end->forceStop = qtrue;
+		}
+		else if(!Q_stricmp(forceStopInputStr, "0"))
+		{
+			end->forceStop = qfalse;
+		}
+		else
+		{
 
-        int horizontalRange = atoi(horizontalRangeStr);
-        int verticalRange = atoi(verticalRangeStr);
-
-        trap_Argv(2, horizontalRangeStr, sizeof(horizontalRangeStr));
-        trap_Argv(3, verticalRangeStr, sizeof(verticalRangeStr));
-
-        horizontalRange = atoi(horizontalRangeStr);
-        verticalRange = atoi(verticalRangeStr);
-
-        if(horizontalRange)
-        {
-            end->horizontalRange = horizontalRange;
-        }
-        else
-        {
-            end->horizontalRange = sr_defaultAreaRange.integer;
-        }
-
-        if(verticalRange)
-        {
-            end->verticalRange = verticalRange;
-        }
-        else
-        {
-            end->verticalRange = sr_defaultAreaRange.integer;
-        }
+		}
     }
+	
     CP(va("cp \"^7Added an ^1end ^7spot (%d, %d)\n\"", end->horizontalRange, end->verticalRange)) ;
 }
 

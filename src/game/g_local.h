@@ -484,7 +484,7 @@ struct gentity_s {
 	int		mg42weapHeat;
 
 	vec3_t	oldOrigin;
-
+	qboolean forceStop;
     int horizontalRange;
     int verticalRange;
     int position;
