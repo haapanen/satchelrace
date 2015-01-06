@@ -3816,6 +3816,7 @@ static void PM_Weapon( void ) {
 		return;
 	}
 
+
 	// player is underwater - no fire
 	if(pm->waterlevel == 3) {
 		if(	pm->ps->weapon != WP_KNIFE &&
@@ -3828,7 +3829,9 @@ static void PM_Weapon( void ) {
 			// sta acqu-sdk (issue 2): CHRUKER: b029 - Was missing
 			pm->ps->weapon != WP_MEDIC_SYRINGE &&
 			pm->ps->weapon != WP_PLIERS &&
-			pm->ps->weapon != WP_MEDIC_ADRENALINE
+			pm->ps->weapon != WP_MEDIC_ADRENALINE &&
+			pm->ps->weapon != WP_SATCHEL &&
+			pm->ps->weapon != WP_SATCHEL_DET
 			// end acqu-sdk (issue 2): CHRUKER: b029					
 			) {
 				PM_AddEvent(EV_NOFIRE_UNDERWATER);	// event for underwater 'click' for nofire
