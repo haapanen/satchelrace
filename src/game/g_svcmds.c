@@ -1280,7 +1280,6 @@ void Svcmd_StartGame_f()
     {
         return;
     }
-
     level.raceIsStarting = qtrue;
     level.raceStartTime = level.time + sr_startTime.integer;
     trap_SendServerCommand(-1, va("cp \"^5Race is starting in %d seconds\n\"", 

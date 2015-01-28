@@ -519,6 +519,13 @@ void RouteMakerEnd( gentity_t *ent )
 void RouteMakerClear( gentity_t * ent )
 {
     int i = 0;
+
+	if(level.raceIsStarting)
+	{
+		AP("cpm \"^8SR^7: can't clear route while race is starting.\n\"") ;
+		return;
+	}
+
     if(level.routeBegin != NULL)
     {
         G_FreeEntity(level.routeBegin);
@@ -546,6 +553,11 @@ void RouteMakerClear( gentity_t * ent )
 void RouteMakerClearCP( gentity_t * ent )
 {
     int i = 0;
+	if(level.raceIsStarting)
+	{
+		AP("cpm \"^8SR^7: can't clear checkpoints while race is starting.\n\"") ;
+		return;
+	}
     for(; i < MAX_CHECKPOINTS; i++)
     {
         if(level.checkpoints[i])
@@ -559,6 +571,11 @@ void RouteMakerClearCP( gentity_t * ent )
 
 void RouteMakerClearPW( gentity_t * ent )
 {
+	if(level.raceIsStarting)
+	{
+		AP("cpm \"^8SR^7: can't clear powerups while race is starting.\n\"") ;
+		return;
+	}
     ClearPowerups();
     trap_SendServerCommand(ent->client->ps.clientNum,
                            "print \"^8SR^7: deleted all powerups\n\"");
