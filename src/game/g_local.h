@@ -631,6 +631,7 @@ typedef struct {
 	
 	int visitedCheckpoints;
     int raceStartTime;
+	int checkpointCount;
 
     // Show route
     int nextCp;
@@ -1192,7 +1193,7 @@ typedef struct {
     int numCheckpoints;
     gentity_t *powerups[MAX_POWERUPS];
     int numPowerups;
-
+	int	g_routeMaker;
     int rootPlayers;
 
     route_t routeSettings;

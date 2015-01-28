@@ -293,7 +293,6 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 
 	// initial team determination
 	sess->sessionTeam = TEAM_SPECTATOR;	
-
 	sess->spectatorState = SPECTATOR_FREE;
 	sess->spectatorTime = level.time;
 

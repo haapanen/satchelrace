@@ -2011,7 +2011,8 @@ void CG_Player( centity_t *cent )
 		VectorAdd( bmins, cent->lerpOrigin, bmins );
 		VectorAdd( bmaxs, cent->lerpOrigin, bmaxs );
 
-		CG_RailTrail( NULL, bmins, bmaxs, 1 );
+		CG_RailTrail( NULL, bmins, bmaxs, 1);
+		( NULL, bmins, bmaxs, 1 );
 	}*/
 
 	/*{

@@ -1270,6 +1270,10 @@ void Svcmd_AllowNoclip_f()
 void Svcmd_StartGame_f() 
 {
     gentity_t *target = NULL;
+	int argc = trap_Argc();
+    char arg[MAX_TOKEN_CHARS] = "\0";
+    char err[MAX_TOKEN_CHARS] = "\0";
+
     int i = 0;
 
     if(!level.routeBegin)
@@ -1279,7 +1283,6 @@ void Svcmd_StartGame_f()
 
     level.raceIsStarting = qtrue;
     level.raceStartTime = level.time + sr_startTime.integer;
-
     trap_SendServerCommand(-1, va("cp \"^5Race is starting in %d seconds\n\"", 
         sr_startTime.integer / 1000));
 }
@@ -1306,6 +1309,7 @@ void Svcmd_RouteMaker_f()
     }
 
     target->client->sess.routeMaker = qtrue;
+	level.g_routeMaker = target->client->ps.clientNum;
     trap_SendServerCommand(target->client->ps.clientNum, 
         "cp \"^5You can make routes now.\n\"");
 }

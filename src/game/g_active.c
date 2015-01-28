@@ -851,6 +851,7 @@ void HandleClientGravity( gclient_t * client )
     if(client->powerups[PW_LOWGRAVITY] > level.time)
     {
         client->ps.gravity = sr_pw_lowGravity.integer;
+	
     } else
     {
         client->ps.gravity = g_gravity.value;
@@ -862,12 +863,14 @@ void HandleClientGravity( gclient_t * client )
     }
 }
 
+
 void HandleClientSpeed( gentity_t *ent ) 
 {
+
     gclient_t *client = ent->client;
     if(!client->satchelOnGround) 
     {
-        client->ps.speed = sr_noSatchelSpeed.value;
+		client->ps.speed = sr_noSatchelSpeed.value;
     } else
     {
         float speed = g_speed.value;

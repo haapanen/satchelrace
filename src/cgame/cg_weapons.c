@@ -792,10 +792,11 @@ CG_RailTrail
 	SA: re-inserted this as a debug mechanism for bullets
 ==========================
 */
+
+
 void CG_RailTrail2( clientInfo_t *ci, vec3_t start, vec3_t end) {
 	localEntity_t	*le;
 	refEntity_t		*re;
-
 	le = CG_AllocLocalEntity();
 	re = &le->refEntity;
 

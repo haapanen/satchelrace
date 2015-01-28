@@ -3781,7 +3781,6 @@ static void CG_DrawNewCompass( void ) {
 		}
 //	}
 }
-
 static int CG_PlayerAmmoValue( int *ammo, int *clips, int *akimboammo ) {
 	centity_t		*cent;
 	playerState_t	*ps;
@@ -4606,6 +4605,26 @@ void CG_DrawMiscGamemodels( void ) {
 	}
 }
 
+void SR_DrawUPS(int calcState) //here
+{
+	playerState_t *ps;
+	vec3_t vel;
+	char		*s;
+	int			w;
+	vec4_t		tclr			=	{ 1.0f,	1.0f,	1.0f,	1.0f	};
+	int calcValue;
+	ps = &cg.predictedPlayerState;
+	VectorCopy(ps->velocity, vel);
+	if(calcState == 1){ calcValue = sqrt(vel[0]*vel[0] + vel[1]*vel[1]);}
+	else if(calcState == 2){ calcValue = sqrt(vel[0]*vel[0] + vel[1]*vel[1] + vel[2]*vel[2]); }
+	if(calcState > 0)
+	{
+		s = va( "%i", calcValue );
+		w = CG_Text_Width_Ext( s, 0.32f, 0, &cgs.media.limboFont1 );
+		CG_Text_Paint_Ext( (SCREEN_WIDTH / 2), (SCREEN_HEIGHT/2) + (SCREEN_HEIGHT/4), 0.32f, 0.32f, tclr, s, 0, 0, 0, &cgs.media.limboFont1 );
+	}
+}
+
 /*
 =====================
 CG_DrawActive
@@ -4709,6 +4728,12 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 	} else {
 		CG_LimboPanel_Draw();
 	}
+
+	if ( sr_drawUPS.integer ) 
+	{
+		SR_DrawUPS( sr_drawUPS.integer );
+	}
+
 }
 
 // Zero: etpubs implementation of shoutcaster used to
@@ -4878,3 +4903,5 @@ void CG_DrawFloatingStrings( void )
 
 	cg.floatingStringCount = 0;
 }
+
+
