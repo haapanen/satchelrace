@@ -866,8 +866,10 @@ void HandleClientGravity( gclient_t * client )
 
 void HandleClientSpeed( gentity_t *ent ) 
 {
-
     gclient_t *client = ent->client;
+	if ( client->ps.groundEntityNum == ENTITYNUM_NONE ) {
+			return;
+	}
     if(!client->satchelOnGround) 
     {
 		client->ps.speed = sr_noSatchelSpeed.value;
