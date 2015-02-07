@@ -1,0 +1,4 @@
+language: cpp
+compiler: gcc
+script:
+  - cd src; mkdir cmake; cd cmake; cmake .. -G "Unix Makefiles"; make
