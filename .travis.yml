@@ -1,4 +1,6 @@
 language: cpp
 compiler: gcc
+before_install:
+  - sudo apt-get install gcc-multilib
 script:
   - cd src; mkdir cmake; cd cmake; cmake .. -G "Unix Makefiles"; make
