@@ -4,3 +4,12 @@ before_install:
   - sudo apt-get install gcc-multilib
 script:
   - cd src; mkdir cmake; cd cmake; cmake .. -G "Unix Makefiles"; make
+
+notifications:
+  irc:
+    template:
+      - "%{repository}#%{build_number} %{commit} %{author}: %{message} %{build_url}"
+    channels:
+      - "dreamhack.se.quakenet.org#satchelrace"
+    use_notice: true
+    skip_join: true
