@@ -1647,6 +1647,12 @@ qboolean	ConsoleCommand( void ) {
 			return qtrue;
 		}
 
+        if (!Q_stricmp(cmd, "enc_qsay"))
+        {
+            trap_SendServerCommand(-1, va("enc_chat \"%s\"", ConcatArgs(1)));
+            return qtrue;
+        }
+
 		// OSP - console also gets ref commands
 		if(!level.fLocalHost && Q_stricmp(cmd, "ref") == 0) {
 			// sta acqu-sdk (issue 2): CHRUKER: b005 - G_refCommandCheck expects the next argument (warn, pause, lock etc).

@@ -1413,23 +1413,6 @@ void CG_VoiceChat( int mode ) {
 
 /*
 =================
-CG_RemoveChatEscapeChar
-=================
-*/
-static void CG_RemoveChatEscapeChar( char *text ) {
-	int i, l;
-
-	l = 0;
-	for ( i = 0; text[i]; i++ ) {
-		if (text[i] == '\x19')
-			continue;
-		text[l++] = text[i];
-	}
-	text[l] = '\0';
-}
-
-/*
-=================
 CG_LocalizeServerCommand
 
 NERVE - SMF - localize string sent from server
@@ -1965,6 +1948,23 @@ void CG_dumpStats(void)
 }
 // -OSP
 
+/*
+=================
+CG_RemoveChatEscapeChar
+=================
+*/
+static void CG_RemoveChatEscapeChar( char *text ) {
+	int i, l;
+
+	l = 0;
+	for ( i = 0; text[i]; i++ ) {
+		if (text[i] == '\x19')
+			continue;
+		text[l++] = text[i];
+	}
+	text[l] = '\0';
+}
+
 
 /*
 =================
@@ -2134,6 +2134,29 @@ static void CG_ServerCommand( void ) {
 
 		return;
 	}
+
+    if (!Q_stricmp(cmd, "enc_chat"))
+    {
+		const char *s;
+
+		if ( atoi( CG_Argv( 3 ) ) ) {
+			s = CG_LocalizeServerCommand( CG_Argv( 1 ) );
+		} else {
+			s = CG_Argv( 1 );
+		}
+
+		// sta acqu-sdk (issue 21)
+		unescape_string((char *)(s));
+		// end acqu-sdk (issue 21)
+
+		Q_strncpyz( text, s, MAX_SAY_TEXT );
+		CG_RemoveChatEscapeChar( text );
+		CG_AddToTeamChat( text, atoi( CG_Argv( 2 ) ) );
+		CG_Printf( "%s\n", text );
+
+		return;
+        
+    }
 
 	if ( !Q_stricmp( cmd, "tchat" ) ) {
 		const char *s;
