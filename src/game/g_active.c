@@ -898,7 +898,7 @@ void HandleClientSpeed( gentity_t *ent )
 				{
 					if ( VectorLengthSquared( dist ) < SQR( sr_satchelDistance.value ) ) 
 					{
-						ent->client->radiusCheckTimer = level.time + 1000;
+						ent->client->radiusCheckTimer = level.time + sr_scaledSatchelRefreshInterval.value;
 						speed = g_speed.value;
 						ent->client->prevSpeedCount = 0;
 					}
@@ -908,7 +908,7 @@ void HandleClientSpeed( gentity_t *ent )
 						{
 							if(ent->client->prevSpeedCount <= (g_speed.value - sr_scaledSatchelMinSpeed.value) / speedLoss)
 							{
-								ent->client->radiusCheckTimer = level.time + 1000;
+								ent->client->radiusCheckTimer = level.time + sr_scaledSatchelRefreshInterval.value;
 								ent->client->prevSpeedCount += 1;
 							}
 							else

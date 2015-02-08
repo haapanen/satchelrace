@@ -262,6 +262,7 @@ vmCvar_t sr_startTime;
 vmCvar_t sr_airPenalty;
 vmCvar_t sr_scaledSatchelRange;
 vmCvar_t sr_scaledSatchelSpeedLossPercent;
+vmCvar_t sr_scaledSatchelRefreshInterval;
 // powerups
 vmCvar_t sr_pw_noSlowDuration;
 
@@ -540,14 +541,15 @@ cvarTable_t		gameCvarTable[] = {
 	// end acqu-sdk (issue 9)
 #endif
     { &sr_noSatchelSpeed, "sr_noSatchelSpeed", "50", CVAR_ARCHIVE },
-    { &sr_satchelDistance, "sr_satchelDistance", "300", CVAR_ARCHIVE },
-	{ &sr_scaledSatchelMinSpeed, "sr_scaledSatchelMinSpeed", "125", CVAR_ARCHIVE },
+    { &sr_satchelDistance, "sr_satchelDistance", "250", CVAR_ARCHIVE },
+	{ &sr_scaledSatchelMinSpeed, "sr_scaledSatchelMinSpeed", "50", CVAR_ARCHIVE },
     { &sr_smokeBounce, "sr_smokeBounce", "0", CVAR_ARCHIVE },
     { &sr_defaultAreaRange, "sr_defaultEndAreaRange", "100", CVAR_ARCHIVE },
     { &sr_startTime, "sr_startTime", "5000", CVAR_ARCHIVE },
 	{ &sr_airPenalty, "sr_airPenalty", "0", CVAR_ARCHIVE },
 	{ &sr_scaledSatchelRange, "sr_scaledSatchelRange", "0", CVAR_ARCHIVE },
-	{ &sr_scaledSatchelSpeedLossPercent, "sr_scaledSatchelSpeedLossPercent", "20", CVAR_ARCHIVE },
+	{ &sr_scaledSatchelSpeedLossPercent, "sr_scaledSatchelSpeedLossPercent", "10", CVAR_ARCHIVE },
+	{ &sr_scaledSatchelRefreshInterval, "sr_scaledSatchelRefreshInterval", "100", CVAR_ARCHIVE },
     // Powerups
     { &sr_pw_noSlowDuration, "sr_pw_noSlowDuration", "7000", CVAR_ARCHIVE },
 

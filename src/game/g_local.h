@@ -2042,13 +2042,14 @@ extern vmCvar_t lua_allowedModules;
 
 extern vmCvar_t sr_noSatchelSpeed;
 extern vmCvar_t sr_satchelDistance;
-extern vmCvar_t sr_scaledSatchelMinSpeed;
 extern vmCvar_t sr_smokeBounce;
 extern vmCvar_t sr_defaultAreaRange;
 extern vmCvar_t sr_startTime;
 extern vmCvar_t sr_airPenalty;
 extern vmCvar_t sr_scaledSatchelRange;
+extern vmCvar_t sr_scaledSatchelMinSpeed;
 extern vmCvar_t sr_scaledSatchelSpeedLossPercent;
+extern vmCvar_t sr_scaledSatchelRefreshInterval;
 // Powerups
 // no slow
 extern vmCvar_t sr_pw_noSlowDuration;
