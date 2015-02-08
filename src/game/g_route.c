@@ -142,6 +142,10 @@ void ThinkCheckpoint(gentity_t *self)
     int i = 0;
     int count = 0;
     int visitedCP = 0;
+	qboolean forceStopStatus = self->forceStopCp;
+	qboolean playerStopped = qfalse;
+	qboolean cpFinished = qfalse;
+	qboolean validateCp = qfalse;
     vec3_t range = {self->horizontalRange, self->horizontalRange, self->verticalRange};
     vec3_t mins = {0, 0, 0};
     vec3_t maxs = {0, 0, 0};
@@ -175,16 +179,14 @@ void ThinkCheckpoint(gentity_t *self)
             sec = msec / 1000;
             msec = msec - sec * 1000;
             currentCP = self->position;
-
+			
             if(level.routeSettings.cpOrder)
             {
                 if(currentCP != 0)
                 {
                     if(ent->client->sess.checkpointVisited[currentCP - 1])
                     {
-                        trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
-                                                      min, sec, msec));
-                        ent->client->sess.checkpointVisited[self->position] = qtrue;
+						cpFinished = qtrue;
                     }
                     else
                     {
@@ -194,21 +196,49 @@ void ThinkCheckpoint(gentity_t *self)
 
                 else if(currentCP == 0)
                 {
-                    trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
-                                                  min, sec, msec));
-                    ent->client->sess.checkpointVisited[self->position] = qtrue;
+                    cpFinished = qtrue;
                 }
             }
             else
             {
-                ent->client->sess.visitedCheckpoints++;
-                trap_SendServerCommand(-1, va("cpm \"%s ^7reached a ^3checkpoint ^7in %02d:%02d:%03d (%d out of %d checkpoints).\n\"", ent->client->pers.netname,
-                                              min, sec, msec, ent->client->sess.visitedCheckpoints, level.numCheckpoints));
-                ent->client->sess.checkpointVisited[self->position] = qtrue;
-            }
-        }
-    }
+                cpFinished = qtrue;
+			}
 
+			if(cpFinished)
+			{
+				if(forceStopStatus)
+				{
+					if(!VectorLength(ent->client->ps.velocity) > 0)
+					{
+						playerStopped = qtrue;
+					}
+					else
+					{
+						return;
+					}
+					if(playerStopped)
+					{
+						validateCp = qtrue;
+					}
+					else
+					{
+						return;
+					}
+				}
+				else
+				{
+					validateCp = qtrue;
+				}
+			}
+
+			if(validateCp)
+			{
+				trap_SendServerCommand(-1, va("cpm \"%s ^7reached ^3checkpoint ^7%d in %02d:%02d:%03d.\n\"", ent->client->pers.netname, self->position + 1,
+											min, sec, msec));
+				ent->client->sess.checkpointVisited[self->position] = qtrue;
+			}
+        }			
+    }
     self->nextthink = FRAMETIME ;
 }
 
@@ -262,7 +292,7 @@ void RouteMakerCheckpoints( gentity_t * ent )
         checkpoint->horizontalRange = sr_defaultAreaRange.integer;
         checkpoint->verticalRange = sr_defaultAreaRange.integer;
     }
-    else if(trap_Argc() == 3)
+    else if(trap_Argc() >= 3)
     {
         char rangeStr[MAX_TOKEN_CHARS ] = "\0";
         int range = 0;
@@ -300,6 +330,7 @@ void RouteMakerCheckpoints( gentity_t * ent )
             checkpoint->verticalRange = sr_defaultAreaRange.integer;
         }
     }
+	/*
     else if(trap_Argc() == 4)
     {
         char horizontalRangeStr[MAX_TOKEN_CHARS ] = "\0";
@@ -332,6 +363,26 @@ void RouteMakerCheckpoints( gentity_t * ent )
             checkpoint->verticalRange = sr_defaultAreaRange.integer;
         }
         CP(va("cp \"^7Added a ^3checkpoint ^7(%d, %d)\n\"", checkpoint->horizontalRange, checkpoint->verticalRange)) ;
+    }
+	*/
+
+	if(trap_Argc() == 4)
+    {
+        //ForceStop
+		char forceStopInputStr[MAX_TOKEN_CHARS ] = "\0";
+		trap_Argv(3, forceStopInputStr, sizeof(forceStopInputStr));
+		if(!Q_stricmp(forceStopInputStr, "1"))
+		{
+			checkpoint->forceStopCp = qtrue;
+		}
+		else if(!Q_stricmp(forceStopInputStr, "0"))
+		{
+			checkpoint->forceStopCp = qfalse;
+		}
+		else
+		{
+
+		}
     }
 
     G_SetOrigin(checkpoint, ent->r.currentOrigin);
@@ -547,7 +598,7 @@ void RouteMakerClear( gentity_t * ent )
     level.numCheckpoints = 0;
     ResetRacingState();
     ClearPowerups();
-    AP("cpm \"^8SR^7: route has been cleared. Racing has stopped.\n\"") ;
+    AP("cpm \"^8SR^7: route has been cleared.\n\"") ;
 }
 
 void RouteMakerClearCP( gentity_t * ent )
@@ -667,9 +718,8 @@ void Cmd_ShowRoute_f( gentity_t * ent )
         }
         ent->client->sess.lastRouteSpotTime = 0;
     }
-
     travelTime = ent->client->sess.timeBetweenRouteSpotsSec * (level.numCheckpoints + 2);
-    CP(va("cp \"^7Estimated time to show route: ^2%d ^7seconds\n\"", travelTime)) ;
+    CP(va("cp \"^8SR^7:Estimated time to show route: ^2%d ^7seconds\n\"", travelTime)) ;
     ent->client->sess.nextCp = -1;
     ent->client->sess.showingRoute = qtrue;
 }
@@ -695,20 +745,20 @@ void Cmd_RestartRun_f( gentity_t * ent )
             ent->client->sess.raceStartTime = level.time + 10;
         }
 
+		//If he has already ended the run, put him to racing status again, if there's an endpoint.
+		if(!ent->client->sess.racing)
+        {
+            ent->client->sess.racing = qtrue;
+        }
+
         //Teleporting to beginning
         ent->client->ps.eFlags ^= EF_TELEPORT_BIT ;
         VectorCopy(level.routeBegin->r.currentOrigin, ent->client->ps.origin);
         SetClientViewAngle(ent, level.routeBegin->r.currentAngles);
 
-        //If he has already ended the run, put him to racing status again.
-        if(!ent->client->sess.racing)
-        {
-            ent->client->sess.racing = qtrue;
-        }
-
         //Give message to server that he reset his run
-        trap_SendServerCommand(-1, va("cpm \"%s^7has restarted his run.", ent->client->pers.netname));
-        CP("cp \"^5Your run has been successfully restarted.\n\"") ;
+        trap_SendServerCommand(-1, va("cpm \"^8SR: %s^8 ^7 has restarted his run.", ent->client->pers.netname));
+        CP("cp \"^8SR^7: Your run has been successfully restarted.\n\"") ;
     }
 }
 

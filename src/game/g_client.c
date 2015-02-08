@@ -1786,7 +1786,7 @@ void ClientBegin( int clientNum )
 
 	client->pers.connected = CON_CONNECTED;
 	client->pers.teamState.state = TEAM_BEGIN;
-
+	client->prevSpeedCount = 0;
 	// save eflags around this, because changing teams will
 	// cause this to happen with a valid entity, and we
 	// want to make sure the teleport bit is set right
@@ -1809,7 +1809,7 @@ void ClientBegin( int clientNum )
 
 	client->pers.complaintClient = -1;
 	client->pers.complaintEndTime = -1;
-
+	
 #ifdef OMNIBOT_SUPPORT
 	// sta acqu-sdk (issue 3): omnibot support
 	client->sess.botSuicide = qfalse; // make sure this is not set

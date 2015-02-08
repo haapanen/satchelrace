@@ -286,7 +286,7 @@ void CG_DrawConnectScreen( qboolean interactive, qboolean forcerefresh ) {
 		CG_DrawRect_FixedBorder( 8, 23, 230, 216, 1, colorMdGrey );*/
 
 		y = 322;
-		CG_Text_Paint_Centred_Ext( 540, y, 0.22f, 0.22f, clr3, "^7Satchel race ^80.0.3", 0, 0, 0, &bg_loadscreenfont1 );
+		CG_Text_Paint_Centred_Ext( 540, y, 0.22f, 0.22f, clr3, "^7Satchel race ^80.0.5", 0, 0, 0, &bg_loadscreenfont1 );
 		
 		y = 340;
 		str = Info_ValueForKey( buffer, "sv_hostname" );

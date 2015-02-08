@@ -485,6 +485,7 @@ struct gentity_s {
 
 	vec3_t	oldOrigin;
 	qboolean forceStop;
+	qboolean forceStopCp;
     int horizontalRange;
     int verticalRange;
     int position;
@@ -922,6 +923,10 @@ struct gclient_s {
 	qboolean		maxlivescalced;
     qboolean        satchelOnGround;
     gentity_t       *satchelEnt;
+
+	int				prevSpeedCount;
+	qboolean		radiusRunTimer;
+	int				radiusCheckTimer;
     int powerups[NUM_SR_POWERUP_TYPES];
 };
 
@@ -2037,10 +2042,13 @@ extern vmCvar_t lua_allowedModules;
 
 extern vmCvar_t sr_noSatchelSpeed;
 extern vmCvar_t sr_satchelDistance;
+extern vmCvar_t sr_scaledSatchelMinSpeed;
 extern vmCvar_t sr_smokeBounce;
 extern vmCvar_t sr_defaultAreaRange;
 extern vmCvar_t sr_startTime;
-
+extern vmCvar_t sr_airPenalty;
+extern vmCvar_t sr_scaledSatchelRange;
+extern vmCvar_t sr_scaledSatchelSpeedLossPercent;
 // Powerups
 // no slow
 extern vmCvar_t sr_pw_noSlowDuration;

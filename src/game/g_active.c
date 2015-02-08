@@ -867,29 +867,60 @@ void HandleClientGravity( gclient_t * client )
 void HandleClientSpeed( gentity_t *ent ) 
 {
     gclient_t *client = ent->client;
-	if ( client->ps.groundEntityNum == ENTITYNUM_NONE ) {
+	int i = 0;
+	float x;
+	float speedLoss;
+	float speed;
+	if( !sr_airPenalty.value > 0)
+	{
+		if ( client->ps.groundEntityNum == ENTITYNUM_NONE ) 
 			return;
 	}
+
     if(!client->satchelOnGround) 
     {
 		client->ps.speed = sr_noSatchelSpeed.value;
-    } else
+    } 
+	else
     {
-        float speed = g_speed.value;
-        if(client->satchelEnt)
-        {
-            vec3_t dist;
-
-            VectorSubtract( ent->r.currentOrigin, ent->client->satchelEnt->r.currentOrigin, dist );
-            if ( VectorLengthSquared( dist ) > SQR( sr_satchelDistance.value ) ) {
-                speed = sr_noSatchelSpeed.value;
-            }
-        }
-
-        // set speed
-        client->ps.speed = speed;
+		speedLoss = (g_speed.value - sr_scaledSatchelMinSpeed.value) * (sr_scaledSatchelSpeedLossPercent.value / 100);
+		speed = g_speed.value - (ent->client->prevSpeedCount * speedLoss);
+		if(client->satchelEnt)
+			{
+				vec3_t dist;
+				VectorSubtract( ent->r.currentOrigin, ent->client->satchelEnt->r.currentOrigin, dist );
+				if(!sr_scaledSatchelRange.value > 0)
+				{
+					if ( VectorLengthSquared( dist ) > SQR( sr_satchelDistance.value ) ) 
+						speed = sr_noSatchelSpeed.value;
+				}
+				else
+				{
+					if ( VectorLengthSquared( dist ) < SQR( sr_satchelDistance.value ) ) 
+					{
+						ent->client->radiusCheckTimer = level.time + 1000;
+						speed = g_speed.value;
+						ent->client->prevSpeedCount = 0;
+					}
+					else 
+					{
+						if(level.time > ent->client->radiusCheckTimer)
+						{
+							if(ent->client->prevSpeedCount <= (g_speed.value - sr_scaledSatchelMinSpeed.value) / speedLoss)
+							{
+								ent->client->radiusCheckTimer = level.time + 1000;
+								ent->client->prevSpeedCount += 1;
+							}
+							else
+							{
+								speed = sr_scaledSatchelMinSpeed.value;
+							}
+						}	
+					}		   		
+				}
+			}  
+		client->ps.speed = speed;
     }
-
     if(client->powerups[PW_NOSLOW] > level.time)
     {
         client->ps.speed = g_speed.value;
