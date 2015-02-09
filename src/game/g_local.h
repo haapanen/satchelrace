@@ -2046,10 +2046,11 @@ extern vmCvar_t sr_smokeBounce;
 extern vmCvar_t sr_defaultAreaRange;
 extern vmCvar_t sr_startTime;
 extern vmCvar_t sr_airPenalty;
-extern vmCvar_t sr_scaledSatchelRange;
-extern vmCvar_t sr_scaledSatchelMinSpeed;
-extern vmCvar_t sr_scaledSatchelSpeedLossPercent;
-extern vmCvar_t sr_scaledSatchelRefreshInterval;
+extern vmCvar_t sr_scaledSatchel;
+extern vmCvar_t sr_scaledMinSpeed;
+extern vmCvar_t sr_scaledTimeSpeedLossPercent;
+extern vmCvar_t sr_scaledTimeRefreshInterval;
+extern vmCvar_t sr_scaledRangeSlowRange;
 // Powerups
 // no slow
 extern vmCvar_t sr_pw_noSlowDuration;

@@ -255,14 +255,15 @@ vmCvar_t lua_allowedModules;
 
 vmCvar_t sr_noSatchelSpeed;
 vmCvar_t sr_satchelDistance;
-vmCvar_t sr_scaledSatchelMinSpeed;
+vmCvar_t sr_scaledMinSpeed;
 vmCvar_t sr_smokeBounce;
 vmCvar_t sr_defaultAreaRange;
 vmCvar_t sr_startTime;
 vmCvar_t sr_airPenalty;
-vmCvar_t sr_scaledSatchelRange;
-vmCvar_t sr_scaledSatchelSpeedLossPercent;
-vmCvar_t sr_scaledSatchelRefreshInterval;
+vmCvar_t sr_scaledSatchel;
+vmCvar_t sr_scaledTimeSpeedLossPercent;
+vmCvar_t sr_scaledTimeRefreshInterval;
+vmCvar_t sr_scaledRangeSlowRange;
 // powerups
 vmCvar_t sr_pw_noSlowDuration;
 
@@ -542,14 +543,15 @@ cvarTable_t		gameCvarTable[] = {
 #endif
     { &sr_noSatchelSpeed, "sr_noSatchelSpeed", "50", CVAR_ARCHIVE },
     { &sr_satchelDistance, "sr_satchelDistance", "250", CVAR_ARCHIVE },
-	{ &sr_scaledSatchelMinSpeed, "sr_scaledSatchelMinSpeed", "50", CVAR_ARCHIVE },
+	{ &sr_scaledMinSpeed, "sr_scaledMinSpeed", "50", CVAR_ARCHIVE },
     { &sr_smokeBounce, "sr_smokeBounce", "0", CVAR_ARCHIVE },
     { &sr_defaultAreaRange, "sr_defaultEndAreaRange", "100", CVAR_ARCHIVE },
     { &sr_startTime, "sr_startTime", "5000", CVAR_ARCHIVE },
 	{ &sr_airPenalty, "sr_airPenalty", "0", CVAR_ARCHIVE },
-	{ &sr_scaledSatchelRange, "sr_scaledSatchelRange", "0", CVAR_ARCHIVE },
-	{ &sr_scaledSatchelSpeedLossPercent, "sr_scaledSatchelSpeedLossPercent", "10", CVAR_ARCHIVE },
-	{ &sr_scaledSatchelRefreshInterval, "sr_scaledSatchelRefreshInterval", "100", CVAR_ARCHIVE },
+	{ &sr_scaledSatchel, "sr_scaledSatchel", "0", CVAR_ARCHIVE },
+	{ &sr_scaledTimeSpeedLossPercent, "sr_scaledTimeSpeedLossPercent", "10", CVAR_ARCHIVE },
+	{ &sr_scaledTimeRefreshInterval, "sr_scaledTimeRefreshInterval", "100", CVAR_ARCHIVE },
+	{ &sr_scaledRangeSlowRange, "sr_scaledRangeSlowRange", "300", CVAR_ARCHIVE },
     // Powerups
     { &sr_pw_noSlowDuration, "sr_pw_noSlowDuration", "7000", CVAR_ARCHIVE },
 

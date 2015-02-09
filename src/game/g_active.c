@@ -871,6 +871,7 @@ void HandleClientSpeed( gentity_t *ent )
 	float x;
 	float speedLoss;
 	float speed;
+	float distOutsideRange;
 	if( !sr_airPenalty.value > 0)
 	{
 		if ( client->ps.groundEntityNum == ENTITYNUM_NONE ) 
@@ -883,40 +884,63 @@ void HandleClientSpeed( gentity_t *ent )
     } 
 	else
     {
-		speedLoss = (g_speed.value - sr_scaledSatchelMinSpeed.value) * (sr_scaledSatchelSpeedLossPercent.value / 100);
+		speedLoss = (g_speed.value - sr_scaledMinSpeed.value) * (sr_scaledTimeSpeedLossPercent.value / 100);
 		speed = g_speed.value - (ent->client->prevSpeedCount * speedLoss);
 		if(client->satchelEnt)
 			{
 				vec3_t dist;
 				VectorSubtract( ent->r.currentOrigin, ent->client->satchelEnt->r.currentOrigin, dist );
-				if(!sr_scaledSatchelRange.value > 0)
+				if(!sr_scaledSatchel.value > 0)
 				{
 					if ( VectorLengthSquared( dist ) > SQR( sr_satchelDistance.value ) ) 
 						speed = sr_noSatchelSpeed.value;
 				}
 				else
 				{
-					if ( VectorLengthSquared( dist ) < SQR( sr_satchelDistance.value ) ) 
+					//Vallz: Speedloss scale based on time
+					if(sr_scaledSatchel.value == 1)
 					{
-						ent->client->radiusCheckTimer = level.time + sr_scaledSatchelRefreshInterval.value;
-						speed = g_speed.value;
-						ent->client->prevSpeedCount = 0;
-					}
-					else 
-					{
-						if(level.time > ent->client->radiusCheckTimer)
+						if ( VectorLengthSquared( dist ) < SQR( sr_satchelDistance.value ) ) 
 						{
-							if(ent->client->prevSpeedCount <= (g_speed.value - sr_scaledSatchelMinSpeed.value) / speedLoss)
+							ent->client->radiusCheckTimer = level.time + sr_scaledTimeRefreshInterval.value;
+							speed = g_speed.value;
+							ent->client->prevSpeedCount = 0;
+						}
+						else 
+						{
+							if(level.time > ent->client->radiusCheckTimer)
 							{
-								ent->client->radiusCheckTimer = level.time + sr_scaledSatchelRefreshInterval.value;
-								ent->client->prevSpeedCount += 1;
-							}
-							else
-							{
-								speed = sr_scaledSatchelMinSpeed.value;
-							}
+								if(ent->client->prevSpeedCount <= (g_speed.value - sr_scaledMinSpeed.value) / speedLoss)
+								{
+									ent->client->radiusCheckTimer = level.time + sr_scaledTimeRefreshInterval.value;
+									ent->client->prevSpeedCount += 1;
+								}
+								else
+								{
+									speed = sr_scaledMinSpeed.value;
+								}
+							}	
 						}	
-					}		   		
+					}
+					else if(sr_scaledSatchel.value > 1)
+					{
+						//Slash: Speedloss scale based on range
+						VectorSubtract(ent->r.currentOrigin, ent->client->satchelEnt->r.currentOrigin, dist);
+						distOutsideRange = (float)VectorLengthSquared(dist) - (float)SQR(sr_satchelDistance.value);
+						distOutsideRange = sqrt(distOutsideRange);
+						if(distOutsideRange > 0)
+						{
+								/*Slash: (1 - distOutsideRange / g_speed.value) => reference percentage using rate of constant g_speed to distance outside range, 
+								could be modified to follow a more detailed/accurate rate*/
+								speed = max(g_speed.value * (1 - distOutsideRange / g_speed.value), sr_scaledMinSpeed.value);
+						}
+						else
+						{
+								speed  = g_speed.value;
+						}
+					}
+					else
+						return;
 				}
 			}  
 		client->ps.speed = speed;
