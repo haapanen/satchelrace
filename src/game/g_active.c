@@ -1469,6 +1469,15 @@ void ClientThink_real( gentity_t *ent ) {
 
     ent->client->ps.powerups[PW_ADRENALINE] = level.time + 10000;
 
+	///Vallz: If a player is a spectator, he shouldn't b°re part of the race.
+	if(ent->client->sess.sessionTeam == TEAM_SPECTATOR)
+	{
+		if(ent->client->sess.racing)
+		{
+			ent->client->sess.racing = qfalse;
+		}
+	}
+
     // -1 = begin
     // 0-19 = cp
     // 20 = end

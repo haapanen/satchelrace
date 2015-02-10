@@ -727,8 +727,25 @@ void Cmd_ShowRoute_f( gentity_t * ent )
 void Cmd_RestartRun_f( gentity_t * ent )
 {
     int i;
-    if(level.numCheckpoints > 0)
+    if(level.routeBegin && level.routeEnd)
     {
+		//Vallz: Going over few cases to make sure restartrun can't go through in unintended situations.
+		if(ent->client->sess.showingRoute)
+		{
+			AP("cpm \"^8SR^7: can't restart run while showing route.\"") ;
+		}
+
+		if(level.raceIsStarting)
+		{
+			AP("cpm \"^8SR^7: can't restart run while race is starting.\n\"") ;
+			return;
+		}
+		if(ent->client->sess.sessionTeam == TEAM_SPECTATOR)
+		{
+			AP("cpm \"^8SR^7: can't restart run while in spectator.\n\"") ;
+			return;
+		}
+
         if(level.routeSettings.cpOrder == qfalse)
         {
             ent->client->sess.visitedCheckpoints = 0;
@@ -745,6 +762,11 @@ void Cmd_RestartRun_f( gentity_t * ent )
             ent->client->sess.raceStartTime = level.time + 10;
         }
 
+		if(ent->client->sess.routeMaker)
+		{
+			ent->client->sess.routeMaker = qfalse;
+		}
+
 		//If he has already ended the run, put him to racing status again, if there's an endpoint.
 		if(!ent->client->sess.racing)
         {
@@ -757,7 +779,7 @@ void Cmd_RestartRun_f( gentity_t * ent )
         SetClientViewAngle(ent, level.routeBegin->r.currentAngles);
 
         //Give message to server that he reset his run
-        trap_SendServerCommand(-1, va("cpm \"^8SR: %s^8 ^7 has restarted his run.", ent->client->pers.netname));
+        trap_SendServerCommand(-1, va("cpm \"^8SR^7: %s has restarted his run.", ent->client->pers.netname));
         CP("cp \"^8SR^7: Your run has been successfully restarted.\n\"") ;
     }
 }

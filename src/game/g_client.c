@@ -2044,24 +2044,30 @@ void ClientSpawn( gentity_t *ent, qboolean revived )
 	} 
     // Zero: && level.routeBegin is needed incase client is still
     // racing but somebody cleared route
-    else if( ent->client->sess.racing && level.routeBegin ) {
+	else if( ent->client->sess.racing && level.routeBegin && ent->client->sess.sessionTeam != TEAM_SPECTATOR ) {
         int k = 0;
+		int p = 0;
         ent->client->ps.eFlags ^= EF_TELEPORT_BIT;
 
         if(ent->client->sess.checkpointVisited[0] == qfalse)
         {
             VectorCopy(level.routeBegin->r.currentOrigin, spawn_origin); 
-        } else
+        } 
+		else
         {
             // Find latest checkpoint
             for(; k < level.numCheckpoints; k++)
             {
-                if(ent->client->sess.checkpointVisited[k] == qfalse)
-                {
-                    VectorCopy(level.checkpoints[k-1]->r.currentOrigin, spawn_origin);
-                    break;
-                }
-            }
+				if(k != 0)
+				{
+					//Vallz: Counting every checekpoint you visited, so the end number is where you should spawn.
+					if(ent->client->sess.checkpointVisited[k] == qtrue)
+					{
+						p++;
+					}
+				}
+			}
+			VectorCopy(level.checkpoints[p]->r.currentOrigin, spawn_origin);
         }        
         
         VectorCopy( ent->s.angles, spawn_angles );
